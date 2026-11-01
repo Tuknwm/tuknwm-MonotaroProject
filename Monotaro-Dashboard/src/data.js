@@ -6,13 +6,39 @@ export const rupiah = (n) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0)
 
 export const labelOf = (row) =>
-  row ? row.name ?? row.fullname ?? row.code ?? row.title ?? `#${row.id}` : '—'
+  row ? row.name ?? row.fullname ?? row.code ?? row.title ?? row.value ?? `#${row.id}` : '—'
 
 const name = { key: 'name', label: 'Name', required: true }
 const jsonDataType = { key: 'jsonDataType', label: 'Data Type', options: ['string', 'number', 'boolean'], required: true }
 const unique = (key, message) => (row, db, table) =>
   db[table].some((r) => r.id !== row.id && String(r[key]).toLowerCase() === String(row[key]).toLowerCase()) && message
 const validPeriod = (row) => row.endDate && row.startDate > row.endDate && 'End date must be after start date.'
+
+// attribute values (ERD: SpecificationAttributeValue, ProductSkuAttributeValue): one value per owner + attribute,
+// typed by the attribute's jsonDataType
+const cleanValue = (row) => {
+  const v = String(row.value ?? '').trim()
+  return { ...row, value: /^(true|false)$/i.test(v) ? v.toLowerCase() : v }
+}
+const typeProblem = (type, v) =>
+  (type === 'number' && !Number.isFinite(Number(v)) && 'Value must be a number.') ||
+  (type === 'boolean' && !['true', 'false'].includes(v) && 'Value must be true or false.')
+const valueProblem = ({ owner, ownerKey, attrTable, attrKey }) => (row, db, table) => {
+  if (!row[ownerKey]) return `Choose a ${owner}.`
+  if (!row[attrKey]) return 'Choose an attribute.'
+  if (!row.value) return 'Value is required.'
+  if (db[table].some((r) => r.id !== row.id && r[ownerKey] === row[ownerKey] && r[attrKey] === row[attrKey]))
+    return `This ${owner} already has a value for that attribute. Edit that one instead.`
+  return typeProblem(db[attrTable].find((a) => a.id === row[attrKey])?.jsonDataType, row.value)
+}
+// a specification belongs to a category; it also applies to products in that category's subcategories
+const specFitsProduct = (row, db) => {
+  const product = db.products.find((p) => p.id === row.productId)
+  const spec = db.specificationAttributes.find((a) => a.id === row.specificationAttributeId)
+  const category = db.productCategories.find((c) => c.id === product.productCategoryId)
+  if (spec.productCategoryId === category?.id || spec.productCategoryId === category?.parentId) return false
+  return `${spec.name} only applies to ${labelOf(db.productCategories.find((c) => c.id === spec.productCategoryId))} products.`
+}
 
 // Field types: text (default), textarea, number, money, percent (stored 0–1), date, checkbox, password, email, stars.
 // `ref` points at another table; with type 'multi' it holds an array of ids.
@@ -47,6 +73,7 @@ export const TABLES = {
       { key: 'phoneNumber', label: 'Phone' },
       { key: 'accountType', label: 'Type' },
       { key: 'companyName', label: 'Company' },
+      { key: 'departmentName', label: 'Department' },
       { key: 'companyTypeId', label: 'Company Type', ref: 'companyTypes' },
       { key: 'companyClassificationId', label: 'Classification', ref: 'companyClassifications' },
       { key: 'employeeSizeCategoryId', label: 'Employees', ref: 'employeeSizes' },
@@ -98,6 +125,28 @@ export const TABLES = {
     fields: [{ key: 'productCategoryId', label: 'Category', ref: 'productCategories', required: true }, name, jsonDataType],
   },
   skuAttributes: { label: 'SKU Attributes', inlineEdit: true, fields: [name, jsonDataType] },
+  specificationValues: {
+    label: 'Specification Values', inlineEdit: true,
+    fields: [
+      { key: 'productId', label: 'Product', ref: 'products', required: true },
+      { key: 'specificationAttributeId', label: 'Specification', ref: 'specificationAttributes', required: true },
+      { key: 'value', label: 'Value', required: true, placeholder: 'e.g. 12' },
+    ],
+    normalize: cleanValue,
+    validate: (row, db, table) =>
+      valueProblem({ owner: 'product', ownerKey: 'productId', attrTable: 'specificationAttributes', attrKey: 'specificationAttributeId' })(row, db, table) ||
+      specFitsProduct(row, db),
+  },
+  skuAttributeValues: {
+    label: 'SKU Attribute Values', inlineEdit: true,
+    fields: [
+      { key: 'productSkuId', label: 'SKU', ref: 'productSkus', required: true },
+      { key: 'skuAttributeId', label: 'Attribute', ref: 'skuAttributes', required: true },
+      { key: 'value', label: 'Value', required: true, placeholder: 'e.g. Red' },
+    ],
+    normalize: cleanValue,
+    validate: valueProblem({ owner: 'SKU', ownerKey: 'productSkuId', attrTable: 'skuAttributes', attrKey: 'skuAttributeId' }),
+  },
   vouchers: {
     label: 'Vouchers', inlineEdit: true,
     fields: [
@@ -132,10 +181,13 @@ export const TABLES = {
     fields: [
       { key: 'productSkuId', label: 'SKU', ref: 'productSkus' },
       { key: 'customerAccountId', label: 'Customer', ref: 'customers' },
+      { key: 'reviewerName', label: 'Reviewer' },
       { key: 'stars', label: 'Stars', type: 'stars' },
       { key: 'title', label: 'Title' },
       { key: 'review', label: 'Review', type: 'textarea' },
+      { key: 'imagePath', label: 'Image Path', hideInList: true },
       { key: 'postedAt', label: 'Posted', type: 'date' },
+      { key: 'updatedAt', label: 'Updated', type: 'date', hideInList: true },
     ],
   },
   testimonies: {
@@ -150,9 +202,11 @@ export const TABLES = {
       { key: 'companyImagePath', label: 'Company Image Path', hideInList: true },
       { key: 'adminAccountId', label: 'Managed By', ref: 'admins', auto: true },
       { key: 'postedAt', label: 'Posted', type: 'date', auto: true },
+      { key: 'updatedAt', label: 'Updated', type: 'date', auto: true, hideInList: true },
     ],
     // the signed-in admin owns whatever they create
     defaults: (admin) => ({ adminAccountId: admin.id, postedAt: today() }),
+    normalize: (row) => ({ ...row, updatedAt: today() }),
   },
   orderStatuses: { label: 'Order Statuses', inlineEdit: true, fields: [name], validate: unique('name', 'Status already exists.') },
   vatRecords: {
@@ -325,6 +379,18 @@ export const seed = {
   skuAttributes: [
     { id: 1, name: 'Color', jsonDataType: 'string' }, { id: 2, name: 'Size', jsonDataType: 'string' },
   ],
+  specificationValues: [
+    { id: 1, productId: 1, specificationAttributeId: 1, value: '12' },
+    { id: 2, productId: 2, specificationAttributeId: 1, value: '230' },
+    { id: 3, productId: 3, specificationAttributeId: 2, value: 'Chrome vanadium' },
+    { id: 4, productId: 4, specificationAttributeId: 3, value: 'true' },
+    { id: 5, productId: 5, specificationAttributeId: 3, value: 'true' },
+  ],
+  skuAttributeValues: [
+    { id: 1, productSkuId: 1, skuAttributeId: 1, value: 'Teal' },
+    { id: 2, productSkuId: 5, skuAttributeId: 1, value: 'Clear' },
+    { id: 3, productSkuId: 7, skuAttributeId: 1, value: 'Black' },
+  ],
   products: [
     { id: 1, name: 'Makita Cordless Drill', brandId: 3, productCategoryId: 2, popularityCategoryId: 1, condition: 'New', description: 'Compact cordless driver drill for workshop use.' },
     { id: 2, name: 'Bosch Angle Grinder', brandId: 2, productCategoryId: 2, popularityCategoryId: 3, condition: 'New', description: '750W angle grinder, 100 mm disc.' },
@@ -343,11 +409,11 @@ export const seed = {
     { id: 7, productId: 6, skuNumber: 'KNK-HD10', name: 'Kenko HD-10 Stapler', price: 18500, unit: 'Pcs', unitAmount: 1, weightKg: 0.12, remainingStock: 200, imagePath: '/products/knk-hd10.jpg' },
   ],
   customers: [
-    { id: 1, fullname: 'Budi Santoso', email: 'budi@majujaya.co.id', phoneNumber: '081234567801', accountType: 'Business', companyName: 'PT Maju Jaya Teknik', companyTypeId: 1, companyClassificationId: 3, employeeSizeCategoryId: 2 },
-    { id: 2, fullname: 'Siti Rahma', email: 'siti.rahma@gmail.com', phoneNumber: '081234567802', accountType: 'Personal', companyName: '', companyTypeId: null, companyClassificationId: null, employeeSizeCategoryId: null },
-    { id: 3, fullname: 'Andi Wijaya', email: 'andi@sinarabadi.id', phoneNumber: '081234567803', accountType: 'Business', companyName: 'CV Sinar Abadi', companyTypeId: 2, companyClassificationId: 4, employeeSizeCategoryId: 1 },
-    { id: 4, fullname: 'Dewi Lestari', email: 'dewi@nusantarafood.co.id', phoneNumber: '081234567804', accountType: 'Business', companyName: 'PT Nusantara Food', companyTypeId: 1, companyClassificationId: 2, employeeSizeCategoryId: 3 },
-    { id: 5, fullname: 'Rizky Pratama', email: 'rizky.p@yahoo.com', phoneNumber: '081234567805', accountType: 'Personal', companyName: '', companyTypeId: null, companyClassificationId: null, employeeSizeCategoryId: null },
+    { id: 1, fullname: 'Budi Santoso', email: 'budi@majujaya.co.id', phoneNumber: '081234567801', accountType: 'Business', companyName: 'PT Maju Jaya Teknik', departmentName: 'Procurement', companyTypeId: 1, companyClassificationId: 3, employeeSizeCategoryId: 2 },
+    { id: 2, fullname: 'Siti Rahma', email: 'siti.rahma@gmail.com', phoneNumber: '081234567802', accountType: 'Personal', companyName: '', departmentName: '', companyTypeId: null, companyClassificationId: null, employeeSizeCategoryId: null },
+    { id: 3, fullname: 'Andi Wijaya', email: 'andi@sinarabadi.id', phoneNumber: '081234567803', accountType: 'Business', companyName: 'CV Sinar Abadi', departmentName: 'Purchasing', companyTypeId: 2, companyClassificationId: 4, employeeSizeCategoryId: 1 },
+    { id: 4, fullname: 'Dewi Lestari', email: 'dewi@nusantarafood.co.id', phoneNumber: '081234567804', accountType: 'Business', companyName: 'PT Nusantara Food', departmentName: 'Purchasing', companyTypeId: 1, companyClassificationId: 2, employeeSizeCategoryId: 3 },
+    { id: 5, fullname: 'Rizky Pratama', email: 'rizky.p@yahoo.com', phoneNumber: '081234567805', accountType: 'Personal', companyName: '', departmentName: '', companyTypeId: null, companyClassificationId: null, employeeSizeCategoryId: null },
   ],
   deliveryAddresses: [
     { id: 1, customerAccountId: 1, receiverName: 'Budi Santoso', receiverPhoneNumber: '081234567801', regionAddress: 'Kab. Bekasi, Kec. Cikarang Utara, 17530', detailedAddress: 'Kawasan Industri Jababeka Blok A No. 12' },
@@ -383,13 +449,13 @@ export const seed = {
     { id: 3, voucherId: 2, customerAccountId: 4 }, { id: 4, voucherId: 3, customerAccountId: 2 },
   ],
   reviews: [
-    { id: 1, productSkuId: 1, customerAccountId: 1, stars: 5, title: 'Solid and reliable', review: 'Battery lasts all day in our workshop.', postedAt: '2026-10-08' },
-    { id: 2, productSkuId: 6, customerAccountId: 4, stars: 4, title: 'Good quality', review: 'Comfortable fit, delivery was a bit slow.', postedAt: '2026-10-25' },
-    { id: 3, productSkuId: 7, customerAccountId: 2, stars: 2, title: 'Jams often', review: 'Stapler jams with thicker paper.', postedAt: '2026-10-30' },
+    { id: 1, productSkuId: 1, customerAccountId: 1, reviewerName: 'Budi S.', stars: 5, title: 'Solid and reliable', review: 'Battery lasts all day in our workshop.', imagePath: '/reviews/df333-workshop.jpg', postedAt: '2026-10-08', updatedAt: '2026-10-08' },
+    { id: 2, productSkuId: 6, customerAccountId: 4, reviewerName: 'Dewi L.', stars: 4, title: 'Good quality', review: 'Comfortable fit, delivery was a bit slow.', imagePath: '', postedAt: '2026-10-25', updatedAt: '2026-10-26' },
+    { id: 3, productSkuId: 7, customerAccountId: 2, reviewerName: 'Siti R.', stars: 2, title: 'Jams often', review: 'Stapler jams with thicker paper.', imagePath: '', postedAt: '2026-10-30', updatedAt: '2026-10-30' },
   ],
   testimonies: [
-    { id: 1, companyName: 'PT Maju Jaya Teknik', companyCity: 'Bekasi', companyType: 'Manufacturing', representativeFullName: 'Budi Santoso', representativePosition: 'Procurement Manager', description: 'Ordering tools for our plant is fast and the prices are clear.', companyImagePath: '/testimonies/majujaya.png', adminAccountId: 1, postedAt: '2026-09-12' },
-    { id: 2, companyName: 'PT Nusantara Food', companyCity: 'Tangerang', companyType: 'Food & Beverage', representativeFullName: 'Dewi Lestari', representativePosition: 'Purchasing Lead', description: 'Blanket orders save our team hours every month.', companyImagePath: '/testimonies/nusantara.png', adminAccountId: 2, postedAt: '2026-10-01' },
+    { id: 1, companyName: 'PT Maju Jaya Teknik', companyCity: 'Bekasi', companyType: 'Manufacturing', representativeFullName: 'Budi Santoso', representativePosition: 'Procurement Manager', description: 'Ordering tools for our plant is fast and the prices are clear.', companyImagePath: '/testimonies/majujaya.png', adminAccountId: 1, postedAt: '2026-09-12', updatedAt: '2026-09-12' },
+    { id: 2, companyName: 'PT Nusantara Food', companyCity: 'Tangerang', companyType: 'Food & Beverage', representativeFullName: 'Dewi Lestari', representativePosition: 'Purchasing Lead', description: 'Blanket orders save our team hours every month.', companyImagePath: '/testimonies/nusantara.png', adminAccountId: 2, postedAt: '2026-10-01', updatedAt: '2026-10-15' },
   ],
   rfqs: [
     { id: 1, customerAccountId: 1, brandName: 'Makita', productName: 'Makita HR2470 Rotary Hammer', quantity: 15, budget: 30000000, documentFilePath: 'rfq-majujaya-hr2470.pdf', productUrl: 'https://www.monotaro.id/' },

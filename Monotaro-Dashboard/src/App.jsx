@@ -4,7 +4,7 @@ import Dashboard from './Dashboard.jsx'
 import { seed } from './data.js'
 
 // bump the version when the seed shape changes, so old saved data is ignored
-const STORE = 'monotaro-demo-v3'
+const STORE = 'monotaro-demo-v4'
 const ADMIN_STORE = `${STORE}-admin`
 
 // storage can be blocked (private mode, cleared site data); the demo then just runs in memory

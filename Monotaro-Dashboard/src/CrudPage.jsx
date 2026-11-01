@@ -164,7 +164,8 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
       </div>
       {!cfg.readOnly && isPhone && fab && <Fab label={`Add ${cfg.label}`} onClick={() => open()} />}
 
-      {error && !editing && <div className="alert" role="alert">{error}</div>}
+      {/* the sheet and the dialog show their own error; inline editing needs it here */}
+      {error && !inSheet && !(editing && !cfg.inlineEdit) && <div className="alert" role="alert">{error}</div>}
 
       <ScrollTable>
         <table className="stack">

@@ -1744,3 +1744,23 @@ tbody tr.row-editing td.actions { display: flex; justify-content: flex-end; gap:
 .login .login-submit svg { transition: transform 0.15s; }
 .login .login-submit:hover svg { transform: translateX(3px); }
 .login .login-submit { justify-content: flex-end; padding: 0; }
+
+/* value tables: the product / SKU name gets the most room (columns sum to 100% with the 33% action column) */
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(1),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(1) { width: 33%; }
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(2),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(2) { width: 17%; }
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(3),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(3) { width: 17%; }
+.catalog-specificationValues tbody td:not(.actions),
+.catalog-skuAttributeValues tbody td:not(.actions) { white-space: normal; overflow-wrap: break-word; }
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(1),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(1) { width: 26%; }
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(2),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(2) { width: 24%; }
+.catalog-specificationValues .table-wrap :is(th, td):nth-child(3),
+.catalog-skuAttributeValues .table-wrap :is(th, td):nth-child(3) { width: 22%; }
+.catalog-specificationValues .table-wrap :is(th, td):last-child,
+.catalog-skuAttributeValues .table-wrap :is(th, td):last-child { width: 28%; }
+.catalog-specificationValues tbody td:not(.actions),
+.catalog-skuAttributeValues tbody td:not(.actions) { overflow-wrap: normal; }
