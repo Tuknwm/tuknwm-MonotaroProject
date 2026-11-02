@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BadgeCheck, FolderTree, ListChecks, SlidersHorizontal, Tag, Tags } from 'lucide-react'
+import { BadgeCheck, FolderTree, SlidersHorizontal, Tags } from 'lucide-react'
 import CrudPage from './CrudPage.jsx'
 import { AddPicker, useIsPhone } from './BottomSheet.jsx'
 
@@ -8,10 +8,8 @@ const SECTIONS = [
   ['productCategories', 'Categories', FolderTree],
   ['specificationAttributes', 'Specifications', SlidersHorizontal],
   ['skuAttributes', 'SKU Attributes', Tags],
-  ['specificationValues', 'Specification Values', ListChecks],
-  ['skuAttributeValues', 'SKU Attribute Values', Tag],
 ]
-const ROWS = [SECTIONS.slice(0, 2), SECTIONS.slice(2, 4), SECTIONS.slice(4)]
+const ROWS = [SECTIONS.slice(0, 2), SECTIONS.slice(2, 4)]
 
 export default function CatalogPage({ db, setDb, admin }) {
   const isPhone = useIsPhone()

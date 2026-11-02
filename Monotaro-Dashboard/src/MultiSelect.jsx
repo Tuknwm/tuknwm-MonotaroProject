@@ -6,6 +6,7 @@ const MAX_HEIGHT = 280
 
 export default function MultiSelect({ value = [], options, onChange, placeholder = 'Select…' }) {
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [pos, setPos] = useState(null)
   const btnRef = useRef(null)
   const listRef = useRef(null)
@@ -16,6 +17,11 @@ export default function MultiSelect({ value = [], options, onChange, placeholder
     : value.length === 1
     ? options.find((o) => o.value === value[0])?.label ?? `${value.length} selected`
     : `${value.length} selected`
+
+  const close = () => {
+    setClosing(true)
+    setTimeout(() => { setOpen(false); setClosing(false) }, 140)
+  }
 
   const show = () => {
     const r = btnRef.current.getBoundingClientRect()
@@ -38,7 +44,7 @@ export default function MultiSelect({ value = [], options, onChange, placeholder
   useEffect(() => {
     if (!open) return
     const inside = (e) => listRef.current?.contains(e.target) || btnRef.current?.contains(e.target)
-    const onPointer = (e) => !inside(e) && setOpen(false)
+    const onPointer = (e) => !inside(e) && close()
     const onScroll = (e) => !listRef.current?.contains(e.target) && setOpen(false)
     document.addEventListener('pointerdown', onPointer)
     window.addEventListener('scroll', onScroll, true)
@@ -57,15 +63,15 @@ export default function MultiSelect({ value = [], options, onChange, placeholder
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
-        onClick={() => (open ? setOpen(false) : show())}
-        onKeyDown={(e) => e.key === 'Escape' && (e.preventDefault(), e.stopPropagation(), setOpen(false))}
+        onClick={() => (open ? close() : show())}
+        onKeyDown={(e) => e.key === 'Escape' && (e.preventDefault(), e.stopPropagation(), close())}
       >
         <span className={value.length === 0 ? 'muted' : undefined}>{label}</span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
 
-      {open && createPortal(
-        <ul id={listId} ref={listRef} role="listbox" aria-multiselectable="true" className="select-list" style={pos}>
+      {(open || closing) && createPortal(
+        <ul id={listId} ref={listRef} role="listbox" aria-multiselectable="true" className={`select-list${closing ? ' closing' : ''}`} style={pos}>
           {options.map((o) => (
             <li
               key={o.value}
@@ -80,7 +86,6 @@ export default function MultiSelect({ value = [], options, onChange, placeholder
                 checked={value.includes(o.value)}
                 onChange={() => toggle(o.value)}
                 tabIndex={-1}
-                style={{ marginLeft: '0.5rem', accentColor: '#000' }}
               />
               <span>{o.label}</span>
             </li>

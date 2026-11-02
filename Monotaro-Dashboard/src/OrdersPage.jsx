@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Printer } from 'lucide-react'
+import { ChevronDown, Printer } from 'lucide-react'
 import { DELIVERY_FIELDS, changeOrderStatus, labelOf, orderTotals, rupiah, shippedCount } from './data.js'
 import { Field } from './CrudPage.jsx'
 import DeliveryNote from './DeliveryNote.jsx'
@@ -56,7 +56,6 @@ export default function OrdersPage({ db, setDb }) {
           options={[{ value: null, label: 'All statuses' }, ...statusOptions]}
           onChange={setStatusFilter}
         />
-        <span className="muted">{orders.length} of {db.orders.length}</span>
       </div>
 
       {error && <div className="alert" role="alert">{error}</div>}
@@ -67,11 +66,11 @@ export default function OrdersPage({ db, setDb }) {
           <thead>
             <tr>
               {[['id','Order'],['date','Date'],['customer','Customer']].map(([col,label]) => (
-                <th key={col}><button className="sort-btn" onClick={() => toggleSort(col)}>{label}<span className="sort-arrow" data-dir={sortCol===col ? (sortDir===1?'asc':'desc') : ''} /></button></th>
+                <th key={col}><button className="sort-btn" onClick={() => toggleSort(col)}>{label}<ChevronDown size={14} className={`sort-arrow${sortCol===col ? (sortDir===1?' asc':' desc') : ''}`} aria-hidden="true" /></button></th>
               ))}
               <th>Items</th>
               {[['total','Total'],['payment','Payment']].map(([col,label]) => (
-                <th key={col}><button className="sort-btn" onClick={() => toggleSort(col)}>{label}<span className="sort-arrow" data-dir={sortCol===col ? (sortDir===1?'asc':'desc') : ''} /></button></th>
+                <th key={col}><button className="sort-btn" onClick={() => toggleSort(col)}>{label}<ChevronDown size={14} className={`sort-arrow${sortCol===col ? (sortDir===1?' asc':' desc') : ''}`} aria-hidden="true" /></button></th>
               ))}
               <th>Status</th><th />
             </tr>
@@ -119,6 +118,7 @@ function OrderDetail({ order, db, setDb, onClose }) {
   const [delivery, setDelivery] = useState(order.delivery)
   const [shipped, setShipped] = useState(() => order.items.map((i) => i.shippedQty ?? 0))
   const [printing, setPrinting] = useState(false)
+  const [closing, setClosing] = useState(false)
   const t = orderTotals(order, db)
   const c = db.customers.find((x) => x.id === order.customerAccountId)
   const address = db.deliveryAddresses.find((a) => a.id === order.deliveryAddressId)
@@ -138,7 +138,13 @@ function OrderDetail({ order, db, setDb, onClose }) {
   const save = (e) => {
     e.preventDefault()
     persist()
-    onClose()
+    close()
+  }
+
+  const close = () => {
+    if (closing) return
+    setClosing(true)
+    window.setTimeout(onClose, 180)
   }
 
   // printing also saves, so the paper always matches what is stored
@@ -159,14 +165,14 @@ function OrderDetail({ order, db, setDb, onClose }) {
     setShipped(shipped.map((n, j) => (j === k ? Math.min(order.items[k].quantity, Math.max(0, Math.floor(value) || 0)) : n)))
 
   return (
-    <div className="overlay" onClick={onClose}>
+    <div className={`overlay${closing ? ' closing' : ''}`} onClick={close}>
       <form
-        className="modal modal-lg"
+        className={`modal modal-lg${closing ? ' closing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={`Order ${order.id}`}
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.key === 'Escape' && onClose()}
+        onKeyDown={(e) => e.key === 'Escape' && close()}
         onSubmit={save}
       >
         <h2>Order #{order.id} · {labelOf(db.orderStatuses.find((s) => s.id === order.orderStatusId))}</h2>
@@ -252,7 +258,7 @@ function OrderDetail({ order, db, setDb, onClose }) {
           <button type="button" className="btn btn-ghost print-btn" onClick={print}>
             <Printer size={16} aria-hidden="true" /> Print delivery note
           </button>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button type="button" className="btn btn-ghost" onClick={close}>Cancel</button>
           <button className="btn btn-primary">Save delivery</button>
         </div>
       </form>

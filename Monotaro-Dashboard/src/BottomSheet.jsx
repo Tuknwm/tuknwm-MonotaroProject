@@ -14,32 +14,70 @@ export const useIsPhone = () => useSyncExternalStore(subscribe, () => phone.matc
 // rendered into <body>: the page wrapper animates with a transform, which would drag fixed elements along
 const SWIPE_CLOSE = 100
 
-export default function BottomSheet({ title, onClose, children }) {
+// from: 'bottom' (default) slides up from the bottom edge; 'top' slides down from the top edge.
+// closeRef: gets the animated close function, so buttons inside (Cancel, Save) can close it with the same animation.
+const CLOSE_MS = 220
+
+// action: optional button shown on the title row (desktop Save)
+export default function BottomSheet({ title, onClose, children, from = 'bottom', closeRef, action }) {
+  const dir = from === 'top' ? -1 : 1
   const ref = useRef(null)
   const startY = useRef(null)
+  const drag = useRef(0)
+  const dragged = useRef(false)
+  const closingRef = useRef(false)
   const [dragY, setDragY] = useState(0)
+  const [closing, setClosing] = useState(false)
   useEffect(() => { ref.current?.focus() }, [])
 
-  // swipe down to close: only from the top of the sheet's scroll, so scrolling a long form still works
-  const onTouchStart = (e) => { startY.current = ref.current.scrollTop > 0 ? null : e.touches[0].clientY }
-  const onTouchMove = (e) => { if (startY.current != null) setDragY(Math.max(0, e.touches[0].clientY - startY.current)) }
-  const onTouchEnd = () => {
+  // slide out the way it came, then let the parent unmount it
+  const close = () => {
+    if (closingRef.current) return
+    closingRef.current = true
+    setClosing(true)
+    setTimeout(onClose, CLOSE_MS)
+  }
+  useEffect(() => { if (closeRef) closeRef.current = close })
+
+  const setDrag = (v) => { drag.current = v; setDragY(v) }
+  const moveTo = (y) => {
+    const v = Math.max(0, dir * (y - startY.current))
+    if (v > 5) dragged.current = true
+    setDrag(v)
+  }
+  const end = () => {
     if (startY.current == null) return
     startY.current = null
-    if (dragY > SWIPE_CLOSE) onClose()
-    else setDragY(0)
+    if (drag.current > SWIPE_CLOSE) close()
+    else setDrag(0)
+    setTimeout(() => { dragged.current = false })
+  }
+
+  // swipe it back toward its edge to close: only from the top of the sheet's scroll, so scrolling a long form still works
+  const onTouchStart = (e) => { startY.current = ref.current.scrollTop > 0 ? null : e.touches[0].clientY }
+  const onTouchMove = (e) => { if (startY.current != null) moveTo(e.touches[0].clientY) }
+  // the mouse drags from anywhere that isn't a control, so fields and buttons still click normally
+  const onMouseDown = (e) => {
+    if (e.button !== 0 || e.target.closest('input, textarea, button, a, label, .select-trigger')) return
+    startY.current = e.clientY
+    const move = (ev) => moveTo(ev.clientY)
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); end() }
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', up)
   }
 
   return createPortal(
-    <div className="sheet-overlay" onClick={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}
-        style={dragY ? { transform: `translateY(${dragY}px)`, transition: 'none' } : undefined}
+    <div className={`sheet-overlay${from === 'top' ? ' from-top' : ''}${closing ? ' closing' : ''}`}
+      onClick={() => { if (!dragged.current) close() }}>
+      <div className={`sheet${from === 'top' ? ' sheet-top' : ''}${closing ? ' closing' : ''}`} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}
+        style={dragY ? { transform: `translateY(${dir * dragY}px)`, transition: 'none' } : undefined}
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.key === 'Escape' && onClose()}
-        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}
+        onKeyDown={(e) => e.key === 'Escape' && close()}
+        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={end} onTouchCancel={end}
+        onMouseDown={onMouseDown}
       >
         <div className="sheet-handle" aria-hidden="true" />
-        <h2>{title}</h2>
+        {action ? <div className="sheet-head"><h2>{title}</h2>{action}</div> : <h2>{title}</h2>}
         {children}
       </div>
     </div>,

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { ChevronDown, Eye, EyeOff, Pen, Search } from 'lucide-react'
 import BottomSheet, { Fab, useIsPhone } from './BottomSheet.jsx'
 import ScrollTable from './ScrollTable.jsx'
+import ConfirmDialog from './ConfirmDialog.jsx'
 import { TABLES, inUse, labelOf, nextId, rupiah } from './data.js'
 import Select from './Select.jsx'
 import MultiSelect from './MultiSelect.jsx'
@@ -42,14 +43,14 @@ const placeholderFor = (f) => f.placeholder ?? EXAMPLES[f.key] ?? (
   `e.g. ${f.label}`
 )
 
-export function Field({ f, db, value, onChange, selfId }) {
+export function Field({ f, db, value, onChange, selfId, allow }) {
   if (f.type === 'multi') {
     const options = db[f.ref].map((r) => ({ value: r.id, label: labelOf(r) }))
     return <MultiSelect value={value ?? []} options={options} onChange={onChange} placeholder={f.placeholder ?? 'Select…'} />
   }
   if (f.ref || f.options) {
     const options = f.ref
-      ? db[f.ref].filter((r) => r.id !== selfId).map((r) => ({ value: r.id, label: labelOf(r) }))
+      ? db[f.ref].filter((r) => r.id !== selfId && (!allow || allow(r))).map((r) => ({ value: r.id, label: labelOf(r) }))
       : f.options.map((o) => ({ value: o, label: o }))
     return (
       <Select
@@ -64,6 +65,7 @@ export function Field({ f, db, value, onChange, selfId }) {
   if (f.type === 'textarea') return <textarea rows={3} value={value ?? ''} required={f.required} placeholder={placeholderFor(f)} onChange={(e) => onChange(e.target.value)} />
 
   const numeric = ['number', 'money', 'percent'].includes(f.type)
+  if (f.type === 'password') return <PasswordField value={value ?? ''} required={f.required} onChange={onChange} />
   return (
     <input
       type={numeric ? 'number' : f.type || 'text'}
@@ -78,11 +80,36 @@ export function Field({ f, db, value, onChange, selfId }) {
   )
 }
 
+function PasswordField({ value, required, onChange }) {
+  const [show, setShow] = useState(false)
+  return (
+    <span className="pw-wrap">
+      <input type={show ? 'text' : 'password'} value={value} required={required} placeholder="Password"
+        autoComplete="new-password" onChange={(e) => onChange(e.target.value)} />
+      <button type="button" className="pw-eye" aria-label={show ? 'Hide password' : 'Show password'} onClick={() => setShow(v => !v)}>
+        {show ? <EyeOff size={16} strokeWidth={1.5} aria-hidden="true" /> : <Eye size={16} strokeWidth={1.5} aria-hidden="true" />}
+      </button>
+    </span>
+  )
+}
+
 const NUMERIC = new Set(['number', 'money', 'percent', 'stars'])
 
 // fab: show this table's own + on phones (off when the page has one shared + for several tables)
 // addSignal: a counter the page bumps to open this table's add form from outside
-export default function CrudPage({ table, db, setDb, admin, fab = true, addSignal }) {
+// scope: { field: value } shows only matching rows, hides those fields and pre-fills them on add
+// extraCell: { [extra column label]: (row) => content } replaces that extra column's cell
+// refFilter: { [ref field key]: (option row) => bool } limits that dropdown's choices
+// where: (row) => bool shows only matching rows, for conditions scope can't express
+// desktopSheet: desktop add/edit opens a sheet sliding from this edge ('top'); phones always use a bottom sheet
+// lucide's trash without its two inner lines, for a cleaner row action
+const TrashIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+)
+
+export default function CrudPage({ table, db, setDb, admin, fab = true, addSignal, scope = {}, extraCell = {}, refFilter = {}, where, desktopSheet = 'top' }) {
   const cfg = TABLES[table]
   const isPhone = useIsPhone()
   const [query, setQuery] = useState('')
@@ -97,9 +124,11 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
     else { setSortCol(key); setSortDir(1) }
   }
 
-  const columns = cfg.fields.filter((f) => !f.hideInList && (f.type !== 'password' || cfg.inlineEdit))
+  const scoped = (f) => f.key in scope
+  const columns = cfg.fields.filter((f) => !f.hideInList && !scoped(f) && (f.type !== 'password' || cfg.inlineEdit))
+  const all = db[table].filter((r) => Object.entries(scope).every(([k, v]) => r[k] === v) && (!where || where(r)))
   const q = query.trim().toLowerCase()
-  const filtered = db[table].filter(
+  const filtered = all.filter(
     (r) => !q || columns.some((f) => display(db, f, r[f.key]).toLowerCase().includes(q)),
   )
   const rows = sortCol
@@ -113,13 +142,15 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
 
   const open = (row) => {
     setError('')
-    setEditing(row ?? { ...cfg.defaults?.(admin) })
+    setEditing(row ?? { ...cfg.defaults?.(admin), ...scope })
   }
   const cancel = () => { setEditing(null); setError('') }
   // on phones a row is added or edited in a bottom sheet instead of inline cells you'd have to scroll across
-  const inSheet = isPhone && editing && !cfg.readOnly
+  const inSheet = (isPhone || desktopSheet) && editing && !cfg.readOnly
 
   useEffect(() => { if (addSignal) open() }, [addSignal]) // eslint-disable-line react-hooks/exhaustive-deps
+  const sheetClose = useRef(null) // the sheet's animated close, set while it's open
+  const formId = useId()
 
   const save = (e) => {
     e?.preventDefault()
@@ -132,8 +163,13 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
         ? { ...db, [table]: list.map((r) => (r.id === row.id ? row : r)) }
         : { ...db, [table]: [...list, { ...row, id: nextId(list) }] }
     })
-    setEditing(null)
+    if (inSheet && sheetClose.current) sheetClose.current()
+    else setEditing(null)
   }
+
+  // why a row can't be deleted (or false); its Delete button is shown greyed out with this as the tooltip
+  const deleteBlock = (row) =>
+    (cfg.hideDelete?.(row) && 'The main admin account cannot be deleted.') || cfg.canDelete?.(row, admin) || inUse(db, table, row.id)
 
   const remove = (row) => {
     const problem = cfg.canDelete?.(row, admin) || inUse(db, table, row.id)
@@ -159,8 +195,11 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
           <Search size={16} aria-hidden="true" />
           <input type="search" placeholder="Search…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search" />
         </div>
-        <span className="muted">{rows.length} of {db[table].length}</span>
-        {!cfg.readOnly && !isPhone && <button className="btn btn-primary" onClick={() => open()}>Add new</button>}
+        {!cfg.readOnly && !isPhone && (
+          <button className="btn btn-primary toolbar-add" onClick={() => open()} aria-label={`New ${cfg.label}`}>
+            New
+          </button>
+        )}
       </div>
       {!cfg.readOnly && isPhone && fab && <Fab label={`Add ${cfg.label}`} onClick={() => open()} />}
 
@@ -175,7 +214,7 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
                 <th key={f.key}>
                   <button className="sort-btn" onClick={() => toggleSort(f.key)}>
                     {f.label}
-                    <span className="sort-arrow" data-dir={sortCol === f.key ? (sortDir === 1 ? 'asc' : 'desc') : ''} />
+                    <ChevronDown size={14} className={`sort-arrow${sortCol===f.key ? (sortDir===1 ? ' asc' : ' desc') : ''}`} aria-hidden="true" />
                   </button>
                 </th>
               ))}
@@ -184,11 +223,11 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
             </tr>
           </thead>
           <tbody>
-            {cfg.inlineEdit && editing && !editing.id && !isPhone && (
+            {cfg.inlineEdit && editing && !editing.id && !inSheet && (
               <tr className="row-editing">
                 {columns.map((f) => (
                   <td key={f.key} data-label={f.label}>
-                    <Field f={f} db={db} value={editing[f.key]} onChange={(v) => setEditing({ ...editing, [f.key]: v })} />
+                    <Field f={f} db={db} value={editing[f.key]} allow={refFilter[f.key]} onChange={(v) => setEditing({ ...editing, [f.key]: v })} />
                   </td>
                 ))}
                 {cfg.extra?.map((x) => <td key={x.label} />)}
@@ -199,17 +238,17 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
               </tr>
             )}
             {rows.map((r) => {
-              const isInlineEditing = cfg.inlineEdit && editing?.id === r.id && !isPhone
+              const isInlineEditing = cfg.inlineEdit && editing?.id === r.id && !inSheet
               return (
                 <tr key={r.id} className={isInlineEditing ? 'row-editing' : undefined}>
                   {columns.map((f) => (
                     <td key={f.key} data-label={f.label}>
                       {isInlineEditing
-                        ? <Field f={f} db={db} value={editing[f.key]} onChange={(v) => setEditing({ ...editing, [f.key]: v })} />
+                        ? <Field f={f} db={db} value={editing[f.key]} allow={refFilter[f.key]} onChange={(v) => setEditing({ ...editing, [f.key]: v })} />
                         : display(db, f, r[f.key])}
                     </td>
                   ))}
-                  {cfg.extra?.map((x) => <td key={x.label} data-label={x.label}>{x.get(r, db)}</td>)}
+                  {cfg.extra?.map((x) => <td key={x.label} data-label={x.label}>{extraCell[x.label] ? extraCell[x.label](r) : x.get(r, db)}</td>)}
                   <td className="actions">
                     {isInlineEditing ? (
                       <span className="action-buttons">
@@ -220,10 +259,16 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
                       <span className="action-buttons">
                         {!cfg.noView && (cfg.readOnly
                           ? <button className="btn btn-ghost" onClick={() => open(r)}>View</button>
-                          : <button className="btn btn-ghost" onClick={() => open(r)}>Edit</button>)}
-                        {!cfg.noDelete && !cfg.hideDelete?.(r) && !inUse(db, table, r.id)
-                          ? <button className="btn btn-danger" onClick={() => remove(r)}>Delete</button>
-                          : <span className="action-spacer" aria-hidden="true" />}
+                          : <button className="btn btn-ghost btn-icon" aria-label={`Edit ${labelOf(r)}`} title="Edit" onClick={() => open(r)}><Pen size={15} strokeWidth={1.5} aria-hidden="true" /></button>)}
+                        {cfg.noDelete
+                          ? <span className="action-spacer" aria-hidden="true" />
+                          : (() => {
+                              const why = deleteBlock(r)
+                              return (
+                                <button className="btn btn-danger btn-icon" aria-disabled={why ? true : undefined} aria-label={`Delete ${labelOf(r)}`} title={why || 'Delete'}
+                                  onClick={() => { if (!why) remove(r) }}><TrashIcon /></button>
+                              )
+                            })()}
                       </span>
                     )}
                   </td>
@@ -238,39 +283,32 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
       </ScrollTable>
 
       {confirmDelete && (
-        <div className="overlay" onClick={() => setConfirmDelete(null)}>
-          <div className="modal modal-sm" role="dialog" aria-modal="true" aria-label="Confirm delete"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.key === 'Escape' && setConfirmDelete(null)}
-            tabIndex={-1}
-          >
-            <h2>Delete?</h2>
-            <p>Are you sure you want to delete <strong>{deleteLabel}</strong>? This cannot be undone.</p>
-            <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setConfirmDelete(null)} autoFocus>Cancel</button>
-              <button className="btn btn-danger" onClick={doDelete}>Delete</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog title="Delete?" actionLabel="Delete" onAction={doDelete} onCancel={() => setConfirmDelete(null)}>
+          Are you sure you want to delete <strong>{deleteLabel}</strong>? This cannot be undone.
+        </ConfirmDialog>
       )}
 
       {inSheet && (
-        <BottomSheet title={`${editing.id ? 'Edit' : 'Add'} ${cfg.label}`} onClose={cancel}>
-          <form className="sheet-form" onSubmit={save}>
+        <BottomSheet title={isPhone ? `${editing.id ? 'Edit' : 'Add'} ${cfg.label}` : <>{editing.id ? <u>Edit</u> : <u>Add</u>} {cfg.label}</>} onClose={cancel} from={isPhone ? 'bottom' : desktopSheet} closeRef={sheetClose}
+          action={!isPhone && <button className="btn btn-primary" form={formId}>Save</button>}>
+          <form className="sheet-form" id={formId} onSubmit={save}>
             <div className="fields">
-              {cfg.fields.filter((f) => !f.auto).map((f) => (
-                <label key={f.key}>
+              {cfg.fields.filter((f) => !f.auto && !scoped(f)).map((f) => (
+                <label key={f.key} className={f.type === 'checkbox' ? 'field-checkbox' : undefined}>
                   <span>{f.label}{f.required && ' *'}</span>
-                  <Field f={f} db={db} value={editing[f.key]} selfId={f.ref === table ? editing.id : undefined}
+                  <Field f={f} db={db} value={editing[f.key]} selfId={f.ref === table ? editing.id : undefined} allow={refFilter[f.key]}
                     onChange={(v) => setEditing({ ...editing, [f.key]: v })} />
                 </label>
               ))}
             </div>
             {error && <div className="alert" role="alert">{error}</div>}
-            <div className="sheet-actions">
-              <button type="button" className="btn btn-ghost" onClick={cancel}>Cancel</button>
-              <button className="btn btn-primary">Save</button>
-            </div>
+            {/* desktop: Save sits on the title row instead, and Esc / outside click / drag close it */}
+            {isPhone && (
+              <div className="sheet-actions">
+                <button type="button" className="btn btn-ghost" onClick={() => sheetClose.current()}>Cancel</button>
+                <button className="btn btn-primary">Save</button>
+              </div>
+            )}
           </form>
         </BottomSheet>
       )}

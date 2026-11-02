@@ -8,8 +8,8 @@ const UNPAID = ['Pending Payment', 'Cancelled']
 const WAITING_ON_US = ['Paid', 'Processing']
 
 // one colour per subject, kept the same everywhere it appears on the screen
-const STAGE_HUE = { 'Pending Payment': '#ca8a04', Paid: '#ca8a04', Processing: '#ca8a04', Shipped: '#ca8a04', Completed: '#ca8a04' }
-const CATEGORY_HUE = { Safety: '#ca8a04', 'Power Tools': '#ca8a04', 'Hand Tools': '#ca8a04', 'Office Supplies': '#ca8a04', Tools: '#ca8a04' }
+const STAGE_HUE = { 'Pending Payment': '#1d1f20', Paid: '#1d1f20', Processing: '#1d1f20', Shipped: '#1d1f20', Completed: '#1d1f20' }
+const CATEGORY_HUE = { Safety: '#1d1f20', 'Power Tools': '#1d1f20', 'Hand Tools': '#1d1f20', 'Office Supplies': '#1d1f20', Tools: '#1d1f20' }
 
 const compactRp =(v) => (v >= 1e6 ? `Rp ${+(v / 1e6).toFixed(1)} jt` : v >= 1e3 ? `Rp ${Math.round(v / 1e3)} rb` : `Rp ${v}`)
 const count = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
@@ -20,6 +20,7 @@ const unitOf = (n, unit) => {
 
 export default function Overview({ db, go }) {
   const [metric, setMetric] = useState('revenue')
+  const [inclVat, setInclVat] = useState(false)
   const chartRef = useRef(null)
 
   const statusName = (o) => db.orderStatuses.find((s) => s.id === o.orderStatusId)?.name
@@ -46,15 +47,15 @@ export default function Overview({ db, go }) {
 
   const metrics = {
       revenue: {
-      label: 'Paid revenue', hue: '#ca8a04', values: cumulative(monthPaid, total), format: rupiah, tick: compactRp,
+      label: 'Paid revenue', hue: '#1d1f20', values: cumulative(monthPaid, total), format: rupiah, tick: compactRp,
       note: `${count(monthPaid.length, 'paid order')}, VAT and delivery included`,
     },
       orders: {
-      label: 'Orders placed', hue: '#ca8a04', values: cumulative(monthOrders, () => 1), format: (v) => String(v), tick: (v) => String(v),
+      label: 'Orders placed', hue: '#1d1f20', values: cumulative(monthOrders, () => 1), format: (v) => String(v), tick: (v) => String(v),
       note: `${monthOrders.length - monthPaid.length} unpaid or cancelled`,
     },
       units: {
-      label: 'Units sold', hue: '#ca8a04', values: cumulative(monthPaid, units), format: (v) => v.toLocaleString('id-ID'), tick: (v) => v.toLocaleString('id-ID'),
+      label: 'Units sold', hue: '#1d1f20', values: cumulative(monthPaid, units), format: (v) => v.toLocaleString('id-ID'), tick: (v) => v.toLocaleString('id-ID'),
       note: `in ${count(monthPaid.length, 'paid order')}`,
     },
   }
@@ -74,8 +75,12 @@ export default function Overview({ db, go }) {
     const product = db.products.find((p) => p.id === sku?.productId)
     return db.productCategories.find((c) => c.id === product?.productCategoryId)?.name ?? 'Uncategorised'
   }
+  const vatRate = (o) => db.vatRecords.find((v) => v.id === o.vatId)?.rateDecimal ?? 0
   const byCategory = {}
-  for (const o of monthPaid) for (const i of o.items) byCategory[categoryOf(i.productSkuId)] = (byCategory[categoryOf(i.productSkuId)] ?? 0) + i.quantity * i.price
+  for (const o of monthPaid) for (const i of o.items) {
+    const val = i.quantity * i.price * (inclVat ? 1 + vatRate(o) : 1)
+    byCategory[categoryOf(i.productSkuId)] = (byCategory[categoryOf(i.productSkuId)] ?? 0) + val
+  }
   const categoryRows = Object.entries(byCategory).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value)
   const categoryMax = categoryRows[0]?.value || 1
 
@@ -94,12 +99,6 @@ export default function Overview({ db, go }) {
   return (
     <div className="ov">
       <div className="ov-glow" aria-hidden="true"><span /><span /><span /><span /></div>
-      <div className="ov-head">
-        <p>{finding}</p>
-        {waiting.length > 0 && (
-          <button className="ov-primary" onClick={() => go('orders')}>Pack {count(waiting.length, 'order')}</button>
-        )}
-      </div>
 
       <div className="ov-top">
       <section className="ov-card" aria-labelledby="ov-sales">
@@ -125,39 +124,27 @@ export default function Overview({ db, go }) {
           <button className="ov-link" onClick={() => go('orders')}>All orders<ArrowRight size={14} strokeWidth={2} aria-hidden="true" /></button>
         </div>
         <ol className="ov-stages">
-          {stages.map((s) => {
+          {stages.filter((s) => WAITING_ON_US.includes(s.name)).map((s) => {
             const rows = db.orders.filter((o) => o.orderStatusId === s.id).sort((a, b) => a.orderDate.localeCompare(b.orderDate))
             return (
-              <li key={s.id} className="ov-stage" style={{ '--hue': STAGE_HUE[s.name] ?? '#ca8a04' }} data-waiting={WAITING_ON_US.includes(s.name) || undefined}>
+              <li key={s.id} className="ov-stage" style={{ '--hue': STAGE_HUE[s.name] ?? '#1d1f20' }} data-waiting>
                 <div className="ov-stage-head">
                   <span><i className="ov-dot" />{s.name}</span>
-                  {WAITING_ON_US.includes(s.name) && rows.length > 0 && <span className="badge">To pack</span>}
                 </div>
                 <strong className="ov-stage-count">{rows.length}</strong>
-                {rows.map((o) => {
-                  const { ordered, shipped } = shippedCount(o)
-                  return (
-                    <div key={o.id} className="ov-order">
-                      <div className="ov-order-line">
-                        <span>#{o.id} {customer(o.customerAccountId)}</span>
-                        <span className="ov-num">{rupiah(total(o))}</span>
-                      </div>
-                      {s.name === 'Shipped' && shipped < ordered && (
-                        <span className="ov-sub">{shipped} of {ordered} units shipped</span>
-                      )}
+                {rows.map((o) => (
+                  <div key={o.id} className="ov-order">
+                    <div className="ov-order-line">
+                      <span>#{o.id} {customer(o.customerAccountId)}</span>
+                      <span className="ov-num">{rupiah(total(o))}</span>
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
                 {!rows.length && <span className="ov-sub">None</span>}
               </li>
             )
           })}
         </ol>
-        {cancelled.length > 0 && (
-          <p className="ov-foot">
-            Cancelled in {monthName}: {cancelled.map((o) => `#${o.id} ${customer(o.customerAccountId)}, ${rupiah(total(o))}`).join(' · ')}
-          </p>
-        )}
       </section>
       </div>
 
@@ -165,7 +152,7 @@ export default function Overview({ db, go }) {
         <section className="ov-card" aria-labelledby="ov-cat">
           <div className="ov-card-head">
             <h2 id="ov-cat">Item sales by category</h2>
-            <span className="ov-meta">Before VAT</span>
+            <button className="ov-link" onClick={() => setInclVat((v) => !v)}>{inclVat ? 'After VAT' : 'Before VAT'}</button>
           </div>
           {categoryRows.length ? (
             <ul className="ov-bars">
@@ -173,7 +160,6 @@ export default function Overview({ db, go }) {
                 <li key={r.label} style={{ '--hue': CATEGORY_HUE[r.label] ?? '#ca8a04' }}>
                   <span>{r.label}</span>
                   <span className="ov-num">{rupiah(r.value)}</span>
-                  <span className="ov-bar" style={{ width: `${(r.value / categoryMax) * 100}%` }} />
                 </li>
               ))}
             </ul>
@@ -183,7 +169,7 @@ export default function Overview({ db, go }) {
         <section className="ov-card" aria-labelledby="ov-stock">
           <div className="ov-card-head">
             <h2 id="ov-stock">Low on stock</h2>
-            <button className="ov-link" onClick={() => go('productSkus')}>Manage<ArrowRight size={14} strokeWidth={2} aria-hidden="true" /></button>
+            <button className="ov-link" onClick={() => go('products')}>Manage<ArrowRight size={14} strokeWidth={2} aria-hidden="true" /></button>
           </div>
           <ul className="ov-list">
             {lowStock.map((s) => (

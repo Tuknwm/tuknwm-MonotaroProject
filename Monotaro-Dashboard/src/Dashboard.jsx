@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useIsPhone } from './BottomSheet.jsx'
 import {
-  BadgeCheck, Boxes, Building2, ChevronDown, CircleDot, ClipboardList, FileText, FolderTree, LayoutDashboard, Menu,
+  BadgeCheck, Boxes, Building2, ChevronDown, CircleDot, ClipboardList, FileText, FolderTree, LayoutDashboard, Library, Menu,
   MessageSquareQuote, Network, Package, PanelLeftClose, PanelLeftOpen, Percent, Receipt, Settings2, ShieldCheck,
   ShoppingCart, SlidersHorizontal, Star, Tags, TicketPercent, TrendingUp, Users, UsersRound,
 } from 'lucide-react'
@@ -12,11 +12,13 @@ import VouchersPage from './VouchersPage.jsx'
 import OrdersPage from './OrdersPage.jsx'
 import Overview from './Overview.jsx'
 import CatalogPage from './CatalogPage.jsx'
+import ProductsPage from './ProductsPage.jsx'
+import ConfirmDialog from './ConfirmDialog.jsx'
 
 const NAV = [
   [null, ['overview']],
   ['Sales', ['orders', 'rfqs', 'blanketOrders', 'customers']],
-  ['Catalog', ['products', 'productSkus', 'catalog']],
+  ['Catalog', ['products', 'catalog']],
   ['Marketing', ['vouchers', 'reviews', 'testimonies']],
   ['Settings', ['vatRecords', 'config', 'admins']],
 ]
@@ -26,7 +28,7 @@ const ICONS = {
   orders: ShoppingCart, rfqs: FileText, blanketOrders: ClipboardList, customers: Users,
   products: Package, productSkus: Boxes, brands: BadgeCheck, productCategories: FolderTree,
   popularityCategories: TrendingUp, specificationAttributes: SlidersHorizontal, skuAttributes: Tags,
-  catalog: Package,
+  catalog: Library,
   vouchers: TicketPercent, voucherUsages: Receipt, reviews: Star, testimonies: MessageSquareQuote,
   vatRecords: Percent, companyClassifications: Network, config: Settings2,
   employeeSizes: UsersRound, admins: ShieldCheck,
@@ -141,20 +143,10 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
       </aside>
 
       {confirm && (
-        <div className="overlay" onClick={() => setConfirming(null)}>
-          <div className="modal modal-sm" role="dialog" aria-modal="true" aria-label={confirm.title}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.key === 'Escape' && setConfirming(null)}
-            tabIndex={-1}
-          >
-            <h2>{confirm.title}</h2>
-            <p>{confirm.text}</p>
-            <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setConfirming(null)} autoFocus>Cancel</button>
-              <button className="btn btn-danger" onClick={() => { setConfirming(null); confirm.run() }}>{confirm.action}</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog title={confirm.title} actionLabel={confirm.action}
+          onAction={() => { setConfirming(null); confirm.run() }} onCancel={() => setConfirming(null)}>
+          {confirm.text}
+        </ConfirmDialog>
       )}
 
       <button
@@ -175,10 +167,20 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
         <div className={`page page-${page}`} key={page}>
           {page === 'overview' ? <Overview db={db} go={go} />
             : page === 'catalog' ? <CatalogPage db={db} setDb={setDb} admin={admin} />
+            : page === 'products' ? <ProductsPage db={db} setDb={setDb} admin={admin} />
             : page === 'orders' ? <OrdersPage db={db} setDb={setDb} />
             : page === 'vouchers' ? <VouchersPage db={db} setDb={setDb} admin={admin} />
             : page === 'config' ? <ConfigPage db={db} setDb={setDb} admin={admin} />
             : <CrudPage table={page} db={db} setDb={setDb} admin={admin} />}
+          {page === 'admins' && (
+            <footer className="about">
+              <p>Monotaro Dashboard is a demo admin panel for managing Monotaro.id data: orders, catalog, customers, vouchers and settings. All data is dummy and stored only in this browser.</p>
+              <a href="https://github.com/Tuknwm/tuknwm-MonotaroProject" target="_blank" rel="noreferrer">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" /></svg>
+                GitHub
+              </a>
+            </footer>
+          )}
         </div>
       </main>
     </div>

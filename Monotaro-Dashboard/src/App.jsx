@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Dashboard from './Dashboard.jsx'
 import { seed } from './data.js'
 
@@ -58,11 +58,12 @@ export default function App() {
 
   return (
     <main className="login">
+      <div className="login-wrap">
       <form className="form" onSubmit={handleSubmit}>
         <img src="/Logo.png" alt="Monotaro.id" />
 
         <h1>Welcome back</h1>
-        <p>Sign in to the Monotaro Ad Dashboard.</p>
+        <p>Sign in to the Monotaro Dashboard.</p>
 
         <label htmlFor="email">Email</label>
         <div className="login-field">
@@ -88,9 +89,10 @@ export default function App() {
           </div>
         )}
 
-        <button type="submit" className="login-submit">Login<ArrowRight size={18} strokeWidth={2} aria-hidden="true" /></button>
+        <button type="submit" className="btn login-submit">Login</button>
       </form>
       <p className="login-foot">Monotaro.id · Admin access only</p>
+      </div>
     </main>
   )
 }

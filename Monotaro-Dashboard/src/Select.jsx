@@ -8,6 +8,7 @@ const MAX_HEIGHT = 280
 // scrolling tables and modals don't clip it. options: [{ value, label }]
 export default function Select({ value, options, onChange, required, label, className }) {
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [active, setActive] = useState(0)
   const [pos, setPos] = useState(null)
   const buttonRef = useRef(null)
@@ -15,6 +16,12 @@ export default function Select({ value, options, onChange, required, label, clas
   const listId = useId()
   const index = options.findIndex((o) => o.value === value)
   const selected = options[index]
+
+  const CLOSE_MS = 140
+  const close = () => {
+    setClosing(true)
+    setTimeout(() => { setOpen(false); setClosing(false) }, CLOSE_MS)
+  }
 
   const show = () => {
     const r = buttonRef.current.getBoundingClientRect()
@@ -30,21 +37,22 @@ export default function Select({ value, options, onChange, required, label, clas
     })
     setActive(Math.max(0, index))
     setOpen(true)
+    setClosing(false)
   }
 
   const pick = (i) => {
     onChange(options[i].value)
-    setOpen(false)
+    close()
     buttonRef.current.focus()
   }
 
   useEffect(() => {
     if (!open) return
     const inside = (e) => listRef.current?.contains(e.target) || buttonRef.current?.contains(e.target)
-    const onPointer = (e) => !inside(e) && setOpen(false)
+    const onPointer = (e) => !inside(e) && close()
     // the list is fixed-positioned, so close it rather than let it drift away from its button
-    const onScroll = (e) => !listRef.current?.contains(e.target) && setOpen(false)
-    const onResize = () => setOpen(false)
+    const onScroll = (e) => !listRef.current?.contains(e.target) && setOpen(false)  // instant on scroll
+    const onResize = () => setOpen(false)  // instant on resize
     document.addEventListener('pointerdown', onPointer)
     window.addEventListener('scroll', onScroll, true)
     window.addEventListener('resize', onResize)
@@ -79,9 +87,9 @@ export default function Select({ value, options, onChange, required, label, clas
       // keep the surrounding modal or drawer open
       e.preventDefault()
       e.stopPropagation()
-      setOpen(false)
+      close()
     } else if (e.key === 'Tab') {
-      setOpen(false)
+      close()
     }
   }
 
@@ -97,7 +105,7 @@ export default function Select({ value, options, onChange, required, label, clas
         aria-controls={listId}
         aria-activedescendant={open ? `${listId}-${active}` : undefined}
         aria-label={label}
-        onClick={() => (open ? setOpen(false) : show())}
+        onClick={() => (open ? close() : show())}
         onKeyDown={onKeyDown}
       >
         <span className={selected ? undefined : 'muted'}>{selected?.label ?? '—'}</span>
@@ -118,7 +126,7 @@ export default function Select({ value, options, onChange, required, label, clas
       )}
 
       {open && createPortal(
-        <ul id={listId} ref={listRef} role="listbox" aria-label={label} className="select-list" style={pos}>
+        <ul id={listId} ref={listRef} role="listbox" aria-label={label} className={`select-list${closing ? " closing" : ""}`} style={pos}>
           {options.map((o, i) => (
             <li
               key={String(o.value)}

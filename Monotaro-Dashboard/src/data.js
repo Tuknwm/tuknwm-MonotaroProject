@@ -91,6 +91,7 @@ export const TABLES = {
       { key: 'description', label: 'Description', type: 'textarea', hideInList: true },
     ],
     extra: [
+      { label: 'Specs', get: (r, db) => db.specificationValues.filter((v) => v.productId === r.id).length },
       { label: 'SKUs', get: (r, db) => db.productSkus.filter((s) => s.productId === r.id).length },
       { label: 'Stock', get: (r, db) => db.productSkus.filter((s) => s.productId === r.id).reduce((n, s) => n + s.remainingStock, 0) },
     ],
@@ -154,10 +155,10 @@ export const TABLES = {
       { key: 'discountDecimal', label: 'Discount', type: 'percent', required: true, placeholder: '0.10' },
       { key: 'minPrice', label: 'Min. Purchase', type: 'money', required: true, placeholder: '100000' },
       { key: 'maxUses', label: 'Max Uses', type: 'number', required: true, placeholder: '50' },
-      { key: 'isForBusinessOnly', label: 'Business Only', type: 'checkbox' },
       { key: 'startDate', label: 'Start', type: 'date', required: true },
       { key: 'endDate', label: 'End', type: 'date', required: true },
       { key: 'categoryIds', label: 'Eligible Categories', ref: 'productCategories', type: 'multi', placeholder: 'Select categories…' },
+      { key: 'isForBusinessOnly', label: 'Business Only', type: 'checkbox' },
     ],
     extra: [
       { label: 'Used', get: (r, db) => `${db.voucherUsages.filter((u) => u.voucherId === r.id).length} / ${r.maxUses}` },
