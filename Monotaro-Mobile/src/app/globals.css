@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #e60012;
+}
+
+/* Shared form input/select style */
+.field { @apply w-full border border-neutral-300 rounded-[4px] px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand; }
+
+/* Hide scrollbar but keep scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes akun-form-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.akun-form-enter {
+  animation: akun-form-enter 420ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .akun-form-enter { animation: none; }
+}
+
+@keyframes page-transition {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-transition {
+  animation: page-transition 260ms ease-out both;
+}
+
+.section-transition {
+  animation: page-transition 260ms ease-out both;
+}
+
+.nav-item::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) scale(.86);
+  background: transparent;
+  transition: background-color 160ms ease, transform 160ms ease;
+  z-index: 0;
+}
+
+.nav-item:active::before {
+  background: #f5f5f5;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.nav-item > svg,
+.nav-item > span:not(.absolute) { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition { animation: none; }
+}
+
+/* Mobile lock: max 430px, centered on desktop */
+body {
+  background-color: #f0f0f0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+main {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  background-color: #ffffff;
+  overflow-x: clip;
+  position: relative;
+}
