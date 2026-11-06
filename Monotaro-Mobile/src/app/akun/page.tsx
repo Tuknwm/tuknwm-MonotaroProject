@@ -360,28 +360,28 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
         <div className="mb-2.5 flex items-center justify-between">
           <h2 className="text-[15px] font-bold text-neutral-900">Produk Terpopuler</h2>
         </div>
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           {POPULAR.slice(0, 8).map((p) => (
             <div key={p.name} className="flex flex-col rounded-[8px] border border-neutral-200 bg-white overflow-hidden">
-              <div className="relative h-[130px] bg-neutral-50">
+              <div className={`relative aspect-square w-full ${p.bg ?? "bg-neutral-50"}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.icon} alt={p.name} className="w-full h-full object-cover" />
+                <img src={p.icon} alt={p.name} className="w-full h-full object-contain" />
                 {p.discount && (
                   <span className="absolute top-2 left-0 bg-brand text-white text-[10px] font-bold px-1.5 py-0.5 rounded-r">
                     {p.discount}
                   </span>
                 )}
               </div>
-              <div className="p-2 flex flex-col gap-1 flex-1 justify-between">
-                <div>
-                  <p className="text-[11px] text-neutral-700 leading-snug line-clamp-2 min-h-[30px]">{p.name}</p>
+              <div className="p-3 flex flex-col gap-1.5 flex-1">
+                <p className="text-[11px] text-neutral-700 leading-snug line-clamp-2 min-h-[30px]">{p.name}</p>
+                <div className="mt-auto flex flex-col gap-1">
                   {p.oldPrice && <p className="text-[10px] text-neutral-400 line-through leading-none">{p.oldPrice}</p>}
                   <p className={`text-[13px] font-bold leading-none ${p.oldPrice ? "text-brand" : "text-neutral-900"}`}>{p.price}</p>
                   {p.unit && <p className="text-[10px] text-neutral-500 leading-none">{p.unit}</p>}
-                </div>
-                <div className="flex items-center gap-1 pt-0.5">
-                  <span className="text-[11px] tracking-[-1px] text-orange-500">★★★★★</span>
-                  <span className="text-[10px] text-neutral-500">({p.reviews})</span>
+                  <div className="flex items-center gap-1 pt-1">
+                    <span className="text-[11px] tracking-[-1px] text-orange-500">★★★★★</span>
+                    <span className="text-[10px] text-neutral-500">({p.reviews})</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -682,7 +682,7 @@ export default function AkunPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-neutral-50 flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       <header className="relative bg-white border-b border-neutral-200 px-4 py-3">
         <button
           type="button"

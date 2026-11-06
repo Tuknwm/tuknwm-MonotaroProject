@@ -24,7 +24,7 @@ export default function FaqPage() {
   const isEn = language === "en";
 
   return (
-    <main className="min-h-dvh bg-neutral-50">
+    <main className="min-h-dvh">
       <header className="relative flex items-center border-b border-neutral-200 bg-white px-4 py-3">
         <button type="button" aria-label={t("common.back")} onClick={backToAccount} className="text-neutral-500">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>

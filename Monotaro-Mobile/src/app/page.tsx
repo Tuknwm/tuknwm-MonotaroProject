@@ -1,9 +1,12 @@
 "use client";
 import { createPortal } from "react-dom";
 import { AkunContent } from "./akun/page";
+import { KeranjangContent } from "./keranjang/page";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCart } from "@/context/CartContext";
 import {
   ADVANTAGES, ALL_BRANDS, ARTICLES, BRANDS, CATEGORY_SECTIONS, FOOTER_LINKS, FOOTER_TABS, HERO, HIGHLIGHT,
   PAYMENTS, POPULAR, PROMOS, QUICK_LINKS, SERVICES, SHIPPING, SUPPORT, TOP_CATEGORIES, VALUE_PROPS,
@@ -35,23 +38,26 @@ function Stars() {
 }
 
 function ProductCard({ p, popular }: { p: Product; popular?: boolean }) {
+  const router = useRouter();
   return (
-    <div className="shrink-0 w-[140px] snap-start rounded-[8px] border border-neutral-200 overflow-hidden">
-      <div className="relative h-[120px] bg-neutral-50">
+    <button type="button" onClick={() => router.push("/produk/1")} className="shrink-0 w-[140px] snap-start rounded-[8px] border border-neutral-200 overflow-hidden text-left flex flex-col">
+      <div className={`relative aspect-square w-full ${p.bg ?? "bg-neutral-50"}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={p.icon} alt={p.name} className="w-full h-full object-cover" />
+        <img src={p.icon} alt={p.name} className="w-full h-full object-contain" />
         {p.discount && <span className="absolute top-2 left-0 bg-brand text-white text-[10px] font-bold px-1.5 py-0.5 rounded-r">{p.discount}</span>}
       </div>
-      <div className="p-2 flex flex-col gap-1">
+      <div className="p-2 flex flex-col gap-1 flex-1">
         <p className="text-[11px] text-neutral-700 leading-snug line-clamp-2 min-h-[30px]">{p.name}</p>
-        {p.oldPrice && <p className="text-[10px] text-neutral-400 line-through leading-none">{p.oldPrice}</p>}
-        <p className={`text-[13px] font-bold leading-none ${p.oldPrice ? "text-brand" : "text-neutral-900"}`}>{p.price}</p>
-        {p.unit && <p className="text-[10px] text-neutral-500 leading-none">{p.unit}</p>}
-        {popular && (
-          <div className="flex items-center gap-1"><Stars /><span className="text-[10px] text-neutral-500">({p.reviews})</span></div>
-        )}
+        <div className="mt-auto flex flex-col gap-1">
+          {p.oldPrice && <p className="text-[10px] text-neutral-400 line-through leading-none">{p.oldPrice}</p>}
+          <p className={`text-[13px] font-bold leading-none ${p.oldPrice ? "text-brand" : "text-neutral-900"}`}>{p.price}</p>
+          {p.unit && <p className="text-[10px] text-neutral-500 leading-none">{p.unit}</p>}
+          {popular && (
+            <div className="flex items-center gap-1"><Stars /><span className="text-[10px] text-neutral-500">({p.reviews})</span></div>
+          )}
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -251,7 +257,10 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
 }
 
 export default function Home() {
+  const router = useRouter();
   const { t } = useLanguage();
+  const { items: cartItems } = useCart();
+  const cartCount = cartItems.reduce((s, i) => s + i.qty, 0);
   const [showPromo, setShowPromo] = useState(false);
   const [promoVisible, setPromoVisible] = useState(false);
   const [promoPortal, setPromoPortal] = useState<HTMLElement | null>(null);
@@ -268,24 +277,35 @@ export default function Home() {
     setTimeout(() => { setShowPromo(false); localStorage.setItem("promo_seen", "1"); }, 300);
   }
   const [showAllBrands, setShowAllBrands] = useState(false);
-  const [section, setSection] = useState<"home" | "akun">(() => (
-    typeof window !== "undefined" && sessionStorage.getItem("open_account") === "1" ? "akun" : "home"
-  ));
+  const [section, setSection] = useState<"home" | "akun" | "keranjang">(() => {
+    if (typeof window === "undefined") return "home";
+    if (sessionStorage.getItem("open_account") === "1") return "akun";
+    if (sessionStorage.getItem("open_keranjang") === "1") return "keranjang";
+    return "home";
+  });
   const [qlDot, setQlDot] = useState(0);
   const qlRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem("open_account") === "1") {
-      sessionStorage.removeItem("open_account");
-    }
+    sessionStorage.removeItem("open_account");
+    sessionStorage.removeItem("open_keranjang");
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [section]);
+
+  // scroll to top on mount (e.g. navigating back from product page)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
   return (
-    <div className="min-h-dvh bg-neutral-100 pb-24 relative">
+    <div className="min-h-dvh pb-24 relative">
       {/* Header */}
       {section === "akun" && <div key="akun" className="section-transition"><AkunContent onBack={() => setSection("home")} /></div>}
-      {section === "home" && <div key="home" className="section-transition">
-      <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
+      {section === "keranjang" && <div key="keranjang" className="section-transition"><KeranjangContent /></div>}
+      {section === "home" && <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
         <div className="flex items-center justify-between mb-2.5">
           <Image src="/Logo.png" alt="monotaro.id" width={140} height={40} className="h-8 w-auto brightness-0 invert" priority />
           <div className="flex items-center gap-3 text-white">
@@ -299,9 +319,16 @@ export default function Home() {
         </div>
         <div className="relative flex items-center bg-white rounded-[8px] overflow-hidden px-3 gap-2">
           <svg className="w-4 h-4 shrink-0 text-neutral-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" d="m21 21-4.3-4.3M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" /></svg>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} type="search" name="product-search" autoComplete="off" autoCorrect="off" spellCheck={false} className="flex-1 min-w-0 py-2.5 pr-1 text-xs outline-none placeholder:text-neutral-400" placeholder={t("search.placeholder")} />
+          <div
+            role="button"
+            onClick={() => router.push("/cari")}
+            className="flex-1 min-w-0 py-2.5 pr-1 text-xs text-neutral-400 cursor-pointer select-none"
+          >
+            {t("search.placeholder")}
+          </div>
         </div>
-      </header>
+      </header>}
+      {section === "home" && <div key="home" className="section-transition">
 
       {/* Register promo popout — rendered via portal so it overlays correctly on mobile */}
       {showPromo && promoPortal && createPortal(
@@ -374,7 +401,7 @@ export default function Home() {
       </div>
 
       {/* Product Highlight */}
-      <section className="mt-3 py-4">
+      <section className="mt-3 py-4 bg-white">
         <SectionTitle title="PRODUCT HIGHLIGHT" action="" />
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex gap-2.5 px-4 w-max snap-x">
@@ -399,7 +426,7 @@ export default function Home() {
       </div>
 
       {/* Popular */}
-      <section className="mt-3 py-4">
+      <section className="mt-3 py-4 bg-white">
         <SectionTitle title={t("section.popular")} action="" />
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex gap-2.5 px-4 w-max snap-x">
@@ -414,7 +441,7 @@ export default function Home() {
         <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-4">
           {TOP_CATEGORIES.map((c) => (
             <button key={c.label} className="flex flex-col items-center gap-1.5">
-              <span className="w-16 h-16 rounded-[8px] overflow-hidden border border-neutral-100">
+              <span className="w-16 h-16 rounded-[8px] overflow-hidden border border-neutral-100 shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/KategoriUnggulan/${c.img}`} alt={c.label} className="w-full h-full object-cover" />
               </span>
@@ -430,7 +457,7 @@ export default function Home() {
         <div className="grid grid-cols-4 gap-2 px-4">
           {BRANDS.map((b) => (
             <div key={b.name} className="flex items-center justify-center">
-              <img src={`/BrandPopuler/${b.img}`} alt={b.name} className="h-10 w-auto rounded-[8px] object-contain" />
+              <img src={`/BrandPopuler/${b.img}`} alt={b.name} className="h-10 w-auto rounded-[8px] object-contain shadow-sm" />
             </div>
           ))}
         </div>
@@ -564,16 +591,18 @@ export default function Home() {
               aria-current={n.active ? "page" : undefined}
               onClick={() => {
                 if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(20);
-                if (n.label === "Akun") setSection("akun"); else setSection("home");
+                if (n.label === "Akun") setSection("akun");
+                else if (n.label === "Keranjang") setSection("keranjang");
+                else setSection("home");
               }}
               className={`nav-item flex-1 flex flex-col items-center gap-1 py-2 rounded-[18px] relative ${
-                (n.label === "Akun" ? section === "akun" : section === "home" && n.active) ? "text-brand" : "text-neutral-500"
+                (n.label === "Akun" ? section === "akun" : n.label === "Keranjang" ? section === "keranjang" : section === "home" && n.active) ? "text-brand" : "text-neutral-500"
               }`}
             >
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
                 {n.icon}
               </svg>
-              {n.badge && <span className="absolute top-1 left-1/2 ml-1.5 bg-brand text-white text-[9px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{n.badge}</span>}
+              {n.label === "Keranjang" && cartCount > 0 && <span className="absolute top-1 left-1/2 ml-1.5 bg-brand text-white text-[9px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{cartCount}</span>}
               <span className="text-[10px] font-semibold leading-none">{displayLabel}</span>
             </button>
           );

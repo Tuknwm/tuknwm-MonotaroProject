@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 @import "tailwindcss";
+
 
 @theme {
   --color-brand: #e60012;
@@ -26,12 +26,38 @@
 }
 
 @keyframes page-transition {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.page-transition {
-  animation: page-transition 260ms ease-out both;
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.page-content {
+  animation: page-transition 300ms ease-out both;
+  will-change: transform, opacity;
+}
+
+.page-slide-in {
+  animation: slide-in-right 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes cart-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.cart-bump {
+  animation: cart-bump 300ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-content, .page-slide-in { animation: none; }
 }
 
 .section-transition {
@@ -67,9 +93,10 @@
 /* Mobile lock: max 430px, centered on desktop */
 body {
   background-color: #f0f0f0;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: var(--font-jakarta), sans-serif;
   display: flex;
   justify-content: center;
+  min-height: 100dvh;
 }
 
 main {
@@ -77,6 +104,26 @@ main {
   max-width: 430px;
   min-height: 100dvh;
   background-color: #ffffff;
-  overflow-x: clip;
   position: relative;
+  isolation: isolate;
+}
+
+main::before {
+  content: '';
+  position: fixed;
+  top: 50svh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw, 430px);
+  height: min(100vw, 430px);
+  background: url('/Logo.png') center center no-repeat;
+  background-size: min(70vw, 260px) auto;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+main > * {
+  position: relative;
+  z-index: 1;
 }

@@ -164,6 +164,49 @@ export const DICTIONARY = {
   "faq.newsletter_label": { id: "Dapatkan info produk & promo terkini:", en: "Get the latest product updates & promotions:" },
   "faq.subscribe": { id: "Langganan", en: "Subscribe" },
 
+  // Cart page
+  "cart.title": { id: "Keranjang Belanja Anda", en: "Your Shopping Cart" },
+  "cart.empty": { id: "Keranjang kamu kosong", en: "Your cart is empty" },
+  "cart.empty_sub": { id: "Tambahkan produk untuk mulai belanja", en: "Add products to start shopping" },
+  "cart.select_all": { id: "Pilih Semua", en: "Select All" },
+  "cart.total_price": { id: "Total Harga", en: "Total Price" },
+  "cart.items_count": { id: "produk", en: "items" },
+  "cart.ppn": { id: "PPN 11%", en: "VAT 11%" },
+  "cart.total_order": { id: "Total Pesanan", en: "Order Total" },
+  "cart.checkout_btn": { id: "Lanjutkan ke Checkout", en: "Proceed to Checkout" },
+  "cart.wishlist_swipe": { id: "Wishlist", en: "Wishlist" },
+  "cart.add_to_cart": { id: "+ Keranjang", en: "+ Cart" },
+
+  // Wishlist page
+  "wishlist.empty": { id: "Wishlist kosong", en: "Wishlist is empty" },
+  "wishlist.empty_sub": { id: "Simpan produk favorit kamu di sini", en: "Save your favorite products here" },
+  "wishlist.start_shopping": { id: "Mulai Belanja", en: "Start Shopping" },
+  "wishlist.remove": { id: "Hapus", en: "Remove" },
+
+  // Product detail page
+  "product.filter_latest": { id: "Terbaru", en: "Latest" },
+  "product.filter_photo": { id: "Dengan Foto", en: "With Photos" },
+  "product.filter_top_rating": { id: "Rating tertinggi", en: "Highest Rating" },
+  "product.filter_low_rating": { id: "Rating terendah", en: "Lowest Rating" },
+  "product.reviews": { id: "Ulasan Produk", en: "Product Reviews" },
+  "product.cart_btn": { id: "Keranjang", en: "Cart" },
+  "product.buy_now": { id: "Beli Sekarang", en: "Buy Now" },
+
+  // Checkout page
+  "checkout.change_payment": { id: "Ubah Metode Pembayaran", en: "Change Payment Method" },
+  "checkout.select_payment_btn": { id: "Pilih Metode Pembayaran", en: "Select Payment Method" },
+  "checkout.use_address": { id: "Gunakan Alamat", en: "Use Address" },
+  "checkout.unavailable": { id: "Tidak Tersedia", en: "Not Available" },
+  "checkout.selected": { id: "Dipilih", en: "Selected" },
+  "checkout.select": { id: "Pilih", en: "Select" },
+  "checkout.pay_now": { id: "Bayar Sekarang", en: "Pay Now" },
+  "checkout.add_address": { id: "Tambah alamat", en: "Add address" },
+  "checkout.change_btn": { id: "Ubah", en: "Change" },
+  "checkout.total_order": { id: "Total Pesanan", en: "Order Total" },
+
+  // Settings
+  "settings.account_dashboard": { id: "Dashboard Akun", en: "Account Dashboard" },
+
   // Common buttons & labels
   "common.back": { id: "Kembali", en: "Back" },
   "common.close": { id: "Tutup", en: "Close" },

@@ -1,6 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Monotaro ID",
@@ -21,11 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" className={jakarta.variable}>
       <body>
         <LanguageProvider>
-          <main>{children}</main>
-          <div id="modal-root" />
+          <CartProvider>
+            <WishlistProvider>
+              <main>{children}</main>
+              <div id="modal-root" />
+            </WishlistProvider>
+          </CartProvider>
         </LanguageProvider>
       </body>
     </html>
