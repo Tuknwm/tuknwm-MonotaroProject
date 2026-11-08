@@ -208,7 +208,7 @@ export default function CheckoutPage() {
         {/* Alamat Pengiriman */}
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-bold text-neutral-900">Alamat Pengiriman</p>
+            <p className="text-xs font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
             <button type="button" onClick={() => setShowAlamat(true)} className="shrink-0 text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
               {alamat ? t("checkout.change_btn") : t("checkout.add_address")}
             </button>
@@ -218,7 +218,7 @@ export default function CheckoutPage() {
           ) : (
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-[8px] px-3 py-2">
               <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-              <p className="text-[11px] text-red-500">Silakan isi alamat pengiriman Anda untuk melanjutkan transaksi</p>
+              <p className="text-[11px] text-red-500">{t("checkout.fill_address")}</p>
             </div>
           )}
         </div>
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
         {/* Nomor PO & Faktur Pajak */}
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <p className="text-xs font-bold text-neutral-900">Nomor PO</p>
+            <p className="text-xs font-bold text-neutral-900">{t("checkout.po_number")}</p>
             <input
               type="text"
               value={noPO}
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
               Ubah produk
             </button>
           </div>
-          <p className="text-[11px] text-neutral-500">Total Berat Pengiriman (Estimasi {beratTotal.toFixed(1)} kg)</p>
+          <p className="text-[11px] text-neutral-500">{t("checkout.total_weight")} (Estimasi {beratTotal.toFixed(1)} kg)</p>
           <div className="border-t border-neutral-100 pt-3 flex flex-col gap-3">
             {items.map((item, i) => (
               <div key={i} className="flex gap-3">
@@ -319,11 +319,11 @@ export default function CheckoutPage() {
           <p className="text-xs font-bold text-neutral-900">Rangkuman Pesanan</p>
           <div className="flex flex-col gap-1.5 pt-1">
             <div className="flex justify-between">
-              <p className="text-xs text-neutral-500">Subtotal Sebelum PPN</p>
+              <p className="text-xs text-neutral-500">{t("checkout.subtotal_before_vat")}</p>
               <p className="text-xs font-semibold text-neutral-800">{formatRp(subtotal)}</p>
             </div>
             <div className="flex justify-between">
-              <p className="text-xs text-neutral-500">Biaya Pengiriman</p>
+              <p className="text-xs text-neutral-500">{t("checkout.shipping_cost")}</p>
               <p className="text-xs font-semibold text-neutral-800">Rp0</p>
             </div>
             <div className="flex justify-between">
@@ -447,7 +447,7 @@ export default function CheckoutPage() {
             </div>
             {/* Header */}
             <div className="flex items-start justify-between px-4 pt-2 pb-3 shrink-0">
-              <p className="text-lg font-bold text-neutral-900">Alamat Pengiriman</p>
+              <p className="text-lg font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
               <div className="flex flex-col items-end gap-1">
                 <button type="button" onClick={closeAlamat} className="text-neutral-400">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
@@ -578,7 +578,7 @@ export default function CheckoutPage() {
               <div className="w-10 h-1 rounded-full bg-neutral-300" />
             </div>
             <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
-              <p className="text-sm font-bold text-neutral-900">Pilih Metode Pembayaran</p>
+              <p className="text-sm font-bold text-neutral-900">{t("checkout.select_payment_title")}</p>
               <button type="button" onClick={closePayment} className="text-neutral-400">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
               </button>

@@ -45,7 +45,7 @@ const VARIANTS = [
   { sku: "S043477715", blister: "Shrink Pack 8 pcs",    sni: "-",   unit: "1pack(8pcs)",               price: "Rp35.900",    stock: "Ready Stock",    days: null },
   { sku: "S028361534", blister: "Box (48 pcs)",         sni: "-",   unit: "1box(48pcs)",               price: "Rp329.900",   stock: "Ready Stock",    days: null },
   { sku: "S028113195", blister: "Carton (288 pcs)",     sni: "Ya",  unit: "1carton(24packs/288pcs)",   price: "Rp1.899.900", stock: "Ready Stock",    days: null },
-  { sku: "S028113119", blister: "Carton (432 pcs)",     sni: "Ya",  unit: "1carton(72packs/432pcs)",   price: "Rp2.199.900", stock: null,             days: "3–7 hari kerja" },
+  { sku: "S028113119", blister: "Carton (432 pcs)",     sni: "Ya",  unit: "1carton(72packs/432pcs)",   price: "Rp2.199.900", stock: null,             days: "product.delivery_days" },
 ];
 
 function Stars({ count = 5 }: { count?: number }) {
@@ -62,16 +62,58 @@ export default function ProdukDetailPage() {
   const { addItem, items: cartItems } = useCart();
   const cartCount = cartItems.reduce((s, i) => s + i.qty, 0);
   const cartIconRef = useRef<HTMLButtonElement>(null);
+  const [product, setProduct] = useState(PRODUCT);
   const productImgRef = useRef<HTMLImageElement>(null);
   const [flyDot, setFlyDot] = useState<{ from: {x:number,y:number}; size: number; img: string; to: {x:number,y:number}; active: boolean } | null>(null);
   const [cartBump, setCartBump] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
   const { toggle: toggleWishlist, has: isWishlisted } = useWishlist();
-  const wishlisted = isWishlisted(PRODUCT.sku);
+  const wishlisted = isWishlisted(product.sku);
   const [specOpen, setSpecOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    const rawProduct = sessionStorage.getItem("selected_product");
+    if (!rawProduct) return;
+
+    try {
+      const selected = JSON.parse(rawProduct) as {
+        name?: string; price?: string; unit?: string; icon?: string; category?: string;
+      };
+      if (!selected.name || !selected.price || !selected.icon) return;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem("recently_viewed_products") ?? "[]");
+        const next = [selected, ...(Array.isArray(saved) ? saved : [])].filter((item, index, list) => item?.name && list.findIndex((candidate) => candidate?.name === item.name) === index).slice(0, 10);
+        localStorage.setItem("recently_viewed_products", JSON.stringify(next));
+      } catch { localStorage.removeItem("recently_viewed_products"); }
+
+      const sku = `DUMMY-${selected.name.replace(/[^a-z0-9]/gi, "").slice(0, 10).toUpperCase()}`;
+      const seed = encodeURIComponent(selected.name.slice(0, 24));
+      setProduct({
+        ...PRODUCT,
+        name: selected.name,
+        sku,
+        brand: selected.name.split(" ")[0],
+        price: Number(selected.price.replace(/[^0-9]/g, "")) || PRODUCT.price,
+        priceStr: selected.price,
+        unit: selected.unit ?? "1pc",
+        reviews: 8 + selected.name.length % 140,
+        images: [selected.icon, `https://picsum.photos/seed/${seed}-2/400/400`, `https://picsum.photos/seed/${seed}-3/400/400`],
+        specs: [
+          { label: "Kategori", value: selected.category ?? "Produk Industri" },
+          { label: "Unit", value: selected.unit ?? "1pc" },
+          { label: "Kondisi", value: "Baru" },
+          { label: "Stok", value: "Ready Stock" },
+        ],
+        descID: `${selected.name} adalah produk dummy untuk kebutuhan simulasi katalog Monotaro. Produk tersedia dalam kondisi baru dan siap dikirim.`,
+        descEN: `${selected.name} is dummy product data for the Monotaro catalog simulation. The product is new and ready to ship.`,
+      });
+    } catch {
+      sessionStorage.removeItem("selected_product");
+    }
+  }, []);
 
   // varian bottom sheet
   const [showSheet, setShowSheet] = useState(false);
@@ -79,7 +121,7 @@ export default function ProdukDetailPage() {
   const [sheetMode, setSheetMode] = useState<"keranjang" | "beli">("keranjang");
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
   const [qty, setQtyState] = useState(1);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [reviewFilter, setReviewFilter] = useState("product.filter_latest");
   const dragY = useRef(0);
   const startDragY = useRef(0);
@@ -141,7 +183,7 @@ export default function ProdukDetailPage() {
       ? { x: imgRect.left + imgRect.width / 2 - SIZE / 2, y: imgRect.top + imgRect.height / 2 - SIZE / 2 }
       : { x: window.innerWidth / 2 - SIZE / 2, y: window.innerHeight / 2 - SIZE / 2 };
     const to = { x: cartRect.left + cartRect.width / 2 - SIZE / 2, y: cartRect.top + cartRect.height / 2 - SIZE / 2 };
-    const img = PRODUCT.images[imgIdx];
+    const img = product.images[imgIdx];
     setFlyDot({ from, to, size: SIZE, img, active: false });
     requestAnimationFrame(() => requestAnimationFrame(() => setFlyDot((d) => d ? { ...d, active: true } : null)));
     setTimeout(() => { setCartBump(true); setTimeout(() => setCartBump(false), 300); }, 550);
@@ -150,7 +192,7 @@ export default function ProdukDetailPage() {
 
   function openSheet(mode: "keranjang" | "beli") {
     setSheetMode(mode);
-    setSelectedSku(PRODUCT.sku);
+    setSelectedSku(product.sku);
     setQtyState(1);
     setShowSheet(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setSheetVisible(true)));
@@ -188,11 +230,11 @@ export default function ProdukDetailPage() {
       <div className="bg-white">
         <div className="relative aspect-square w-full bg-neutral-50 overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img ref={productImgRef} src={PRODUCT.images[imgIdx]} alt={PRODUCT.name} className="w-full h-full object-contain p-4" />
+          <img ref={productImgRef} src={product.images[imgIdx]} alt={product.name} className="w-full h-full object-contain p-4" />
         </div>
         {/* Thumbnail strip */}
         <div className="flex gap-2 px-4 py-3">
-          {PRODUCT.images.map((src, i) => (
+          {product.images.map((src, i) => (
             <button
               key={i}
               type="button"
@@ -209,23 +251,23 @@ export default function ProdukDetailPage() {
       {/* Info utama */}
       <div className="bg-white mt-2 px-4 py-4 flex flex-col gap-2">
         {/* Brand */}
-        <span className="text-[11px] font-semibold text-brand uppercase tracking-wide">{PRODUCT.brand}</span>
+        <span className="text-[11px] font-semibold text-brand uppercase tracking-wide">{product.brand}</span>
         {/* Nama */}
-        <h1 className="text-sm font-bold text-neutral-900 leading-snug">{PRODUCT.name}</h1>
+        <h1 className="text-sm font-bold text-neutral-900 leading-snug">{product.name}</h1>
         {/* SKU */}
-        <p className="text-[11px] text-neutral-400">No. SKU: {PRODUCT.sku}</p>
+        <p className="text-[11px] text-neutral-400">No. SKU: {product.sku}</p>
         {/* Rating */}
         <div className="flex items-center gap-2 mt-1">
           <Stars />
-          <span className="text-xs text-neutral-500">{PRODUCT.reviews} Ulasan</span>
+          <span className="text-xs text-neutral-500">{product.reviews} {t("product.reviews_label")}</span>
           <span className="text-neutral-300">|</span>
-          <span className="text-[11px] text-neutral-500">{PRODUCT.sold}</span>
+          <span className="text-[11px] text-neutral-500">{product.sold}</span>
         </div>
         {/* Harga */}
         <div className="mt-2 p-3 bg-neutral-50 rounded-[8px]">
-          <p className="text-[11px] text-neutral-500 mb-0.5">Sebelum PPN</p>
-          <p className="text-xl font-extrabold text-brand">{PRODUCT.priceStr}</p>
-          <p className="text-[11px] text-neutral-400 mt-0.5">{PRODUCT.unit}</p>
+          <p className="text-[11px] text-neutral-500 mb-0.5">{t("product.before_vat")}</p>
+          <p className="text-xl font-extrabold text-brand">{product.priceStr}</p>
+          <p className="text-[11px] text-neutral-400 mt-0.5">{product.unit}</p>
         </div>
       </div>
 
@@ -236,13 +278,13 @@ export default function ProdukDetailPage() {
           className="w-full flex items-center justify-between px-4 py-4"
           onClick={() => setSpecOpen((o) => !o)}
         >
-          <span className="text-sm font-bold text-neutral-900">Spesifikasi Produk</span>
+          <span className="text-sm font-bold text-neutral-900">{t("product.specs_title")}</span>
           <svg className={`w-4 h-4 text-neutral-400 transition-transform ${specOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         {specOpen && (
           <table className="w-full text-xs mb-4">
             <tbody>
-              {PRODUCT.specs.map((s, i) => (
+              {product.specs.map((s, i) => (
                 <tr key={s.label} className={i % 2 === 0 ? "bg-neutral-50" : "bg-white"}>
                   <td className="px-4 py-2.5 font-semibold text-neutral-600 w-[45%] align-top">{s.label}</td>
                   <td className="px-4 py-2.5 text-neutral-800 align-top">{s.value}</td>
@@ -260,18 +302,18 @@ export default function ProdukDetailPage() {
           className="w-full flex items-center justify-between px-4 py-4"
           onClick={() => setInfoOpen((o) => !o)}
         >
-          <span className="text-sm font-bold text-neutral-900">Informasi Produk</span>
+          <span className="text-sm font-bold text-neutral-900">{t("product.info_title")}</span>
           <svg className={`w-4 h-4 text-neutral-400 transition-transform ${infoOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         {infoOpen && (
           <div className="px-4 pb-4 flex flex-col gap-4">
             <div>
-              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide mb-1.5">Deskripsi (ID)</p>
-              <p className="text-xs text-neutral-700 leading-relaxed">{PRODUCT.descID}</p>
+              <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide mb-1.5">{language === "en" ? "Description (ID)" : "Deskripsi (ID)"}</p>
+              <p className="text-xs text-neutral-700 leading-relaxed">{product.descID}</p>
             </div>
             <div>
               <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide mb-1.5">Description (EN)</p>
-              <p className="text-xs text-neutral-700 leading-relaxed">{PRODUCT.descEN}</p>
+              <p className="text-xs text-neutral-700 leading-relaxed">{product.descEN}</p>
             </div>
           </div>
         )}
@@ -279,7 +321,7 @@ export default function ProdukDetailPage() {
 
       {/* Dokumentasi Produk */}
       <div className="bg-white mt-2 px-4 py-4">
-        <p className="text-sm font-bold text-neutral-900 mb-3">Dokumentasi Produk</p>
+        <p className="text-sm font-bold text-neutral-900 mb-3">{t("product.docs_title")}</p>
         <a href="#" className="flex items-center gap-3 p-3 border border-neutral-200 rounded-[8px]">
           <div className="w-9 h-9 rounded-[6px] bg-red-50 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
@@ -294,14 +336,14 @@ export default function ProdukDetailPage() {
 
       {/* Ketentuan */}
       <div className="bg-white mt-2 px-4 py-4 mb-2">
-        <p className="text-sm font-bold text-neutral-900 mb-3">Ketentuan dan Kondisi Barang</p>
+        <p className="text-sm font-bold text-neutral-900 mb-3">{t("product.terms_title")}</p>
         <div className="flex items-center gap-3 p-3 bg-brand/5 rounded-[8px] border border-brand/20">
           <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
             <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div>
             <p className="text-xs font-bold text-neutral-800">e-Commerce Authorized Partner</p>
-            <p className="text-[11px] text-neutral-500 mt-0.5">Produk resmi terjamin keasliannya</p>
+            <p className="text-[11px] text-neutral-500 mt-0.5">{language === "en" ? "Official product with guaranteed authenticity" : "Produk resmi terjamin keasliannya"}</p>
           </div>
         </div>
       </div>
@@ -373,13 +415,13 @@ export default function ProdukDetailPage() {
       </div>
 
       {/* Rekomendasi produk */}
-      {[
-        "Pembeli yg melihat produk ini juga melihat produk berikut",
-        "Pembeli yg melihat produk ini telah membeli produk berikut",
-        "Pembeli yg membeli produk ini juga membeli produk berikut",
-      ].map((title) => (
-        <div key={title} className="bg-white mt-2 py-4">
-          <p className="text-sm font-bold text-neutral-900 px-4 mb-3 border-b border-neutral-100 pb-3">{title}</p>
+      {([
+        "product.also_viewed",
+        "product.also_bought_after_view",
+        "product.also_bought",
+      ] as const).map((titleKey) => (
+        <div key={titleKey} className="bg-white mt-2 py-4">
+          <p className="text-sm font-bold text-neutral-900 px-4 mb-3 border-b border-neutral-100 pb-3">{t(titleKey)}</p>
           <div className="flex gap-3 px-4 overflow-x-auto pb-1 no-scrollbar">
             {POPULAR.map((p) => (
               <button
@@ -395,10 +437,10 @@ export default function ProdukDetailPage() {
                 </div>
                 <div className="p-2 flex flex-col gap-1 flex-1">
                   <p className="text-[11px] text-neutral-700 leading-snug line-clamp-2 min-h-[28px]">{p.name}</p>
-                  <p className="mt-auto text-[10px] text-neutral-500">Mulai <span className="text-sm font-bold text-brand">{p.price}</span></p>
+                  <p className="mt-auto text-[10px] text-neutral-500">{t("product.from_price")} <span className="text-sm font-bold text-brand">{p.price}</span></p>
                   <div className="flex gap-1 flex-wrap mt-0.5">
-                    <span className="text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-[3px]">Ready Stock</span>
-                    <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">Terjual &gt; 5</span>
+                    <span className="text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-[3px]">{t("product.ready_stock")}</span>
+                    <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                   </div>
                   <div className="flex items-center gap-0.5 mt-0.5">
                     <span className="text-[10px] text-orange-400">★★★★★</span>
@@ -429,10 +471,10 @@ export default function ProdukDetailPage() {
               </div>
               <div className="p-2 flex flex-col gap-1 flex-1">
                 <p className="text-[11px] text-neutral-700 leading-snug line-clamp-2 min-h-[28px]">{p.name}</p>
-                <p className="mt-auto text-[10px] text-neutral-500">Mulai <span className="text-sm font-bold text-brand">{p.price}</span></p>
+                <p className="mt-auto text-[10px] text-neutral-500">{t("product.from_price")} <span className="text-sm font-bold text-brand">{p.price}</span></p>
                 <div className="flex gap-1 flex-wrap mt-0.5">
-                  <span className="text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-[3px]">Ready Stock</span>
-                  <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">Terjual &gt; 5</span>
+                  <span className="text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-[3px]">{t("product.ready_stock")}</span>
+                  <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                 </div>
                 <div className="flex items-center gap-0.5 mt-0.5">
                   <span className="text-[10px] text-orange-400">★★★★★</span>
@@ -478,7 +520,7 @@ export default function ProdukDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] flex items-center gap-3 z-[90]">
           <button
             type="button"
-            onClick={() => { if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(30); toggleWishlist({ sku: PRODUCT.sku, name: PRODUCT.name, price: PRODUCT.priceStr, icon: PRODUCT.images[0] }); }}
+            onClick={() => { if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(30); toggleWishlist({ sku: product.sku, name: product.name, price: product.priceStr, icon: product.images[0] }); }}
             className="shrink-0 w-11 h-11 flex items-center justify-center rounded-[8px] border border-neutral-200 active:bg-neutral-50"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill={wishlisted ? "#f59e0b" : "none"} stroke={wishlisted ? "#f59e0b" : "#737373"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -537,8 +579,8 @@ export default function ProdukDetailPage() {
 
             {/* Title */}
             <div className="px-4 pb-3 shrink-0">
-              <p className="text-sm font-bold text-neutral-900">Pilih jenis produk yang diinginkan</p>
-              <p className="text-[11px] text-neutral-400 mt-0.5">{VARIANTS.length} varian tersedia</p>
+              <p className="text-sm font-bold text-neutral-900">{t("product.select_variant_title")}</p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">{VARIANTS.length} {t("product.variants_available")}</p>
             </div>
 
             <div className="h-px bg-neutral-100 shrink-0" />
@@ -546,7 +588,7 @@ export default function ProdukDetailPage() {
             {/* List varian — scrollable */}
             <div ref={scrollRef} className="overflow-y-auto flex-1 px-4 py-3 flex flex-col gap-2.5" style={{ overscrollBehavior: "contain" }}>
               {VARIANTS.map((v) => {
-                const isCurrent = v.sku === PRODUCT.sku;
+                const isCurrent = v.sku === product.sku;
                 const isSelected = v.sku === selectedSku;
                 return (
                   <button
@@ -571,12 +613,12 @@ export default function ProdukDetailPage() {
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-sm font-extrabold text-brand">{v.price}</span>
-                        {v.days && <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">{v.days}</span>}
+                        {v.days && <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">{t(v.days)}</span>}
                       </div>
                     </div>
                     {/* Badge + Checkmark */}
                     <div className="shrink-0 flex flex-row items-center gap-1.5 self-start mt-0.5">
-                      {isCurrent && <span className="text-[10px] font-bold text-neutral-900 leading-none">SKU saat ini</span>}
+                      {isCurrent && <span className="text-[10px] font-bold text-neutral-900 leading-none">{language === "en" ? "Current SKU" : "SKU saat ini"}</span>}
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-brand bg-brand" : "border-neutral-300"}`}>
                       {isSelected && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                     </div>
@@ -594,7 +636,7 @@ export default function ProdukDetailPage() {
               <div className="px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] text-neutral-400">Jumlah</p>
+                    <p className="text-[11px] text-neutral-400">{language === "en" ? "Quantity" : "Jumlah"}</p>
                     <p className="text-xs font-semibold text-brand">
                       {selectedVariant
                         ? "Rp" + (parseInt(selectedVariant.price.replace(/[^\d]/g, "")) * qty).toLocaleString("id-ID")
@@ -617,9 +659,9 @@ export default function ProdukDetailPage() {
                       if (selectedVariant) {
                         addItem({
                           sku: selectedVariant.sku,
-                          name: PRODUCT.name,
+                          name: product.name,
                           price: selectedVariant.price,
-                          icon: PRODUCT.images[0],
+                          icon: product.images[0],
                         }, qty);
                         flyToCart();
                       }

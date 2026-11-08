@@ -21,6 +21,21 @@ const NAV = [
   { label: "Akun", icon: <><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></> },
 ];
 
+const TOP_CATEGORY_ROUTES: Record<string, string> = {
+  "Batu Potong & Gerinda": "Batu Potong Mesin & Gerinda",
+  "Pengepakan & Logistik": "Pengepakan, Plester & Logistik",
+  "Alat Kebersihan": "Alat & Kebutuhan Kebersihan",
+  "Perkakas & Listrik": "Perkakas Tangan, Pneumatik & Listrik",
+  "Bahan Kimia": "Bahan Kimia, Lem (Perekat) & Pengelasan",
+  "Komponen Mekanikal": "Komponen Mekanikal, Laher & Roda",
+  "Mur, Baut & Pengikat": "Mur, Baut & Alat Pengikat",
+  "Kelistrikan & Kontrol": "Alat Kelistrikan & Alat Kontrol",
+  "Otomotif & Truk": "Otomotif, Truk & Sepeda Motor",
+  "Dapur & Horeka": "Perlengkapan Dapur & Horeka",
+  "Bahan Bangunan": "Bahan Bangunan, Perlengkapan Rumah & Cat",
+  "AC & Pipa": "Alat AC & Pipa",
+};
+
 function SectionTitle({ title, sub, action = "Lihat semua", onAction }: { title: string; sub?: string; action?: string; onAction?: () => void }) {
   return (
     <div className="flex items-end justify-between px-4 mb-3">
@@ -40,7 +55,7 @@ function Stars() {
 function ProductCard({ p, popular }: { p: Product; popular?: boolean }) {
   const router = useRouter();
   return (
-    <button type="button" onClick={() => router.push("/produk/1")} className="shrink-0 w-[140px] snap-start rounded-[8px] border border-neutral-200 overflow-hidden text-left flex flex-col">
+    <button type="button" onClick={() => { sessionStorage.setItem("selected_product", JSON.stringify(p)); router.push("/produk/1"); }} className="shrink-0 w-[140px] snap-start rounded-[8px] border border-neutral-200 overflow-hidden text-left flex flex-col">
       <div className={`relative aspect-square w-full ${p.bg ?? "bg-neutral-50"}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={p.icon} alt={p.name} className="w-full h-full object-contain" />
@@ -109,11 +124,14 @@ function HeroCarousel() {
 }
 
 function CategoryExplorer() {
+  const router = useRouter();
+  const { t, language } = useLanguage();
   const [active, setActive] = useState(0);
   const cat = CATEGORY_SECTIONS[active];
+  const toKategori = (name: string) => router.push(`/kategori/${encodeURIComponent(name)}`);
   return (
     <section className="py-4">
-      <SectionTitle title="Jelajahi Kategori" sub={`${cat.stock} Ready Stock di ${cat.name}`} action="" />
+      <SectionTitle title={t("category.explore")} sub={`${cat.stock} Ready Stock ${language === "en" ? "in" : "di"} ${cat.name}`} action="" />
       <div className="flex gap-2 px-4 overflow-x-auto no-scrollbar pt-1 pb-3">
         {CATEGORY_SECTIONS.map((c, i) => (
           <button
@@ -133,18 +151,18 @@ function CategoryExplorer() {
         {cat.groups.map((g) => (
           <div key={g.name} className="rounded-[8px] bg-white border border-neutral-200 shadow-sm p-3">
             <div className="flex items-center gap-3 pb-3">
-              <div className="w-16 h-16 shrink-0 rounded-[8px] bg-neutral-100 overflow-hidden">
+              <button onClick={() => toKategori(cat.name)} className="w-16 h-16 shrink-0 rounded-[8px] bg-neutral-100 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={g.img} alt={g.name} className="w-full h-full object-contain" />
-              </div>
+              </button>
               <div className="flex-1 min-w-0">
                 <p className="text-[15px] font-bold text-neutral-900 leading-tight">{g.name}</p>
-                <button className="text-xs font-semibold text-brand mt-1">Lihat semua</button>
+                <button onClick={() => router.push(`/kategori/${encodeURIComponent(g.name)}`)} className="text-xs font-semibold text-brand mt-1">Lihat semua</button>
               </div>
             </div>
             <div className="grid grid-cols-2">
               {g.items.map((it) => (
-                <button key={it} className="flex items-center justify-between gap-2 text-left text-xs text-neutral-700 py-3 border-b border-neutral-100 odd:border-r odd:pr-3 even:pl-3">
+                <button key={it} onClick={() => router.push(`/subkategori/${encodeURIComponent(it)}`)} className="flex items-center justify-between gap-2 text-left text-xs text-neutral-700 py-3 border-b border-neutral-100 odd:border-r odd:pr-3 even:pl-3">
                   <span>{it}</span>
                   <svg className="w-4 h-4 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
                 </button>
@@ -153,14 +171,109 @@ function CategoryExplorer() {
           </div>
         ))}
       </div>
-      <button className="mx-4 mt-3 w-[calc(100%-2rem)] text-xs font-semibold text-brand px-4 py-3">
-        Lihat Semua Produk dalam Kategori {cat.name}
+      <button onClick={() => toKategori(cat.name)} className="mx-4 mt-3 w-[calc(100%-2rem)] text-xs font-semibold text-brand px-4 py-3">
+        {t("common.see_all")} {cat.name}
       </button>
     </section>
   );
 }
 
+function KategoriSection({ onBack }: { onBack: () => void }) {
+  const router = useRouter();
+  const { t } = useLanguage();
+  const [active, setActive] = useState(0);
+  const cat = CATEGORY_SECTIONS[active];
+
+  return (
+    <div className="min-h-dvh bg-white flex flex-col">
+      {/* Two-column layout */}
+      <div className="flex flex-none h-[calc(100dvh-72px)] min-h-0 overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-[90px] shrink-0 h-full overflow-y-scroll overscroll-y-contain bg-neutral-50 border-r border-neutral-200 pb-32 no-scrollbar">
+          {CATEGORY_SECTIONS.map((c, i) => (
+            <button
+              key={c.name}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`w-full flex flex-col items-center gap-1.5 px-2 py-3 text-center border-b border-neutral-100 transition-colors ${
+                i === active ? "bg-white border-l-2 border-l-brand" : "border-l-2 border-l-transparent"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.tab} alt="" className="w-10 h-10 rounded-[6px] object-cover bg-white" />
+              <span className={`text-[9px] font-semibold leading-tight ${i === active ? "text-brand" : "text-neutral-600"}`}>{c.short}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 h-full min-w-0 overflow-y-scroll overscroll-y-contain pb-32 no-scrollbar">
+          {/* Category header */}
+          <div className="px-3 py-3 border-b border-neutral-100 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-neutral-900">{cat.name}</p>
+              <p className="text-[10px] text-neutral-500">{cat.stock} Ready Stock</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push(`/kategori/${encodeURIComponent(cat.name)}`)}
+              className="text-[10px] font-semibold text-brand shrink-0"
+            >
+              {t("common.see_all")}
+            </button>
+          </div>
+
+          {/* Groups */}
+          <div className="flex flex-col gap-0">
+            {cat.groups.map((g) => (
+              <div key={g.name} className="border-b border-neutral-100">
+                {/* Group header */}
+                <button
+                  type="button"
+                  onClick={() => router.push(`/kategori/${encodeURIComponent(g.name)}`)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={g.img} alt={g.name} className="w-10 h-10 rounded-[6px] bg-neutral-100 object-contain shrink-0" />
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-[12px] font-bold text-neutral-900 leading-snug">{g.name}</p>
+                  </div>
+                  <svg className="w-4 h-4 text-neutral-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+                {/* Subcategory items */}
+                <div className="px-3 pb-2 grid grid-cols-2 gap-x-2 gap-y-0">
+                  {g.items.slice(0, 6).map((it) => (
+                    <button
+                      key={it}
+                      type="button"
+                      onClick={() => router.push(`/subkategori/${encodeURIComponent(it)}`)}
+                      className="flex items-center gap-1.5 py-1.5 text-left border-b border-neutral-50"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-neutral-300 shrink-0" />
+                      <span className="text-[10px] text-neutral-600 leading-snug line-clamp-1">{it}</span>
+                    </button>
+                  ))}
+                  {g.items.length > 6 && (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/kategori/${encodeURIComponent(g.name)}`)}
+                      className="col-span-2 text-[10px] text-brand font-semibold py-1.5 text-left"
+                    >
+                      +{g.items.length - 6} {t("common.more_items")}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BrandSheet({ onClose }: { onClose: () => void }) {
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [portalEl, setPortalEl] = useState<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
@@ -226,14 +339,14 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
           </div>
           {/* Header */}
           <div className="px-4 pb-2">
-            <h2 className="text-[15px] font-bold text-neutral-900">Semua Brand</h2>
+            <h2 className="text-[15px] font-bold text-neutral-900">{t("home.all_brands")}</h2>
           </div>
         </div>
         {/* Search */}
         <div className="px-4 pb-3 shrink-0">
           <div className="flex items-center gap-2 bg-neutral-100 rounded-[8px] px-3">
             <svg className="w-4 h-4 shrink-0 text-neutral-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" d="m21 21-4.3-4.3M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" /></svg>
-            <input value={q} onChange={(e) => setQ(e.target.value)} className="flex-1 py-2 text-xs outline-none bg-transparent placeholder:text-neutral-400" placeholder="Cari brand..." />
+            <input value={q} onChange={(e) => setQ(e.target.value)} className="flex-1 py-2 text-xs outline-none bg-transparent placeholder:text-neutral-400" placeholder={t("home.search_brand")} />
             {q && <button onClick={() => setQ("")} className="text-neutral-400 text-base leading-none">×</button>}
           </div>
         </div>
@@ -247,7 +360,7 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
             ))}
           </div>
           {filtered.length === 0 && (
-            <p className="text-center text-xs text-neutral-400 py-8">Brand tidak ditemukan</p>
+            <p className="text-center text-xs text-neutral-400 py-8">{t("home.brand_not_found")}</p>
           )}
         </div>
       </div>
@@ -258,15 +371,20 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
 
 export default function Home() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { items: cartItems } = useCart();
   const cartCount = cartItems.reduce((s, i) => s + i.qty, 0);
   const [showPromo, setShowPromo] = useState(false);
   const [promoVisible, setPromoVisible] = useState(false);
   const [promoPortal, setPromoPortal] = useState<HTMLElement | null>(null);
   const [search, setSearch] = useState("");
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   useEffect(() => {
     setPromoPortal(document.getElementById("modal-root"));
+    try {
+      const saved = JSON.parse(localStorage.getItem("recently_viewed_products") ?? "[]");
+      if (Array.isArray(saved)) setRecentlyViewed(saved.slice(0, 10));
+    } catch { localStorage.removeItem("recently_viewed_products"); }
     if (!localStorage.getItem("promo_seen")) {
       setShowPromo(true);
       requestAnimationFrame(() => requestAnimationFrame(() => setPromoVisible(true)));
@@ -277,44 +395,87 @@ export default function Home() {
     setTimeout(() => { setShowPromo(false); localStorage.setItem("promo_seen", "1"); }, 300);
   }
   const [showAllBrands, setShowAllBrands] = useState(false);
-  const [section, setSection] = useState<"home" | "akun" | "keranjang">(() => {
-    if (typeof window === "undefined") return "home";
-    if (sessionStorage.getItem("open_account") === "1") return "akun";
-    if (sessionStorage.getItem("open_keranjang") === "1") return "keranjang";
-    return "home";
-  });
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [moreMenuVisible, setMoreMenuVisible] = useState(false);
+
+  function toggleMoreMenu() {
+    if (moreMenuOpen) {
+      setMoreMenuVisible(false);
+      setTimeout(() => setMoreMenuOpen(false), 180);
+      return;
+    }
+    setMoreMenuOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setMoreMenuVisible(true)));
+  }
+  const [section, setSection] = useState<"home" | "akun" | "keranjang" | "kategori">("home");
+  const [hydrated, setHydrated] = useState(false);
+  const changeSection = (next: "home" | "akun" | "keranjang" | "kategori") => {
+    sessionStorage.setItem("home_section", next);
+    setSection(next);
+  };
   const [qlDot, setQlDot] = useState(0);
   const qlRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (sessionStorage.getItem("open_account") === "1") changeSection("akun");
+    else if (sessionStorage.getItem("open_keranjang") === "1") changeSection("keranjang");
+    else {
+      const savedSection = sessionStorage.getItem("home_section");
+      if (savedSection === "akun" || savedSection === "keranjang" || savedSection === "kategori") changeSection(savedSection);
+    }
     sessionStorage.removeItem("open_account");
     sessionStorage.removeItem("open_keranjang");
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
+    if (section !== "home") {
+      window.history.pushState({ section }, "");
+    }
   }, [section]);
+
+  useEffect(() => {
+    const onPop = () => changeSection("home");
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // scroll to top on mount (e.g. navigating back from product page)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
+  if (!hydrated) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <Image src="/Logo.png" alt="monotaro.id" width={150} height={44} className="w-36 h-auto" priority />
+          <div className="w-6 h-6 rounded-full border-2 border-brand/20 border-t-brand animate-spin" aria-label={t("common.loading")} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh pb-24 relative">
       {/* Header */}
-      {section === "akun" && <div key="akun" className="section-transition"><AkunContent onBack={() => setSection("home")} /></div>}
+      {section === "akun" && <div key="akun" className="section-transition"><AkunContent onBack={() => changeSection("home")} /></div>}
       {section === "keranjang" && <div key="keranjang" className="section-transition"><KeranjangContent /></div>}
-      {section === "home" && <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
+      {(section === "home" || section === "kategori") && <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
         <div className="flex items-center justify-between mb-2.5">
           <Image src="/Logo.png" alt="monotaro.id" width={140} height={40} className="h-8 w-auto brightness-0 invert" priority />
           <div className="flex items-center gap-3 text-white">
-            <button aria-label="Wishlist" className="text-xl leading-none">☆</button>
+            <button type="button" aria-label="Wishlist" onClick={() => router.push("/wishlist")} className="text-white leading-none">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </button>
+            <button type="button" onClick={toggleMoreMenu} aria-label={t("common.other_menu")} className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white/15 text-white"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h16" /></svg></button>
             <button aria-label="Keranjang" className="relative hidden">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13 5.4 5M7 13l-2.3 2.3c-.6.6-.2 1.7.7 1.7H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8 2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /></svg>
               <span className="absolute -top-1.5 -right-1.5 bg-yellow-300 text-brand text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">3</span>
             </button>
-            <button aria-label="Pusat Bantuan" className="bg-orange-400 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">{t("header.help")}</button>
           </div>
         </div>
         <div className="relative flex items-center bg-white rounded-[8px] overflow-hidden px-3 gap-2">
@@ -328,6 +489,7 @@ export default function Home() {
           </div>
         </div>
       </header>}
+      {section === "kategori" && <div key="kategori"><KategoriSection onBack={() => changeSection("home")} /></div>}
       {section === "home" && <div key="home" className="section-transition">
 
       {/* Register promo popout — rendered via portal so it overlays correctly on mobile */}
@@ -345,13 +507,13 @@ export default function Home() {
             <button aria-label="Tutup" onClick={closePromo} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-neutral-200 text-neutral-600 text-xs flex items-center justify-center">✕</button>
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/ok.webp" alt="" className="w-24 h-24 object-contain shrink-0" />
+              <img src="/Ok.webp" alt="" className="w-24 h-24 object-contain shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-brand mb-1 uppercase tracking-wide">{t("promo.special")}</p>
                 <p className="text-sm font-extrabold leading-snug">{t("promo.popup_title")}</p>
                 <p className="text-[10px] text-neutral-500 mt-1 leading-relaxed">{t("promo.popup_sub")}</p>
                 <div className="mt-3">
-                  <button onClick={() => { closePromo(); setSection("akun"); }} className="w-full bg-brand text-white text-xs font-bold py-1.5 rounded-[8px]">{t("promo.register_btn")}</button>
+                  <button onClick={() => { closePromo(); changeSection("akun"); }} className="w-full bg-brand text-white text-xs font-bold py-1.5 rounded-[8px]">{t("promo.register_btn")}</button>
                 </div>
               </div>
             </div>
@@ -376,7 +538,7 @@ export default function Home() {
           }}>
             <div className="flex flex-col items-center gap-3 px-2">
               {QUICK_LINKS.map((q) => (
-                <button key={q.label} className="flex w-full shrink-0 flex-col items-center gap-1.5">
+                <button key={q.label} onClick={() => { if (q.label === "Tempo/Termin") router.push("/tempo-termin"); else if (q.label === "Online Quotation") router.push("/online-quotation"); else if (q.label === "Faktur Pajak") router.push("/faktur-pajak"); else if (q.label === "Blanket Order") router.push("/blanket-order"); else if (q.label === "Pending Quotation") router.push("/quotation"); else if (q.label === "Online Approval") router.push("/online-approval"); else if (q.label === "Multiple Login") router.push("/multiple-login"); else if (q.label === "Pickup Service") router.push("/pickup-service"); }} className="flex w-full shrink-0 flex-col items-center gap-1.5">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={q.hot ? "#b45309" : "#404040"} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                     <path d={q.path} />
                   </svg>
@@ -426,6 +588,12 @@ export default function Home() {
       </div>
 
       {/* Popular */}
+      {recentlyViewed.length > 0 && <section className="mt-3 py-4 bg-white">
+        <SectionTitle title={t("home.recently_viewed")} action="" />
+        <div className="overflow-x-auto no-scrollbar"><div className="flex gap-2.5 px-4 w-max snap-x">
+          {recentlyViewed.map((p) => <ProductCard key={`recent-${p.name}`} p={p} />)}
+        </div></div>
+      </section>}
       <section className="mt-3 py-4 bg-white">
         <SectionTitle title={t("section.popular")} action="" />
         <div className="overflow-x-auto no-scrollbar">
@@ -440,7 +608,7 @@ export default function Home() {
         <SectionTitle title={t("section.top_categories")} sub={t("section.top_categories_sub")} action="" />
         <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-4">
           {TOP_CATEGORIES.map((c) => (
-            <button key={c.label} className="flex flex-col items-center gap-1.5">
+            <button key={c.label} onClick={() => router.push(`/kategori/${encodeURIComponent(TOP_CATEGORY_ROUTES[c.label] ?? c.label)}`)} className="flex flex-col items-center gap-1.5">
               <span className="w-16 h-16 rounded-[8px] overflow-hidden border border-neutral-100 shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/KategoriUnggulan/${c.img}`} alt={c.label} className="w-full h-full object-cover" />
@@ -467,7 +635,7 @@ export default function Home() {
 
       {/* Articles */}
       <section className="mt-3 py-4">
-        <SectionTitle title={t("section.articles")} action={t("section.articles_action")} />
+        <SectionTitle title={t("section.articles")} action={t("section.articles_action")} onAction={() => router.push("/blog")} />
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex gap-3 px-4 snap-x" style={{width: "max-content"}}>
           {ARTICLES.map((a) => (
@@ -484,7 +652,7 @@ export default function Home() {
 
       {/* Promos */}
       <section className="mt-3 py-4">
-        <SectionTitle title={t("section.promos")} action="" />
+        <SectionTitle title={t("section.promos")} action={t("account.view_all")} onAction={() => router.push("/promo")} />
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex gap-2.5 px-4 snap-x" style={{width: "max-content"}}>
           {PROMOS.map((p) => (
@@ -580,6 +748,26 @@ export default function Home() {
       {showAllBrands && <BrandSheet onClose={() => setShowAllBrands(false)} />}
       </div>}
 
+      {moreMenuOpen && (
+        <div className={`fixed inset-0 z-[95] transition-opacity duration-200 ${moreMenuVisible ? "opacity-100" : "opacity-0"}`} onClick={toggleMoreMenu}>
+          <div className={`absolute ${section === "keranjang" ? "top-16" : "top-16"} right-5 w-[220px] origin-top-right overflow-hidden rounded-[12px] border border-neutral-200 bg-white shadow-[0_8px_28px_rgba(0,0,0,0.16)] transition-all duration-200 ease-out ${moreMenuVisible ? "translate-y-0 scale-100" : "-translate-y-2 scale-95"}`} onClick={(event) => event.stopPropagation()}>
+            {([
+              ["/produk-baru", "menu.new_products"],
+              ["/brand-monotaro", "menu.brand_monotaro"],
+              ["/promo", "menu.promo"],
+              ["/komparasi-produk", "menu.compare"],
+              ["/blog", "menu.blog"],
+              ["/request-quotation", "menu.request_quotation"],
+            ] as [string, string][]).map(([route, labelKey]) => (
+              <button key={route} type="button" onClick={() => { router.push(route); toggleMoreMenu(); }} className="flex w-full items-center justify-between border-b border-neutral-100 px-4 py-3 text-left text-xs font-medium text-neutral-700 last:border-0 active:bg-neutral-50">
+                <span>{t(labelKey)}</span>
+                <svg className="h-3.5 w-3.5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Bottom nav */}
       <nav className="fixed bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-[100] flex w-[calc(100%-40px)] max-w-[390px] -translate-x-1/2 rounded-full bg-white p-1 shadow-[0_6px_24px_rgba(0,0,0,0.12)] pointer-events-auto">
         {NAV.map((n) => {
@@ -591,12 +779,13 @@ export default function Home() {
               aria-current={n.active ? "page" : undefined}
               onClick={() => {
                 if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(20);
-                if (n.label === "Akun") setSection("akun");
-                else if (n.label === "Keranjang") setSection("keranjang");
-                else setSection("home");
+                if (n.label === "Akun") changeSection("akun");
+                else if (n.label === "Keranjang") changeSection("keranjang");
+                else if (n.label === "Kategori") changeSection("kategori");
+                else changeSection("home");
               }}
               className={`nav-item flex-1 flex flex-col items-center gap-1 py-2 rounded-[18px] relative ${
-                (n.label === "Akun" ? section === "akun" : n.label === "Keranjang" ? section === "keranjang" : section === "home" && n.active) ? "text-brand" : "text-neutral-500"
+                (n.label === "Akun" ? section === "akun" : n.label === "Keranjang" ? section === "keranjang" : n.label === "Kategori" ? section === "kategori" : section === "home" && n.active) ? "text-brand" : "text-neutral-500"
               }`}
             >
               <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">

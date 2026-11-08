@@ -27,26 +27,26 @@ export default function AlamatPage() {
       <form onSubmit={(e) => e.preventDefault()} className="page-content px-5 py-6 flex flex-col gap-6">
 
         <section className="flex flex-col gap-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">Alamat Pengiriman</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">{t("checkout.shipping_address")}</p>
           <hr className="border-neutral-200" />
 
-          <Row label="Nama Penerima" required>
-            <input type="text" value={namaPenerima} onChange={(e) => setNamaPenerima(e.target.value)} placeholder="Nama Penerima" className="field" />
+          <Row label={t("addr.recipient")} required>
+            <input type="text" value={namaPenerima} onChange={(e) => setNamaPenerima(e.target.value)} placeholder={t("addr.recipient")} className="field" />
           </Row>
 
-          <Row label="Nama Perusahaan">
-            <input type="text" placeholder="Masukkan nama perusahaan" className="field" />
+          <Row label={t("account.company_name")}>
+            <input type="text" placeholder={t("addr.company_placeholder")} className="field" />
           </Row>
 
-          <Row label="Nomor Handphone/Telp." required>
+          <Row label={t("account.phone")} required>
             <input type="tel" value={telepon} onChange={(e) => setTelepon(e.target.value)} placeholder="Contoh: 08000000000 atau 021556789" className="field" />
           </Row>
 
-          <Row label="Kota/Kabupaten/Kecamatan/Kode Pos" required>
-            <input type="text" value={kota} onChange={(e) => setKota(e.target.value)} placeholder="Masukkan 3 atau lebih karakter" className="field" />
+          <Row label={t("addr.city_field")} required>
+            <input type="text" value={kota} onChange={(e) => setKota(e.target.value)} placeholder={t("addr.city_placeholder")} className="field" />
           </Row>
 
-          <Row label="Detail Alamat" required>
+          <Row label={t("addr.detail_field")} required>
             <textarea
               value={detail}
               onChange={(e) => setDetail(e.target.value)}
@@ -58,7 +58,7 @@ export default function AlamatPage() {
 
         <div className="pb-6 flex justify-end">
           <button type="submit" disabled={!isValid} className={`text-xs font-semibold rounded-[8px] px-4 py-2.5 transition-colors ${isValid ? "text-neutral-900 bg-white" : "text-neutral-400 bg-neutral-100 cursor-not-allowed"}`} style={isValid ? {boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"} : undefined}>
-            Simpan Alamat
+            {t("addr.save")}
           </button>
         </div>
 

@@ -36,20 +36,20 @@ export default function AccountSettingsPage() {
 
         {/* Informasi Akun */}
         <section>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">Informasi Akun</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{t("settings.account_info")}</p>
           <div className="rounded-xl bg-white divide-y divide-neutral-100 shadow-sm">
 
             {/* Informasi Kontak */}
             <div className="px-4 py-4">
-              <p className="text-sm font-bold text-neutral-900 mb-3">Informasi Kontak</p>
+              <p className="text-sm font-bold text-neutral-900 mb-3">{t("settings.contact_info")}</p>
               <div className="flex flex-col gap-1.5 mb-3">
-                <InfoRow label="Nama" value={nama || "—"} />
-                <InfoRow label="Surel" value={email || "—"} />
-                <InfoRow label="Password" value="••••••" />
+                <InfoRow label={t("common.name")} value={nama || "—"} />
+                <InfoRow label={t("common.email_label")} value={email || "—"} />
+                <InfoRow label={t("account.password")} value="••••••" />
               </div>
               <div className="flex justify-end">
                 <button type="button" onClick={() => router.push("/setting/akun/info")} className="text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2.5 transition-colors" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
-                  Ubah
+                  {t("checkout.change_btn")}
                 </button>
               </div>
             </div>
@@ -75,22 +75,22 @@ export default function AccountSettingsPage() {
 
         {/* Alamat */}
         <section>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">Alamat</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{t("settings.address")}</p>
           <div className="rounded-xl bg-white divide-y divide-neutral-100 shadow-sm">
 
             <div className="px-4 py-4">
-              <p className="text-sm font-bold text-neutral-900 mb-1">Penagihan Utama</p>
-              <p className="text-xs text-neutral-500 mb-3">Anda belum memiliki alamat tagihan utama</p>
+              <p className="text-sm font-bold text-neutral-900 mb-1">{t("settings.billing_primary")}</p>
+              <p className="text-xs text-neutral-500 mb-3">{t("settings.no_billing_address")}</p>
               <button type="button" onClick={() => router.push("/setting/akun/alamat")} className="text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2.5 transition-colors" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
-                Tambah Alamat
+                {t("settings.add_address")}
               </button>
             </div>
 
             <div className="px-4 py-4">
-              <p className="text-sm font-bold text-neutral-900 mb-1">Pengiriman Utama</p>
-              <p className="text-xs text-neutral-500 mb-3">Anda belum memiliki alamat pengiriman utama</p>
+              <p className="text-sm font-bold text-neutral-900 mb-1">{t("settings.shipping_primary")}</p>
+              <p className="text-xs text-neutral-500 mb-3">{t("settings.no_shipping_address")}</p>
               <button type="button" onClick={() => router.push("/setting/akun/alamat")} className="text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2.5 transition-colors" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
-                Ubah Alamat
+                {t("settings.edit_address")}
               </button>
             </div>
           </div>

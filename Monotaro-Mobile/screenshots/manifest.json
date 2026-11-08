@@ -1,0 +1,296 @@
+[
+  {
+    "path": "/",
+    "name": "01-home",
+    "title": "Beranda (Home)",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\01-home.png",
+    "ok": true
+  },
+  {
+    "path": "/produk/1",
+    "name": "02-produk-detail",
+    "title": "Detail Produk",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\02-produk-detail.png",
+    "ok": true
+  },
+  {
+    "path": "/produk/1/ulasan",
+    "name": "03-ulasan",
+    "title": "Ulasan Produk",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\03-ulasan.png",
+    "ok": true
+  },
+  {
+    "path": "/cari",
+    "name": "04-cari",
+    "title": "Pencarian (Search)",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\04-cari.png",
+    "ok": true
+  },
+  {
+    "path": "/keranjang",
+    "name": "05-keranjang",
+    "title": "Keranjang Belanja",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\05-keranjang.png",
+    "ok": true
+  },
+  {
+    "path": "/checkout",
+    "name": "06-checkout",
+    "title": "Checkout",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\06-checkout.png",
+    "ok": true
+  },
+  {
+    "path": "/wishlist",
+    "name": "07-wishlist",
+    "title": "Wishlist",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\07-wishlist.png",
+    "ok": true
+  },
+  {
+    "path": "/pesanan",
+    "name": "08-pesanan",
+    "title": "Pesanan Saya",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\08-pesanan.png",
+    "ok": true
+  },
+  {
+    "path": "/dalam-proses",
+    "name": "09-dalam-proses",
+    "title": "Pesanan Dalam Proses",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\09-dalam-proses.png",
+    "ok": true
+  },
+  {
+    "path": "/menunggu-konfirmasi",
+    "name": "10-menunggu-konfirmasi",
+    "title": "Menunggu Konfirmasi",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\10-menunggu-konfirmasi.png",
+    "ok": true
+  },
+  {
+    "path": "/menunggu-pembayaran",
+    "name": "11-menunggu-pembayaran",
+    "title": "Menunggu Pembayaran",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\11-menunggu-pembayaran.png",
+    "ok": true
+  },
+  {
+    "path": "/telah-dikirim",
+    "name": "12-telah-dikirim",
+    "title": "Telah Dikirim",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\12-telah-dikirim.png",
+    "ok": true
+  },
+  {
+    "path": "/dibatalkan",
+    "name": "13-dibatalkan",
+    "title": "Pesanan Dibatalkan",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\13-dibatalkan.png",
+    "ok": true
+  },
+  {
+    "path": "/kategori/keselamatan-kerja",
+    "name": "14-kategori",
+    "title": "Kategori Produk",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\14-kategori.png",
+    "ok": true
+  },
+  {
+    "path": "/subkategori/sarung-tangan",
+    "name": "15-subkategori",
+    "title": "Sub-Kategori Produk",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\15-subkategori.png",
+    "ok": true
+  },
+  {
+    "path": "/produk-baru",
+    "name": "16-produk-baru",
+    "title": "Produk Baru",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\16-produk-baru.png",
+    "ok": true
+  },
+  {
+    "path": "/promo",
+    "name": "17-promo",
+    "title": "Promo",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\17-promo.png",
+    "ok": true
+  },
+  {
+    "path": "/komparasi-produk",
+    "name": "18-komparasi",
+    "title": "Komparasi Produk",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\18-komparasi.png",
+    "ok": true
+  },
+  {
+    "path": "/brand-monotaro",
+    "name": "19-brand",
+    "title": "Brand Monotaro",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\19-brand.png",
+    "ok": true
+  },
+  {
+    "path": "/blog",
+    "name": "20-blog",
+    "title": "Blog",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\20-blog.png",
+    "ok": true
+  },
+  {
+    "path": "/ai-product-advisor",
+    "name": "21-ai-advisor",
+    "title": "AI Product Advisor",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\21-ai-advisor.png",
+    "ok": true
+  },
+  {
+    "path": "/akun",
+    "name": "22-akun",
+    "title": "Akun Saya",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\22-akun.png",
+    "ok": true
+  },
+  {
+    "path": "/setting",
+    "name": "23-setting",
+    "title": "Pengaturan",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\23-setting.png",
+    "ok": true
+  },
+  {
+    "path": "/setting/akun",
+    "name": "24-setting-akun",
+    "title": "Pengaturan Akun",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\24-setting-akun.png",
+    "ok": true
+  },
+  {
+    "path": "/setting/akun/info",
+    "name": "25-setting-akun-info",
+    "title": "Info Akun",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\25-setting-akun-info.png",
+    "ok": true
+  },
+  {
+    "path": "/setting/akun/alamat",
+    "name": "26-alamat",
+    "title": "Alamat Pengiriman",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\26-alamat.png",
+    "ok": true
+  },
+  {
+    "path": "/faq",
+    "name": "27-faq",
+    "title": "FAQ",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\27-faq.png",
+    "ok": true
+  },
+  {
+    "path": "/bantuan",
+    "name": "28-bantuan",
+    "title": "Bantuan",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\28-bantuan.png",
+    "ok": true
+  },
+  {
+    "path": "/hubungi-kami",
+    "name": "29-hubungi-kami",
+    "title": "Hubungi Kami",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\29-hubungi-kami.png",
+    "ok": true
+  },
+  {
+    "path": "/saran-kritik",
+    "name": "30-saran-kritik",
+    "title": "Saran & Kritik",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\30-saran-kritik.png",
+    "ok": true
+  },
+  {
+    "path": "/testimonial",
+    "name": "31-testimonial",
+    "title": "Testimonial",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\31-testimonial.png",
+    "ok": true
+  },
+  {
+    "path": "/syarat-ketentuan",
+    "name": "32-syarat-ketentuan",
+    "title": "Syarat & Ketentuan",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\32-syarat-ketentuan.png",
+    "ok": true
+  },
+  {
+    "path": "/kebijakan-privasi",
+    "name": "33-kebijakan-privasi",
+    "title": "Kebijakan Privasi",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\33-kebijakan-privasi.png",
+    "ok": true
+  },
+  {
+    "path": "/online-quotation",
+    "name": "34-online-quotation",
+    "title": "Online Quotation",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\34-online-quotation.png",
+    "ok": true
+  },
+  {
+    "path": "/online-approval",
+    "name": "35-online-approval",
+    "title": "Online Approval",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\35-online-approval.png",
+    "ok": true
+  },
+  {
+    "path": "/faktur-pajak",
+    "name": "36-faktur-pajak",
+    "title": "Faktur Pajak",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\36-faktur-pajak.png",
+    "ok": true
+  },
+  {
+    "path": "/tempo-termin",
+    "name": "37-tempo-termin",
+    "title": "Tempo/Termin",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\37-tempo-termin.png",
+    "ok": true
+  },
+  {
+    "path": "/blanket-order",
+    "name": "38-blanket-order",
+    "title": "Blanket Order",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\38-blanket-order.png",
+    "ok": true
+  },
+  {
+    "path": "/request-quotation",
+    "name": "39-request-quotation",
+    "title": "Request Quotation",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\39-request-quotation.png",
+    "ok": true
+  },
+  {
+    "path": "/quotation",
+    "name": "40-quotation",
+    "title": "Quotation",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\40-quotation.png",
+    "ok": true
+  },
+  {
+    "path": "/multiple-login",
+    "name": "41-multiple-login",
+    "title": "Multiple Login",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\41-multiple-login.png",
+    "ok": true
+  },
+  {
+    "path": "/pickup-service",
+    "name": "42-pickup-service",
+    "title": "Pickup Service",
+    "file": "C:\\Users\\tuknw\\Downloads\\Monotaro\\Monotaro-Mobile\\screenshots\\42-pickup-service.png",
+    "ok": true
+  }
+]

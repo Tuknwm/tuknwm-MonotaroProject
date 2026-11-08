@@ -1,5 +1,6 @@
 "use client";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POPULAR } from "@/app/data";
 import CustomSelect from "@/components/CustomSelect";
@@ -40,13 +41,14 @@ function MicrosoftIcon() {
 }
 
 function SupportInfo() {
+  const { t } = useLanguage();
   return (
     <div className="mt-4 w-full rounded-[8px] border border-neutral-300 bg-neutral-50 px-3 py-2.5 text-left">
       <div className="flex items-center gap-2 text-xs font-bold text-neutral-800">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e60012" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 14a8 8 0 0 1 16 0" /><path d="M4 14v3a2 2 0 0 0 2 2h1v-6H6a2 2 0 0 0-2 2Zm16 0v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2Z" /><path d="M15 19c-.5 1-1.5 1.5-3 1.5" />
         </svg>
-        Butuh bantuan? Hubungi CS kami
+        {t("account.help_cs")}
       </div>
       <div className="mt-2 flex flex-col gap-1 text-[10px] leading-relaxed text-neutral-600">
         <div className="flex items-start gap-2">
@@ -177,9 +179,25 @@ function LoginTab({ onSwitch, onLogin }: { onSwitch: () => void; onLogin: (email
 
 function ProfileScreen({ onLogout }: { onLogout: () => void }) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState("user@monotaro.id");
   const [nama, setNama] = useState("Profil Saya");
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [advisorOpen, setAdvisorOpen] = useState(false);
+  const [advisorVisible, setAdvisorVisible] = useState(false);
+  const [chatSheetY, setChatSheetY] = useState(0);
+  const chatStartY = useRef(0);
+  const chatDragging = useRef(false);
+
+  useEffect(() => {
+    if (!chatOpen && !advisorOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [chatOpen, advisorOpen]);
   useEffect(() => {
     const savedEmail = localStorage.getItem("user_email");
     const savedName = localStorage.getItem("user_name");
@@ -196,6 +214,47 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
 
   const initial = (nama || email || "U").trim().charAt(0).toUpperCase();
 
+  const pushFromAkun = (href: string) => {
+    sessionStorage.setItem("open_account", "1");
+    router.push(href);
+  };
+
+  const openChat = () => {
+    setChatOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setChatVisible(true)));
+  };
+  const closeChat = () => {
+    setChatVisible(false);
+    setTimeout(() => setChatOpen(false), 280);
+  };
+  const openAdvisor = () => {
+    setAdvisorOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setAdvisorVisible(true)));
+  };
+  const closeAdvisor = () => {
+    setAdvisorVisible(false);
+    setTimeout(() => setAdvisorOpen(false), 280);
+  };
+
+  const handleChatTouchStart = (event: React.TouchEvent) => {
+    chatStartY.current = event.touches[0].clientY;
+    chatDragging.current = true;
+  };
+  const handleChatTouchMove = (event: React.TouchEvent) => {
+    if (!chatDragging.current) return;
+    const delta = event.touches[0].clientY - chatStartY.current;
+    setChatSheetY(Math.max(-80, delta));
+  };
+  const handleChatTouchEnd = () => {
+    chatDragging.current = false;
+    if (chatSheetY > 120) {
+      closeChat();
+      setChatSheetY(0);
+    } else {
+      setChatSheetY(0);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-5 px-4 py-6">
       <section className="flex items-center justify-between gap-3">
@@ -207,7 +266,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label={t("settings.title")} onClick={() => router.push("/setting")} className="flex h-9 w-9 items-center justify-center rounded-full text-neutral-500 active:bg-neutral-100">
+          <button type="button" aria-label={t("settings.title")} onClick={() => pushFromAkun("/setting")} className="flex h-9 w-9 items-center justify-center rounded-full text-neutral-500 active:bg-neutral-100">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 1 0-2 3.46l.15.08a2 2 0 0 1 1 1.73v.5a2 2 0 0 1-1 1.73l-.15.08a2 2 0 1 0 2 3.46l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 1 0 2-3.46l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.73l.15-.08a2 2 0 1 0-2-3.46l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
@@ -216,13 +275,13 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
       <section className="rounded-[10px] bg-red-50 px-4 py-4">
         <p className="text-sm font-extrabold text-neutral-900">{t("account.business_banner_title")}</p>
         <p className="mt-1 text-xs leading-relaxed text-neutral-600">{t("account.business_banner_desc")}</p>
-        <button type="button" className="mt-3 text-xs font-bold text-brand">{t("account.complete_business_profile")}</button>
+        <button type="button" onClick={() => router.push("/setting/akun/info")} className="mt-3 text-xs font-bold text-brand">{t("account.complete_business_profile")}</button>
       </section>
 
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-neutral-900">{t("account.my_orders")}</h2>
-          <button type="button" className="text-xs font-semibold text-brand">{t("account.view_all")}</button>
+          <button type="button" onClick={() => router.push("/pesanan")} className="text-xs font-semibold text-brand">{t("account.view_all")}</button>
         </div>
         <div className="grid grid-cols-5 divide-x divide-neutral-200 rounded-[10px] border border-neutral-200 bg-white py-3.5">
           {[
@@ -283,8 +342,8 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
                 </svg>
               ),
             },
-          ].map((item) => (
-            <button type="button" key={item.label} className="relative flex min-w-0 flex-col items-center gap-1.5 px-0.5 text-center group">
+          ].map((item, index) => (
+            <button type="button" key={item.label} onClick={() => router.push(["/menunggu-konfirmasi", "/menunggu-pembayaran", "/dalam-proses", "/telah-dikirim", "/dibatalkan"][index])} className="relative flex min-w-0 flex-col items-center gap-1.5 px-0.5 text-center group">
               <div className="relative flex items-center justify-center text-neutral-700 group-hover:text-brand transition-colors">
                 {item.icon}
                 {item.count > 0 && (
@@ -310,15 +369,17 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
             {
               label: t("account.wishlist"),
               count: 0,
+              href: "/wishlist",
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               ),
             },
             {
               label: t("account.quotation"),
               count: 0,
+              href: "/quotation",
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -334,12 +395,13 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
               count: 0,
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  <path d="M12 8l1.09 2.26L15.5 10.6l-1.75 1.7.41 2.4L12 13.6l-2.16 1.1.41-2.4-1.75-1.7 2.41-.34z" />
                 </svg>
               ),
             },
           ].map((item) => (
-            <button type="button" key={item.label} className="relative flex min-w-0 flex-col items-center gap-1.5 px-1 text-center group">
+            <button type="button" key={item.label} onClick={() => (item as {href?: string}).href && pushFromAkun((item as {href?: string}).href!)} className="relative flex min-w-0 flex-col items-center gap-1.5 px-1 text-center group">
               <div className="relative flex items-center justify-center text-neutral-700 group-hover:text-brand transition-colors">
                 {item.icon}
                 {item.count > 0 && (
@@ -356,9 +418,39 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
         </div>
       </section>
 
+      <section className="mb-3 divide-y divide-neutral-200 rounded-[10px] border border-neutral-200 bg-white">
+        <button type="button" onClick={openChat} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm text-neutral-800 active:bg-neutral-50">
+          <svg className="h-5 w-5 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2a9.9 9.9 0 0 0-8.56 14.9L2 22l5.27-1.39A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3.13.82.84-3.05-.19-.31A8 8 0 1 1 12 20Zm4.39-5.94c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.55.12-.16.24-.63.78-.77.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.63-1.18-1.4-1.32-1.64-.14-.24-.01-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.31.98 2.47c.12.16 1.68 2.57 4.07 3.6.57.25 1.01.4 1.35.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z" />
+          </svg>
+          <span className="font-medium">Chat</span>
+        </button>
+        <button type="button" onClick={openAdvisor} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm text-neutral-800 active:bg-neutral-50">
+          <img src="/Ai-ProductAdvisor/mosa_ai_product_advisor.avif" alt="" className="h-6 w-6 rounded-full object-contain" />
+          <span className="font-medium">AI-Product Advisor</span>
+        </button>
+      </section>
+
+      <section className="divide-y divide-neutral-200 rounded-[10px] border border-neutral-200 bg-white">
+        {([
+          ["/testimonial", t("account.testimonial")],
+          ["/faq", t("faq.title")],
+          ["/bantuan", t("account.help_center")],
+          ["/syarat-ketentuan", t("account.terms_and_conditions")],
+          ["/kebijakan-privasi", t("account.privacy_policy")],
+          ["/hubungi-kami", t("account.contact_us")],
+          ["/saran-kritik", t("account.feedback")],
+        ] as [string, string][]).map(([route, label]) => (
+          <button type="button" key={route} onClick={() => pushFromAkun(route)} className="flex min-h-12 w-full items-center justify-between gap-3 px-4 text-left text-sm text-neutral-800 active:bg-neutral-50">
+            <span>{label}</span>
+            <svg className="h-4 w-4 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        ))}
+      </section>
+
       <section>
         <div className="mb-2.5 flex items-center justify-between">
-          <h2 className="text-[15px] font-bold text-neutral-900">Produk Terpopuler</h2>
+          <h2 className="text-[15px] font-bold text-neutral-900">{t("account.popular_products")}</h2>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {POPULAR.slice(0, 8).map((p) => (
@@ -389,21 +481,70 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
         </div>
       </section>
 
-      <section className="divide-y divide-neutral-200 rounded-[10px] border border-neutral-200 bg-white">
-        {["Data pribadi", "Alamat pengiriman", "Quotation tersimpan", "FAQ / Tentang Kami", "Bantuan dan pusat layanan"].map((label) => (
-          <button type="button" key={label} onClick={() => label === "FAQ / Tentang Kami" && router.push("/faq")} className="flex min-h-12 w-full items-center justify-between gap-3 px-4 text-left text-sm text-neutral-800 active:bg-neutral-50">
-            <span>{label}</span>
-            <svg className="h-4 w-4 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6"/></svg>
-          </button>
-        ))}
-      </section>
+      {chatOpen && createPortal(
+        <div className={`fixed inset-0 z-[100] flex items-end justify-center bg-black/40 transition-opacity duration-300 ${chatVisible ? "opacity-100" : "opacity-0"}`} onClick={closeChat}>
+          <div className="w-full max-w-[430px] max-h-[88dvh] overflow-y-auto overscroll-contain rounded-t-[18px] bg-white text-center shadow-2xl transition-transform duration-300 ease-out" style={{ transform: chatVisible ? `translateY(${chatSheetY}px)` : "translateY(100%)", touchAction: "pan-y" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-center py-3" onTouchStart={handleChatTouchStart} onTouchMove={handleChatTouchMove} onTouchEnd={handleChatTouchEnd}>
+              <div className="h-1 w-10 rounded-full bg-neutral-300" />
+            </div>
+            <div className="px-5 pb-6 pt-2">
+              <h2 className="text-lg font-bold text-neutral-800">Order via WA</h2>
+              <p className="text-sm text-neutral-700">085219968320 (Chat only)</p>
+              <p className="mx-auto mt-3 max-w-[230px] text-xs leading-relaxed text-neutral-700">{language === "en" ? "This service is available via WhatsApp channel." : "Layanan ini tersedia untuk channel WhatsApp."}</p>
+              <a href="https://wa.me/6285219968320" target="_blank" rel="noreferrer" className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-[9px] bg-[#0d9b88] px-4 py-2.5 text-sm font-bold text-white">
+                <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2a9.9 9.9 0 0 0-8.56 14.9L2 22l5.27-1.39A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3.13.82.84-3.05-.19-.31A8 8 0 1 1 12 20Zm4.39-5.94c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.55.12-.16.24-.63.78-.77.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.63-1.18-1.4-1.32-1.64-.14-.24-.01-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.31.98 2.47c.12.16 1.68 2.57 4.07 3.6.57.25 1.01.4 1.35.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z" />
+                </svg>
+                {language === "en" ? "Open WhatsApp" : "Buka WhatsApp"}
+              </a>
+              <div className="my-7 border-t border-neutral-300" />
+              <h2 className="text-lg font-bold text-neutral-800">Live Chat</h2>
+              <p className="mx-auto mt-3 max-w-[300px] text-xs leading-relaxed text-neutral-700">{language === "en" ? "You can chat directly with our Customer Support team to ask about Product Stock, Orders, Payments, Shipping, Tax Invoice, Returns & Warranty or visit our Help Center" : "Anda bisa chat secara langsung dengan Customer Support kami untuk bertanya Stok produk, Pesanan, Pembayaran, Pengiriman, Faktur Pajak, Pengembalian Barang & Garansi atau kunjungi Pusat Bantuan Kami"}</p>
+              <button type="button" className="mt-4 inline-flex items-center gap-2 rounded-[9px] bg-red-600 px-5 py-2.5 text-sm font-bold text-white">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.4-.7L4 20l1.2-3.4A7.3 7.3 0 0 1 4.5 12 7.5 7.5 0 0 1 12 4.5a7.5 7.5 0 0 1 8 7Z" />
+                  <path d="M8 12h.01M12 12h.01M16 12h.01" />
+                </svg>
+                {language === "en" ? "Chat Now" : "Chat Sekarang"}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {advisorOpen && createPortal(
+        <div className={`fixed inset-0 z-[100] flex items-end justify-center bg-black/40 transition-opacity duration-300 ${advisorVisible ? "opacity-100" : "opacity-0"}`} onClick={closeAdvisor}>
+          <div className="w-full max-w-[430px] max-h-[88dvh] overflow-y-auto overscroll-contain rounded-t-[18px] bg-white shadow-2xl transition-transform duration-300 ease-out" style={{ transform: advisorVisible ? "translateY(0)" : "translateY(100%)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-center py-3"><div className="h-1 w-10 rounded-full bg-neutral-300" /></div>
+            <div className="bg-gradient-to-r from-red-500 to-purple-700 px-3 py-2 text-sm font-bold text-white"><span className="flex items-center gap-2"><img src="/Ai-ProductAdvisor/mosa_ai_product_advisor.avif" alt="" className="h-7 w-7 rounded-full bg-white object-contain" /> AI-Product Advisor</span></div>
+            <div className="px-4 py-3 text-xs leading-relaxed text-neutral-700">
+              <p>{language === "en" ? "Hello, I am Mosa AI-Product Advisor, happy to help you answer questions about products, including specifications and product features." : "Halo, saya Mosa AI-Product Advisor, dengan senang hati akan membantu Anda dalam menjawab pertanyaan seputar produk, baik spesifikasi maupun fitur produk."}</p>
+              <p className="mt-2 font-bold">{language === "en" ? "Example Questions:" : "Contoh Pertanyaan:"}</p>
+              <p>{language === "en" ? "- PVC pipe diameter 20mm\n- Hand Pallet capacity 2ton\n- Angle grinder with spindle lock" : "- Pipa PVC diameter 20mm\n- Hand Pallet kapasitas 2ton\n- Gerinda tangan dengan kunci spindle"}</p>
+              <p className="mt-2">{language === "en" ? "Mosa AI will immediately reply with product recommendations matching your question." : "Mosa AI akan segera membalas dengan rekomendasi produk yang sesuai dengan pertanyaan Anda."}</p>
+              <p className="mt-5">{language === "en" ? "For questions other than products, such as features, benefits, monotaro.id promos and other topics, please contact our CS team. Thank you and let's start our conversation!" : "Untuk pertanyaan selain produk, seperti fitur, benefit, promo monotaro.id dan topik lainnya, silakan hubungi tim CS kami. Terima kasih dan mari melalui percakapan kita!"}</p>
+              <button type="button" className="mt-3 flex w-full items-center justify-center gap-2 rounded border border-emerald-700 bg-lime-100 py-2 text-xs font-medium text-emerald-800">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2a9.9 9.9 0 0 0-8.56 14.9L2 22l5.27-1.39A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3.13.82.84-3.05-.19-.31A8 8 0 1 1 12 20Zm4.39-5.94c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.55.12-.16.24-.63.78-.77.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.63-1.18-1.4-1.32-1.64-.14-.24-.01-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.31.98 2.47c.12.16 1.68 2.57 4.07 3.6.57.25 1.01.4 1.35.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z" />
+                </svg>
+                {language === "en" ? "Ask About Products Now" : "Tanya Produk Sekarang"}
+              </button>
+              <p className="mt-2 text-center text-xs">via WhatsApp 628551018887</p>
+              <p className="mt-2 text-center text-xs text-neutral-500">{language === "en" ? "This is a beta version powered by OpenAI" : "Ini adalah versi beta yang didukung oleh OpenAI"}</p>
+              <button type="button" onClick={() => { closeAdvisor(); router.push("/ai-product-advisor"); }} className="block w-full text-center text-sm text-blue-600">{language === "en" ? "Learn more" : "Pelajari lebih lanjut"}</button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
 
     </div>
   );
 }
 
 function RegisterTab({ onSwitch, onRegister }: { onSwitch: () => void; onRegister: (email: string, nama?: string) => void }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [tipe, setTipe] = useState<"bisnis" | "individu">("bisnis");
   const [isComplete, setIsComplete] = useState(true);
 
@@ -493,11 +634,13 @@ function RegisterTab({ onSwitch, onRegister }: { onSwitch: () => void; onRegiste
       {/* Voucher info */}
       <div className="flex items-center justify-between gap-3 bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2.5">
         <p className="text-[11px] text-neutral-600 leading-relaxed flex-1">
-          <span className="font-bold text-neutral-900">Diskon 10%</span> untuk pembelanjaan pertama hanya berlaku untuk Akun Bisnis menggunakan kode voucher{" "}
-          <span className="font-extrabold text-brand">FIRST10</span>
+          {language === "en"
+            ? <><span className="font-bold text-neutral-900">10% discount</span> for first purchase only applies to Business Accounts using voucher code <span className="font-extrabold text-brand">FIRST10</span></>
+            : <><span className="font-bold text-neutral-900">Diskon 10%</span> untuk pembelanjaan pertama hanya berlaku untuk Akun Bisnis menggunakan kode voucher <span className="font-extrabold text-brand">FIRST10</span></>
+          }
         </p>
         <button type="button" className="shrink-0 text-[11px] font-bold text-brand border border-brand rounded-[6px] px-2.5 py-1">
-          SALIN
+          {language === "en" ? "COPY" : "SALIN"}
         </button>
       </div>
 
@@ -675,6 +818,7 @@ export function AkunContent({ onBack }: { onBack?: () => void }) {
 
 export default function AkunPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   function backToAccountSection() {
     sessionStorage.setItem("open_account", "1");
@@ -686,7 +830,7 @@ export default function AkunPage() {
       <header className="relative bg-white border-b border-neutral-200 px-4 py-3">
         <button
           type="button"
-          aria-label="Kembali"
+          aria-label={t("common.back")}
           onClick={backToAccountSection}
           className="text-neutral-500 flex items-center"
         >

@@ -25,12 +25,11 @@ export default function FaqPage() {
 
   return (
     <main className="min-h-dvh">
-      <header className="relative flex items-center border-b border-neutral-200 bg-white px-4 py-3">
+      <header className="flex items-center gap-3 border-b border-neutral-200 bg-white px-4 py-3">
         <button type="button" aria-label={t("common.back")} onClick={backToAccount} className="text-neutral-500">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 top-1/2 h-7 w-auto -translate-x-1/2 -translate-y-1/2 object-contain" />
+        <h1 className="text-[15px] font-bold text-neutral-900">{isEn ? "About Us" : "Tentang Kami"}</h1>
       </header>
 
       <div className="flex flex-col gap-5 px-4 py-5">
@@ -108,7 +107,17 @@ export default function FaqPage() {
               </div>
             ))}
             <div className="py-3"><p className="mb-3 text-sm font-bold text-neutral-800">Customer Support</p><div className="grid grid-cols-2 gap-3">{SUPPORT.map((s, i) => <div key={s.text} className="flex min-w-0 items-center gap-2 text-[11px] text-neutral-700"><svg className="h-5 w-5 shrink-0 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={SUPPORT_ICON_PATHS[i]} /></svg><span className="min-w-0 break-words">{s.text}</span></div>)}</div></div>
-            <div className="py-3"><p className="mb-2 text-sm font-bold text-neutral-800">{t("faq.payment_methods")}</p><div className="flex flex-wrap gap-1.5">{PAYMENTS.map((p) => <span key={p} className="rounded-md border border-neutral-200 px-2 py-1 text-[10px] font-bold text-neutral-700">{p}</span>)}</div></div>
+            <div className="py-3"><p className="mb-2 text-sm font-bold text-neutral-800">{t("faq.payment_methods")}</p><div className="grid grid-cols-3 gap-x-3 gap-y-3 items-center">{[
+              { src: "/Payment/Bank Central Asia (BCA) Logo - Colored - zonalogo.com.svg", alt: "BCA" },
+              { src: "/Payment/Bank Mandiri Logo - Colored - zonalogo.com.svg", alt: "Mandiri" },
+              { src: "/Payment/Bank Negara Indonesia (BNI) Logo - Colored - zonalogo.com.svg", alt: "BNI" },
+              { src: "/Payment/Bank Rakyat Indonesia (BRI) Logo - Horizontal With Full Name Colored - zonalogo.com.svg", alt: "BRI" },
+              { src: "/Payment/Permata Bank Logo - Colored - zonalogo.com.svg", alt: "Permata" },
+              { src: "/Payment/QRIS Logo - Black - zonalogo.com.svg", alt: "QRIS" },
+              { src: "/Payment/Tempo Logo - Colored - zonalogo.com.svg", alt: "Tempo" },
+              { src: "/Payment/Visa Logo - Colored - zonalogo.com.svg", alt: "Visa" },
+              { src: "/Payment/cash-on-delivery-logo-free-png.webp", alt: "COD" },
+            ].map((p) => <div key={p.alt} className="flex items-center justify-center border border-neutral-200 rounded-[6px] px-2 py-1.5 h-10"><img src={p.src} alt={p.alt} className="max-h-6 max-w-full object-contain" /></div>)}</div></div>
             <div className="py-3"><p className="mb-2 text-sm font-bold text-neutral-800">{t("faq.shipping")}</p><div className="flex flex-wrap gap-1.5">{SHIPPING.map((s) => <span key={s} className="rounded-md border border-neutral-200 px-2 py-1 text-[10px] font-bold text-neutral-700">{s}</span>)}</div></div>
             <div className="py-4"><p className="mb-2 text-xs font-bold text-neutral-800">{t("faq.newsletter_label")}</p><div className="flex"><input type="email" placeholder="email@company.com" className="min-w-0 flex-1 rounded-l-md border border-neutral-300 px-3 py-2 text-xs outline-none focus:border-brand" /><button className="rounded-r-md bg-brand px-4 text-xs font-bold text-white">{t("faq.subscribe")}</button></div></div>
           </div>

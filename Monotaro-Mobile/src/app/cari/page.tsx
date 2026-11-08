@@ -5,11 +5,14 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { HIGHLIGHT, POPULAR, type Product } from "../data";
+import { DUMMY_CATEGORY_PRODUCTS, HIGHLIGHT, POPULAR, type Product } from "../data";
+import { ITEM_PRODUCTS } from "../item-products";
 
 const ALL_PRODUCTS: Product[] = [
   ...HIGHLIGHT,
   ...POPULAR.filter((p) => !HIGHLIGHT.some((h) => h.name === p.name)),
+  ...ITEM_PRODUCTS.filter((p) => !HIGHLIGHT.some((h) => h.name === p.name) && !POPULAR.some((pp) => pp.name === p.name)),
+  ...DUMMY_CATEGORY_PRODUCTS,
 ];
 
 function Stars() {
@@ -21,7 +24,10 @@ function ProductCard({ p }: { p: Product }) {
   return (
     <button
       type="button"
-      onClick={() => router.push("/produk/1")}
+        onClick={() => {
+          sessionStorage.setItem("selected_product", JSON.stringify(p));
+          router.push("/produk/1");
+        }}
       className="rounded-[8px] border border-neutral-200 overflow-hidden bg-white text-left w-full flex flex-col"
     >
       <div className={`relative aspect-square w-full ${p.bg ?? "bg-neutral-50"}`}>
@@ -182,14 +188,14 @@ function SearchPageInner() {
           <div className="px-4 pt-4">
             <p className="text-xs text-neutral-500 mb-3">
               {results.length > 0
-                ? `${results.length} hasil untuk "${searchParams.get("q")}"`
-                : `Tidak ada hasil untuk "${searchParams.get("q")}"`}
+                ? `${results.length} ${t("search.result_count")} "${searchParams.get("q")}"`
+                : `${t("search.no_result")} "${searchParams.get("q")}"`}
             </p>
 
             {results.length > 0 ? (
               <div className="grid grid-cols-2 gap-2.5">
-                {results.map((p) => (
-                  <div key={p.name} className="relative">
+                {results.map((p, index) => (
+                  <div key={`${p.name}-${index}`} className="relative">
                     <ProductCard p={p} />
                     <button
                       type="button"
@@ -208,8 +214,8 @@ function SearchPageInner() {
                 <svg className="w-16 h-16 text-neutral-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                   <path strokeLinecap="round" d="m21 21-4.3-4.3M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" />
                 </svg>
-                <p className="text-sm font-semibold text-neutral-500">Produk tidak ditemukan</p>
-                <p className="text-xs text-neutral-400">Coba kata kunci yang berbeda</p>
+                <p className="text-sm font-semibold text-neutral-500">{t("search.not_found")}</p>
+                <p className="text-xs text-neutral-400">{t("search.try_different")}</p>
                 <div className="flex flex-wrap gap-2 justify-center mt-2">
                   {POPULAR_SEARCHES.slice(0, 4).map((s) => (
                     <button
