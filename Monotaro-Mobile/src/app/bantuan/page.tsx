@@ -151,14 +151,14 @@ export default function BantuanPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      <header className="sticky top-0 z-10 bg-white border-b border-neutral-200 px-4 py-3 flex items-center gap-3">
-        <button type="button" onClick={() => router.back()} className="text-neutral-500 shrink-0" aria-label={t("common.back")}>
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 rounded-b-3xl bg-brand px-4 py-4 text-white shadow-md">
+        <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
-        <h1 className="text-[15px] font-bold text-neutral-900 flex-1">{t("help.title")}</h1>
+        <h1 className="text-[15px] font-bold text-white flex-1">{t("help.title")}</h1>
       </header>
 
-      <div className="page-content">
+      <div className="page-content pt-[38px]">
         {/* Hero search */}
         <div className="bg-brand px-4 py-6">
           <h2 className="text-base font-bold text-white text-center mb-3">{t("help.welcome")}</h2>

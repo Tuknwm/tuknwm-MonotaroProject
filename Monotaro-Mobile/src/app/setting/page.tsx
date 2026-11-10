@@ -47,13 +47,6 @@ export default function SettingPage() {
           <span><span className="block text-sm font-bold text-neutral-900">{t("settings.address")}</span><span className="mt-1 block text-xs text-neutral-500">{t("settings.address_sub")}</span></span>
           <svg className="h-4 w-4 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
         </button>
-        <button type="button" className="flex items-center justify-between gap-4 rounded-[8px] border border-neutral-200 bg-white px-4 py-4 text-left">
-          <span>
-            <span className="block text-sm font-bold text-neutral-900">{t("settings.notifications")}</span>
-            <span className="mt-1 block text-xs text-neutral-500">{t("settings.notifications_sub")}</span>
-          </span>
-          <svg className="h-4 w-4 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
-        </button>
         <div className="flex items-center justify-between gap-4 rounded-[8px] border border-neutral-200 bg-white px-4 py-4 text-left">
           <span>
             <span className="block text-sm font-bold text-neutral-900">{t("settings.language")}</span>

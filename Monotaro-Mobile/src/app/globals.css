@@ -8,6 +8,13 @@
 /* Shared form input/select style */
 .field { @apply w-full border border-neutral-300 rounded-[4px] px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand; }
 
+/* Keep the new-products header attached to the viewport. */
+header[class*="max-w-\[430px\]"] {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 50 !important;
+}
+
 /* Hide scrollbar but keep scroll */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -52,6 +59,27 @@
   100% { transform: scale(1); }
 }
 
+@keyframes voucher-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-3px); }
+}
+
+@keyframes bottom-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.bottom-sheet-up {
+  animation: bottom-sheet-up 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  touch-action: none;
+}
+
+.voucher-shake {
+  animation: voucher-shake 300ms ease-in-out;
+}
+
 .cart-bump {
   animation: cart-bump 300ms ease-out both;
 }
@@ -93,7 +121,7 @@
 /* Mobile lock: max 430px, centered on desktop */
 body {
   background-color: #f0f0f0;
-  font-family: var(--font-jakarta), sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   display: flex;
   justify-content: center;
   min-height: 100dvh;

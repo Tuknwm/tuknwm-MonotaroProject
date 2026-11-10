@@ -1,2 +1,2 @@
-import EmptyOrderStatus from "@/components/EmptyOrderStatus";
-export default function DalamProsesPage() { return <EmptyOrderStatus title="account.in_process" />; }
+import OrderStatusPage from "@/components/OrderStatusPage";
+export default function DalamProsesPage() { return <OrderStatusPage title="Dalam Proses" />; }

@@ -1,2 +1,2 @@
-import EmptyOrderStatus from "@/components/EmptyOrderStatus";
-export default function TelahDikirimPage() { return <EmptyOrderStatus title="account.shipped" />; }
+import OrderStatusPage from "@/components/OrderStatusPage";
+export default function TelahDikirimPage() { return <OrderStatusPage title="Telah Dikirim" />; }

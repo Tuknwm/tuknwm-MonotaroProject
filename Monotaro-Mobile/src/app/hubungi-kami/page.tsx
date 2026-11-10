@@ -70,12 +70,12 @@ export default function HubungiKamiPage() {
   ];
 
   return (
-    <main className="min-h-dvh bg-neutral-50 pb-8">
-      <header className="sticky top-0 z-20 flex items-center gap-3 bg-white px-4 py-3 border-b border-neutral-200">
-        <button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-neutral-500">
+    <main className="min-h-dvh bg-neutral-50 pb-8 pt-[64px]">
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 rounded-b-3xl bg-brand px-4 py-4 text-white shadow-md">
+        <button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         </button>
-        <h1 className="text-[15px] font-bold text-neutral-900">{t("account.contact_us")}</h1>
+        <h1 className="text-[15px] font-bold text-white">{t("account.contact_us")}</h1>
       </header>
 
       <div className="mx-3 mt-3 space-y-3">

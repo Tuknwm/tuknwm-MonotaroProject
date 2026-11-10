@@ -4,16 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCart } from "@/context/CartContext";
 
 const PROMOS = [
   {
     title: "PROMO WEEKEND",
     desc: "Diskon 10% Semua Produk di monotaro.id",
     kode: "WEEKEND10",
+    discount: 0.10,
     berlaku: "Berlaku 7-8 November 2026",
   },
-  { title: "PROMO KEBUTUHAN KANTOR", desc: "Diskon khusus produk kebutuhan kantor", kode: "KANTOR15", berlaku: "Berlaku s/d 30 November 2026" },
-  { title: "PROMO ALAT LABORATORIUM", desc: "Diskon 5% alat laboratorium pilihan", kode: "LAB5", berlaku: "Berlaku s/d 15 November 2026" },
+  { title: "PROMO KEBUTUHAN KANTOR", desc: "Diskon khusus produk kebutuhan kantor", kode: "KANTOR15", discount: 0.15, berlaku: "Berlaku s/d 30 November 2026" },
+  { title: "PROMO ALAT LABORATORIUM", desc: "Diskon 5% alat laboratorium pilihan", kode: "LAB5", discount: 0.05, berlaku: "Berlaku s/d 15 November 2026" },
 ];
 
 const PAYMENTS = [
@@ -52,11 +54,17 @@ function PaymentIcon({ pm, size = "sm" }: { pm: typeof PAYMENTS[0]; size?: "sm" 
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { items: cartItems } = useCart();
   const [userName, setUserName] = useState("Nama Penerima");
   const [alamat, setAlamat] = useState("");
   const [noPO, setNoPO] = useState("");
   const [voucher, setVoucher] = useState("");
-  const [items] = useState(ITEMS);
+  const [voucherInvalid, setVoucherInvalid] = useState(false);
+  const [voucherChecking, setVoucherChecking] = useState(false);
+  const [voucherApplied, setVoucherApplied] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<(typeof PROMOS)[number] | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [items, setItems] = useState(ITEMS);
   const [selectedPayment, setSelectedPayment] = useState("bca");
   const [showPayment, setShowPayment] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
@@ -69,12 +77,12 @@ export default function CheckoutPage() {
   const alamatDragY = useRef(0);
   const [alamatDragging, setAlamatDragging] = useState(false);
   const [alamatDy, setAlamatDy] = useState(0);
-  const [formNama, setFormNama] = useState("");
-  const [formHp, setFormHp] = useState("");
-  const [formProvinsi, setFormProvinsi] = useState("");
-  const [formDetail, setFormDetail] = useState("");
+  const [formNama, setFormNama] = useState("Budi Santoso");
+  const [formHp, setFormHp] = useState("081234567890");
+  const [formProvinsi, setFormProvinsi] = useState("Jawa Barat / Bekasi / Jati Asih / 17423");
+  const [formDetail, setFormDetail] = useState("Jl. Contoh No. 123, RT.01/RW.02, Kel. Jati Asih");
   const [formBadanUsaha, setFormBadanUsaha] = useState("");
-  const [formPerusahaan, setFormPerusahaan] = useState("");
+  const [formPerusahaan, setFormPerusahaan] = useState("PT Contoh Indonesia");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [showPromo, setShowPromo] = useState(false);
@@ -85,6 +93,38 @@ export default function CheckoutPage() {
   const [promoDy, setPromoDy] = useState(0);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!voucher.trim()) {
+      setVoucherChecking(false);
+      setVoucherApplied(false);
+      setAppliedPromo(null);
+      setVoucherInvalid(false);
+      return;
+    }
+
+    setVoucherChecking(true);
+    setVoucherApplied(false);
+    setAppliedPromo(null);
+    setVoucherInvalid(false);
+    const timer = setTimeout(() => {
+      const promo = PROMOS.find((p) => p.kode.toLowerCase() === voucher.trim().toLowerCase());
+      setVoucherChecking(false);
+      if (promo) {
+        setVoucherApplied(true);
+        setAppliedPromo(promo);
+      } else {
+        setVoucherInvalid(true);
+        setTimeout(() => setVoucherInvalid(false), 700);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [voucher]);
+
+  useEffect(() => {
     const saved = localStorage.getItem("user_name");
     const email = localStorage.getItem("user_email") ?? "";
     if (saved) { setUserName(saved); }
@@ -93,6 +133,31 @@ export default function CheckoutPage() {
       setUserName(local.charAt(0).toUpperCase() + local.slice(1));
     }
   }, []);
+
+  useEffect(() => {
+    const rawProduct = sessionStorage.getItem("selected_product");
+    try {
+      if (rawProduct) {
+        const product = JSON.parse(rawProduct) as { name?: string; price?: string; icon?: string };
+        if (product.name && product.price) {
+          setItems([{ name: product.name, sku: `DUMMY-${product.name.slice(0, 8).toUpperCase()}`, price: Number(product.price.replace(/[^0-9]/g, "")) || ITEMS[0].price, weight: 0.15, qty: 1, img: product.icon ?? ITEMS[0].img }]);
+          return;
+        }
+      }
+      if (cartItems.length > 0) {
+        setItems(cartItems.map((item) => ({
+          name: item.name,
+          sku: item.sku,
+          price: Number(item.price.replace(/[^0-9]/g, "")) || 0,
+          weight: 0.15,
+          qty: item.qty,
+          img: item.icon,
+        })));
+      }
+    } catch {
+      sessionStorage.removeItem("selected_product");
+    }
+  }, [cartItems]);
 
   useEffect(() => {
     if (showPromo) {
@@ -188,25 +253,28 @@ export default function CheckoutPage() {
   }
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const ppn = Math.round(subtotal * 0.11);
-  const total = subtotal + ppn;
+  const discount = appliedPromo ? Math.round(subtotal * appliedPromo.discount) : 0;
+  const subtotalAfterDiscount = subtotal - discount;
+  const ppn = Math.round(subtotalAfterDiscount * 0.11);
+  const total = subtotalAfterDiscount + ppn;
   const beratTotal = items.reduce((s, i) => s + i.weight * i.qty, 0);
 
   return (
     <main className="min-h-dvh pb-28">
       {/* Header */}
-      <header className="relative flex items-center border-b border-neutral-200 bg-white px-4 py-3 sticky top-0 z-10">
-        <button type="button" onClick={() => router.back()} className="text-neutral-500">
+      <header className="relative flex items-center bg-brand px-4 py-4 sticky top-0 z-40 shadow-md rounded-b-3xl">
+        <button type="button" onClick={() => router.back()} className="text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         </button>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 top-1/2 h-7 w-auto -translate-x-1/2 -translate-y-1/2 object-contain" />
+        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 top-1/2 h-7 w-auto -translate-x-1/2 -translate-y-1/2 object-contain brightness-0 invert" />
       </header>
 
       <div className="page-content px-5 py-6 flex flex-col gap-6">
 
+        <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-4">
         {/* Alamat Pengiriman */}
-        <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
             <button type="button" onClick={() => setShowAlamat(true)} className="shrink-0 text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
@@ -224,7 +292,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Nomor PO & Faktur Pajak */}
-        <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <p className="text-xs font-bold text-neutral-900">{t("checkout.po_number")}</p>
             <input
@@ -244,12 +312,13 @@ export default function CheckoutPage() {
             </p>
           </div>
         </div>
+        </div>
 
         {/* Review Pesanan */}
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-neutral-900">Review Pesanan</p>
-            <button type="button" onClick={() => { sessionStorage.setItem("open_keranjang", "1"); router.push("/"); }} className="text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
+            <button type="button" onClick={() => { sessionStorage.setItem("open_keranjang", "1"); router.push("/"); }} className="text-xs font-semibold text-white bg-brand rounded-[8px] px-4 py-2" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>
               Ubah produk
             </button>
           </div>
@@ -290,7 +359,34 @@ export default function CheckoutPage() {
                     placeholder="Masukkan kode diskon"
                     className="field flex-1 text-xs"
                   />
-                  <button type="button" className="text-xs font-semibold text-neutral-900 bg-white rounded-[8px] px-4 py-2.5 shrink-0" style={{boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"}}>Gunakan</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const promo = PROMOS.find((p) => p.kode.toLowerCase() === voucher.trim().toLowerCase());
+                      if (promo) {
+                        setVoucherChecking(false);
+                        setVoucherApplied(true);
+                        setAppliedPromo(promo);
+                      } else {
+                        setVoucherApplied(false);
+                        setVoucherInvalid(true);
+                        setTimeout(() => setVoucherInvalid(false), 700);
+                      }
+                    }}
+                    className={"text-xs font-semibold rounded-[8px] px-4 py-2.5 shrink-0 transition-colors " + (voucherApplied ? "text-green-600 bg-transparent" : voucherInvalid ? "bg-brand text-white voucher-shake" : "text-neutral-900 bg-white")}
+                    style={!voucherApplied ? {boxShadow:"0 0 8px 2px rgba(0,0,0,0.10)"} : undefined}
+                  >
+                    {voucherChecking ? (
+                      <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M12 3a9 9 0 1 0 9 9" />
+                      </svg>
+                    ) : voucherApplied ? (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m7 12 3.5 3.5L17 9" />
+                      </svg>
+                    ) : "Gunakan"}
+                  </button>
                 </div>
                 <button type="button" onClick={() => setShowPromo(true)} className="text-[11px] font-semibold text-brand text-left">Kupon promo yang tersedia &gt;</button>
               </div>
@@ -326,6 +422,12 @@ export default function CheckoutPage() {
               <p className="text-xs text-neutral-500">{t("checkout.shipping_cost")}</p>
               <p className="text-xs font-semibold text-neutral-800">Rp0</p>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between">
+                <p className="text-xs text-green-600">Diskon Voucher</p>
+                <p className="text-xs font-semibold text-green-600">-{formatRp(discount)}</p>
+              </div>
+            )}
             <div className="flex justify-between">
               <p className="text-xs text-neutral-500">{t("cart.ppn")}</p>
               <p className="text-xs font-semibold text-neutral-800">{formatRp(ppn)}</p>
@@ -446,13 +548,15 @@ export default function CheckoutPage() {
               <div className="w-10 h-1 rounded-full bg-neutral-300" />
             </div>
             {/* Header */}
-            <div className="flex items-start justify-between px-4 pt-2 pb-3 shrink-0">
-              <p className="text-lg font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
-              <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center justify-between px-4 pt-2 pb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <p className="text-base font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
+                <p className="text-[11px] font-semibold text-brand">*Wajib Diisi</p>
+              </div>
+              <div>
                 <button type="button" onClick={closeAlamat} className="text-neutral-400">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
                 </button>
-                <p className="text-[11px] font-semibold text-brand">*Wajib Diisi</p>
               </div>
             </div>
             {/* Form */}
@@ -466,7 +570,7 @@ export default function CheckoutPage() {
                     value={formNama}
                     onChange={(e) => setFormNama(e.target.value)}
                     placeholder={userName}
-                    className={`field text-xs ${formSubmitted && !formNama ? "border-brand" : ""}`}
+                    className={`field text-xs placeholder:text-[10px] ${formSubmitted && !formNama ? "border-brand" : ""}`}
                   />
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
@@ -476,7 +580,7 @@ export default function CheckoutPage() {
                     value={formHp}
                     onChange={(e) => setFormHp(e.target.value)}
                     placeholder="Contoh: 08000000000 atau 021556789"
-                    className={`field text-xs ${formSubmitted && !formHp ? "border-brand" : ""}`}
+                    className={`field text-xs placeholder:text-[10px] ${formSubmitted && !formHp ? "border-brand" : ""}`}
                   />
                   {formSubmitted && !formHp && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
                 </div>
@@ -489,7 +593,7 @@ export default function CheckoutPage() {
                   value={formProvinsi}
                   onChange={(e) => setFormProvinsi(e.target.value)}
                   placeholder="Contoh: Jawa Barat/Bekasi/Jati Asih/17423"
-                  className={`field text-xs ${formSubmitted && !formProvinsi ? "border-brand" : ""}`}
+                  className={`field text-xs placeholder:text-[10px] ${formSubmitted && !formProvinsi ? "border-brand" : ""}`}
                 />
                 {formSubmitted && !formProvinsi && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
               </div>
@@ -501,7 +605,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setFormDetail(e.target.value)}
                   placeholder="Contoh: Wisma BNI 46 Lt. 6, Jl. Jenderal Sudirman No.Kav. 1, RT.1/RW.8, Karet Tengsin"
                   rows={3}
-                  className={`field text-xs resize-none ${formSubmitted && !formDetail ? "border-brand" : ""}`}
+                  className={`field text-xs placeholder:text-[10px] resize-none ${formSubmitted && !formDetail ? "border-brand" : ""}`}
                 />
                 {formSubmitted && !formDetail && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
               </div>
@@ -512,7 +616,7 @@ export default function CheckoutPage() {
                   <select
                     value={formBadanUsaha}
                     onChange={(e) => setFormBadanUsaha(e.target.value)}
-                    className="field text-xs"
+                    className="field text-xs placeholder:text-[10px]"
                   >
                     <option value=""></option>
                     <option value="PT">PT</option>
@@ -611,19 +715,25 @@ export default function CheckoutPage() {
       )}
 
       {/* Fixed bottom bar */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-neutral-200 px-4 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] flex items-center justify-between gap-3 z-10">
+      {mounted && createPortal(
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-neutral-200 px-4 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] flex items-center justify-between gap-3 z-[100] shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
         <div>
           <p className="text-[10px] text-neutral-500">{t("checkout.total_order")}</p>
           <p className="text-sm font-bold text-neutral-900">{formatRp(total)}</p>
         </div>
         <button
           type="button"
-          disabled={!alamat}
-          className={`text-xs font-bold px-6 py-2.5 rounded-[8px] transition-colors ${alamat ? "bg-brand text-white" : "bg-neutral-200 text-neutral-400 cursor-not-allowed"}`}
+          onClick={() => {
+            localStorage.setItem("pending_confirmation_order", JSON.stringify({ id: `ORD-${Date.now()}`, createdAt: new Date().toISOString(), items, total }));
+            router.push("/pembelian-berhasil");
+          }}
+          className="text-xs font-bold px-6 py-2.5 rounded-[8px] bg-brand text-white transition-colors"
         >
           {t("checkout.pay_now")}
         </button>
-      </div>
+      </div>,
+      document.body
+      )}
     </main>
   );
 }

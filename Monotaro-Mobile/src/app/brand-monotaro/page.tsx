@@ -41,8 +41,8 @@ export default function BrandMonotaroPage() {
     reviews: product.reviews ?? 8 + index * 7,
   }));
   return <><main className="min-h-dvh bg-white pb-24">
-    <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-200 bg-white px-4 py-4 text-neutral-800 shadow-sm"><button type="button" onClick={() => router.back()} aria-label={t("common.back")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7" /></svg></button><h1 className="text-sm font-bold">Brand Monotaro</h1></header>
-    <div className="px-3 py-4">
+    <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl"><button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-white"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7" /></svg></button><h1 className="text-sm font-bold">Brand Monotaro</h1></header>
+    <div className="px-3 py-4 pt-[76px]">
       <img src="/BrandMonotaro/1-year-warranty-pb-3.webp" alt="One year warranty" className="h-auto w-full rounded border border-neutral-200 object-contain" />
       <div className="mt-2 flex h-20 gap-2"><img src="/BrandMonotaro/logo-pb-monotaro-a.avif" alt="monotaro.id" className="w-1/2 rounded border border-neutral-200 bg-black object-contain p-2" /><img src="/BrandMonotaro/logo-pb-mid-b.avif" alt="MonotaRO" className="w-1/2 rounded border border-neutral-200 bg-[#e9848c] object-contain p-2" /></div>
       <h2 className="mt-5 text-lg font-bold text-neutral-800">{en ? "Quality Private Brand Recommended Products" : "Produk Rekomendasi Private Brand Berkualitas"}</h2>

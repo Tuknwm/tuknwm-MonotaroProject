@@ -46,14 +46,14 @@ export default function BlogPage() {
 
   return (
     <main className="min-h-dvh bg-white pb-8">
-      <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-200 bg-white px-4 py-4 text-neutral-800 shadow-sm">
-        <button type="button" onClick={() => router.back()} aria-label={t("common.back")}>
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
+        <button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         </button>
         <h1 className="text-sm font-bold">Blog monotaro.id</h1>
       </header>
 
-      <div className="px-4 py-5">
+      <div className="px-4 py-5 pt-[76px]">
         <h1 className="mb-6 text-3xl font-light">Blog monotaro.id</h1>
 
         <Heading>{en ? "Latest Articles" : "Artikel Terbaru"}</Heading>

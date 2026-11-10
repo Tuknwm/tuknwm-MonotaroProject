@@ -206,17 +206,17 @@ export default function ProdukDetailPage() {
   return (
     <div className="min-h-dvh pb-[80px]">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white border-b border-neutral-200 relative flex items-center px-4 py-3 gap-3">
-        <button type="button" onClick={() => router.back()} className="text-neutral-500 shrink-0">
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
+        <button type="button" onClick={() => router.back()} className="shrink-0 text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 -translate-x-1/2 h-6 w-auto object-contain" />
+        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 h-6 w-auto -translate-x-1/2 object-contain brightness-0 invert" />
         <button
           type="button"
           ref={cartIconRef}
           onClick={() => { sessionStorage.setItem("open_keranjang", "1"); router.push("/"); }}
-          className={`ml-auto relative text-neutral-500 shrink-0 ${cartBump ? "cart-bump" : ""}`}
+          className={`relative ml-auto shrink-0 text-white ${cartBump ? "cart-bump" : ""}`}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 4h2l2.4 11h10.8L21 7.5H6.1"/><circle cx="9" cy="19.5" r="1.25"/><circle cx="17" cy="19.5" r="1.25"/>
@@ -225,7 +225,7 @@ export default function ProdukDetailPage() {
         </button>
       </header>
 
-      <div className="page-content">
+      <div className="page-content pt-[72px]">
       {/* Gambar produk */}
       <div className="bg-white">
         <div className="relative aspect-square w-full bg-neutral-50 overflow-hidden">

@@ -1,2 +1,2 @@
-import EmptyOrderStatus from "@/components/EmptyOrderStatus";
-export default function MenungguPembayaranPage() { return <EmptyOrderStatus title="account.waiting_payment" />; }
+import OrderStatusPage from "@/components/OrderStatusPage";
+export default function MenungguPembayaranPage() { return <OrderStatusPage title="Menunggu Pembayaran" />; }

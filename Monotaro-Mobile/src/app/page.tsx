@@ -1,7 +1,7 @@
 "use client";
 import { createPortal } from "react-dom";
-import { AkunContent } from "./akun/page";
-import { KeranjangContent } from "./keranjang/page";
+import { AkunContent } from "@/components/AkunPage";
+import { KeranjangContent } from "@/components/KeranjangPage";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,6 @@ import {
 const NAV = [
   { label: "Home", active: true, icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /> },
   { label: "Kategori", icon: <><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" /></> },
-  { label: "Quotation", icon: <><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></> },
   { label: "Keranjang", badge: 3, icon: <><path d="M3 4h2l2.4 11h10.8L21 7.5H6.1" /><circle cx="9" cy="19.5" r="1.25" /><circle cx="17" cy="19.5" r="1.25" /></> },
   { label: "Akun", icon: <><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></> },
 ];
@@ -461,7 +460,7 @@ export default function Home() {
     <div className="min-h-dvh pb-24 relative">
       {/* Header */}
       {section === "akun" && <div key="akun" className="section-transition"><AkunContent onBack={() => changeSection("home")} /></div>}
-      {section === "keranjang" && <div key="keranjang" className="section-transition"><KeranjangContent /></div>}
+      {section === "keranjang" && <div key="keranjang"><KeranjangContent /></div>}
       {(section === "home" || section === "kategori") && <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
         <div className="flex items-center justify-between mb-2.5">
           <Image src="/Logo.png" alt="monotaro.id" width={140} height={40} className="h-8 w-auto brightness-0 invert" priority />

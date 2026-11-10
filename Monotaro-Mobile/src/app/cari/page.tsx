@@ -91,6 +91,9 @@ function SearchPageInner() {
   const results = q
     ? ALL_PRODUCTS.filter((p) => p.name.toLowerCase().includes(q))
     : [];
+  const liveResults = inputVal.trim()
+    ? ALL_PRODUCTS.filter((p) => p.name.toLowerCase().includes(inputVal.trim().toLowerCase()))
+    : [];
 
   function submit(val: string) {
     const trimmed = val.trim();
@@ -101,7 +104,7 @@ function SearchPageInner() {
   return (
     <div className="min-h-dvh pb-6">
       {/* Header with search bar */}
-      <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 flex-col bg-brand px-4 pt-4 pb-2 shadow-md rounded-b-3xl">
         <div className="flex items-center gap-3 mb-2.5">
           <button
             type="button"
@@ -163,7 +166,7 @@ function SearchPageInner() {
         </div>
       </header>
 
-      <div className="page-content">
+      <div className="page-content pt-[66px]">
         {/* No query yet — show popular searches */}
         {!q && (
           <div className="px-4 pt-5">
@@ -174,12 +177,24 @@ function SearchPageInner() {
                   key={s}
                   type="button"
                   onClick={() => { setInputVal(s); submit(s); }}
-                  className="text-xs font-semibold text-neutral-700 bg-neutral-100 px-3 py-1.5 rounded-full"
+                  className="text-xs font-semibold text-neutral-700 bg-neutral-100 px-3 py-1.5 rounded-[5px]"
                 >
                   {s}
                 </button>
               ))}
             </div>
+            {inputVal.trim() && (
+              <div className="mt-5">
+                <p className="mb-3 text-xs text-neutral-500">
+                  {liveResults.length} {t("search.result_count")} "{inputVal}"
+                </p>
+                {liveResults.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {liveResults.map((p, index) => <ProductCard key={`${p.name}-live-${index}`} p={p} />)}
+                  </div>
+                ) : <p className="py-10 text-center text-xs text-neutral-400">{t("search.not_found")}</p>}
+              </div>
+            )}
           </div>
         )}
 
