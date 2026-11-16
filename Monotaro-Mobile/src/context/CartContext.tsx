@@ -17,6 +17,8 @@ type CartContextType = {
   removeItem: (sku: string) => void;
   changeQty: (sku: string, delta: number) => void;
   setQty: (sku: string, qty: number) => void;
+  clearCart: () => void;
+  removeItems: (skus: string[]) => void;
   total: number;
 };
 
@@ -60,13 +62,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => prev.map((i) => i.sku === sku ? { ...i, qty: Math.max(1, qty) } : i));
   }
 
+  function clearCart() {
+    setItems([]);
+  }
+
+  function removeItems(skus: string[]) {
+    const skuSet = new Set(skus);
+    setItems((prev) => prev.filter((i) => !skuSet.has(i.sku)));
+  }
+
   const total = items.reduce((s, i) => {
     const num = parseInt(i.price.replace(/[^\d]/g, ""), 10) || 0;
     return s + num * i.qty;
   }, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, changeQty, setQty, total }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, changeQty, setQty, clearCart, removeItems, total }}>
       {children}
     </CartContext.Provider>
   );

@@ -354,6 +354,44 @@ export const DICTIONARY = {
   // Search results
   "search.result_count": { id: "hasil untuk", en: "results for" },
   "search.no_result": { id: "Tidak ada hasil untuk", en: "No results for" },
+
+  // Order status pages
+  "order.buy_again": { id: "Beli Lagi", en: "Buy Again" },
+  "order.review": { id: "Ulas", en: "Review" },
+  "order.view_review": { id: "Lihat Ulasan", en: "View Review" },
+  "order.reorder": { id: "Pesan Ulang", en: "Reorder" },
+  "order.added_to_cart": { id: "Telah dimasukan ke keranjang", en: "Added to cart" },
+  "order.total_shopping": { id: "Total Belanja", en: "Shopping Total" },
+  "order.contact_info": { id: "Jika produk terdapat masalah silahkan hubungi kami melalui tombol dibawah ini.", en: "If there is an issue with the product, please contact us using the button below." },
+  "order.contact_customer": { id: "Hubungi Customer", en: "Contact Support" },
+  "order.review_placeholder": { id: "Tulis ulasan kamu di sini...", en: "Write your review here..." },
+  "order.submit_review": { id: "Kirim", en: "Submit" },
+  "order.pay_now": { id: "Bayar Sekarang", en: "Pay Now" },
+  "order.waiting_confirm_status": { id: "Sedang menunggu dikonfirmasi", en: "Awaiting confirmation" },
+  "order.cancel_reason_title": { id: "Alasan Pembatalan", en: "Cancellation Reason" },
+  "order.cancel_reason_sub": { id: "Pilih alasan pembatalan pesanan.", en: "Select a reason for cancellation." },
+  "order.cancel_reason_1": { id: "Salah memilih produk", en: "Wrong product selected" },
+  "order.cancel_reason_2": { id: "Ingin mengubah pesanan", en: "Want to change the order" },
+  "order.cancel_reason_3": { id: "Harga tidak sesuai", en: "Price does not match" },
+  "order.cancel_reason_4": { id: "Pesanan tidak lagi dibutuhkan", en: "Order no longer needed" },
+  "order.cancel_ok": { id: "Oke", en: "OK" },
+  "order.cancel_btn": { id: "Cancel", en: "Cancel" },
+  "order.item_count": { id: "item", en: "item" },
+  "order.reviewed_prefix": { id: "Diulas", en: "Reviewed" },
+  "order.order_prefix": { id: "Pesanan", en: "Order" },
+  "order.total_order": { id: "Total Pesanan", en: "Order Total" },
+  "order.awaiting_payment_status": { id: "Menunggu pembayaran", en: "Awaiting payment" },
+  "order.no_orders_yet": { id: "Belum ada pesanan.", en: "No orders yet." },
+  // Payment / purchase success
+  "payment.page_title": { id: "Pembayaran", en: "Payment" },
+  "payment.success_title": { id: "Pembelian Berhasil", en: "Purchase Successful" },
+  "payment.success_desc": { id: "Pesanan kamu berhasil dibuat dan sedang menunggu dikonfirmasi.", en: "Your order has been placed and is awaiting confirmation." },
+  "payment.view_status": { id: "Lihat Status", en: "View Status" },
+  // Ulasan page
+  "ulasan.my_reviews": { id: "Ulasan Saya", en: "My Reviews" },
+  "ulasan.oldest": { id: "Terlama", en: "Oldest" },
+  // Quotation
+  "quotation.empty": { id: "Anda tidak memiliki permintaan penawaran.", en: "You have no pending quotation requests." },
 } as const;
 
 export type TranslationKey = keyof typeof DICTIONARY;

@@ -71,7 +71,15 @@ function SearchPageInner() {
 
   const initialQ = searchParams.get("q") ?? "";
   const [inputVal, setInputVal] = useState(initialQ);
+  const [history, setHistory] = useState<string[]>([]);
   const inputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("search_history");
+      if (saved) setHistory(JSON.parse(saved));
+    } catch {}
+  }, []);
 
   // keep input in sync when URL changes (e.g. browser back/forward)
   useEffect(() => {
@@ -95,9 +103,31 @@ function SearchPageInner() {
     ? ALL_PRODUCTS.filter((p) => p.name.toLowerCase().includes(inputVal.trim().toLowerCase()))
     : [];
 
+  function saveHistory(term: string) {
+    setHistory((prev) => {
+      const next = [term, ...prev.filter((h) => h !== term)].slice(0, 10);
+      try { localStorage.setItem("search_history", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  function removeHistory(term: string) {
+    setHistory((prev) => {
+      const next = prev.filter((h) => h !== term);
+      try { localStorage.setItem("search_history", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  function clearHistory() {
+    setHistory([]);
+    try { localStorage.removeItem("search_history"); } catch {}
+  }
+
   function submit(val: string) {
     const trimmed = val.trim();
     if (!trimmed) return;
+    saveHistory(trimmed);
     router.replace(`/cari?q=${encodeURIComponent(trimmed)}`);
   }
 
@@ -133,25 +163,26 @@ function SearchPageInner() {
             {inputVal && (
               <button
                 type="button"
-                onClick={() => { setInputVal(""); if (inputRef.current) inputRef.current.textContent = ""; inputRef.current?.focus(); }}
+                onMouseDown={(e) => { e.preventDefault(); setInputVal(""); if (inputRef.current) { inputRef.current.textContent = ""; inputRef.current.focus(); } router.replace("/cari"); }}
                 className="text-neutral-400 shrink-0 flex items-center justify-center w-4 h-4"
               >
                 <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-3 h-3"><path d="M2 2l10 10M12 2L2 12"/></svg>
               </button>
             )}
           </div>
-          {inputVal.trim() && (
-            <button
-              type="button"
-              onClick={() => submit(inputVal)}
-              className="text-white text-xs font-bold shrink-0"
-            >
-              {t("common.search")}
-            </button>
-          )}
           <button
             type="button"
-            onClick={() => { sessionStorage.setItem("open_keranjang", "1"); router.push("/"); }}
+            onClick={() => router.push("/wishlist")}
+            className="text-white shrink-0"
+            aria-label="Wishlist"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => { sessionStorage.setItem("keranjang_has_back", "1"); router.push("/keranjang"); }}
             className="relative text-white shrink-0"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -167,9 +198,38 @@ function SearchPageInner() {
       </header>
 
       <div className="page-content pt-[66px]">
-        {/* No query yet — show popular searches */}
+        {/* No query yet — show history + popular searches */}
         {!q && (
           <div className="px-4 pt-5">
+            {history.length > 0 && (
+              <div className="mb-5">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-neutral-700">Riwayat Pencarian</p>
+                  <button type="button" onClick={clearHistory} className="text-[11px] text-brand font-semibold">Hapus semua</button>
+                </div>
+                {history.map((h) => (
+                  <div key={h} className="flex items-center gap-3 py-2 border-b border-neutral-100 last:border-0">
+                    <svg className="w-3.5 h-3.5 shrink-0 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                    </svg>
+                    <button
+                      type="button"
+                      className="flex-1 text-left text-xs text-neutral-700"
+                      onClick={() => { setInputVal(h); if (inputRef.current) inputRef.current.textContent = h; submit(h); }}
+                    >
+                      {h}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeHistory(h)}
+                      className="text-neutral-300 shrink-0"
+                    >
+                      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-3 h-3"><path d="M2 2l10 10M12 2L2 12"/></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             <p className="text-xs font-bold text-neutral-700 mb-3">{t("search.popular")}</p>
             <div className="flex flex-wrap gap-2">
               {POPULAR_SEARCHES.map((s) => (

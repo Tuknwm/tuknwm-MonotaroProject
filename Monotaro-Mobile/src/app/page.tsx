@@ -4,21 +4,15 @@ import { AkunContent } from "@/components/AkunPage";
 import { KeranjangContent } from "@/components/KeranjangPage";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
+import BottomNav from "@/components/BottomNav";
 import {
   ADVANTAGES, ALL_BRANDS, ARTICLES, BRANDS, CATEGORY_SECTIONS, FOOTER_LINKS, FOOTER_TABS, HERO, HIGHLIGHT,
   PAYMENTS, POPULAR, PROMOS, QUICK_LINKS, SERVICES, SHIPPING, SUPPORT, TOP_CATEGORIES, VALUE_PROPS,
   type Product,
 } from "./data";
-
-const NAV = [
-  { label: "Home", active: true, icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /> },
-  { label: "Kategori", icon: <><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" /></> },
-  { label: "Keranjang", badge: 3, icon: <><path d="M3 4h2l2.4 11h10.8L21 7.5H6.1" /><circle cx="9" cy="19.5" r="1.25" /><circle cx="17" cy="19.5" r="1.25" /></> },
-  { label: "Akun", icon: <><circle cx="12" cy="8" r="4" /><path d="M4.5 21a7.5 7.5 0 0 1 15 0" /></> },
-];
 
 const TOP_CATEGORY_ROUTES: Record<string, string> = {
   "Batu Potong & Gerinda": "Batu Potong Mesin & Gerinda",
@@ -183,8 +177,13 @@ function KategoriSection({ onBack }: { onBack: () => void }) {
   const [active, setActive] = useState(0);
   const cat = CATEGORY_SECTIONS[active];
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
   return (
-    <div className="min-h-dvh bg-white flex flex-col">
+    <div className="bg-white flex flex-col">
       {/* Two-column layout */}
       <div className="flex flex-none h-[calc(100dvh-72px)] min-h-0 overflow-hidden">
         {/* Sidebar */}
@@ -397,6 +396,11 @@ export default function Home() {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [moreMenuVisible, setMoreMenuVisible] = useState(false);
 
+  const pathname = usePathname();
+  useEffect(() => {
+    if (moreMenuOpen) { setMoreMenuVisible(false); setTimeout(() => setMoreMenuOpen(false), 180); }
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function toggleMoreMenu() {
     if (moreMenuOpen) {
       setMoreMenuVisible(false);
@@ -411,6 +415,7 @@ export default function Home() {
   const changeSection = (next: "home" | "akun" | "keranjang" | "kategori") => {
     sessionStorage.setItem("home_section", next);
     setSection(next);
+    if (moreMenuOpen) { setMoreMenuVisible(false); setTimeout(() => setMoreMenuOpen(false), 180); }
   };
   const [qlDot, setQlDot] = useState(0);
   const qlRef = useRef<HTMLDivElement>(null);
@@ -768,34 +773,13 @@ export default function Home() {
       )}
 
       {/* Bottom nav */}
-      <nav className="fixed bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-[100] flex w-[calc(100%-40px)] max-w-[390px] -translate-x-1/2 rounded-full bg-white p-1 shadow-[0_6px_24px_rgba(0,0,0,0.12)] pointer-events-auto">
-        {NAV.map((n) => {
-          const navLabelKey = n.label === "Home" ? "nav.home" : n.label === "Kategori" ? "nav.category" : n.label === "Quotation" ? "nav.quotation" : n.label === "Keranjang" ? "nav.cart" : "nav.account";
-          const displayLabel = t(navLabelKey);
-          return (
-            <button
-              key={n.label}
-              aria-current={n.active ? "page" : undefined}
-              onClick={() => {
-                if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(20);
-                if (n.label === "Akun") changeSection("akun");
-                else if (n.label === "Keranjang") changeSection("keranjang");
-                else if (n.label === "Kategori") changeSection("kategori");
-                else changeSection("home");
-              }}
-              className={`nav-item flex-1 flex flex-col items-center gap-1 py-2 rounded-[18px] relative ${
-                (n.label === "Akun" ? section === "akun" : n.label === "Keranjang" ? section === "keranjang" : n.label === "Kategori" ? section === "kategori" : section === "home" && n.active) ? "text-brand" : "text-neutral-500"
-              }`}
-            >
-              <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-                {n.icon}
-              </svg>
-              {n.label === "Keranjang" && cartCount > 0 && <span className="absolute top-1 left-1/2 ml-1.5 bg-brand text-white text-[9px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{cartCount}</span>}
-              <span className="text-[10px] font-semibold leading-none">{displayLabel}</span>
-            </button>
-          );
-        })}
-      </nav>
+      <BottomNav
+        activeSection={section}
+        onNavigate={(s) => {
+          if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(20);
+          changeSection(s);
+        }}
+      />
     </div>
   );
 }

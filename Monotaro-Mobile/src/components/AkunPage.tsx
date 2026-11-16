@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { POPULAR } from "@/app/data";
 import CustomSelect from "@/components/CustomSelect";
+import { ORDER_COUNT } from "@/components/OrderStatusPage";
 import { useLanguage } from "@/context/LanguageContext";
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -182,6 +183,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
   const { t, language } = useLanguage();
   const [email, setEmail] = useState("user@monotaro.id");
   const [nama, setNama] = useState("Profil Saya");
+  const [pendingConfirmCount, setPendingConfirmCount] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatVisible, setChatVisible] = useState(false);
   const [advisorOpen, setAdvisorOpen] = useState(false);
@@ -198,6 +200,16 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
       document.body.style.overflow = previousOverflow;
     };
   }, [chatOpen, advisorOpen]);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("pending_confirmation_order");
+      if (saved) {
+        const order = JSON.parse(saved);
+        setPendingConfirmCount(order?.items?.length ?? 1);
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     const savedEmail = localStorage.getItem("user_email");
     const savedName = localStorage.getItem("user_name");
@@ -287,7 +299,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
           {[
             {
               label: t("account.waiting_confirm"),
-              count: 0,
+              count: pendingConfirmCount,
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -299,7 +311,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
             },
             {
               label: t("account.waiting_payment"),
-              count: 1,
+              count: ORDER_COUNT,
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -309,7 +321,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
             },
             {
               label: t("account.in_process"),
-              count: 0,
+              count: ORDER_COUNT,
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
@@ -397,7 +409,7 @@ function ProfileScreen({ onLogout }: { onLogout: () => void }) {
               icon: (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  <path d="M12 8l1.09 2.26L15.5 10.6l-1.75 1.7.41 2.4L12 13.6l-2.16 1.1.41-2.4-1.75-1.7 2.41-.34z" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
                 </svg>
               ),
             },

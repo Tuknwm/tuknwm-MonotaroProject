@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function QuotationPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <main className="min-h-dvh bg-white">
@@ -11,14 +13,12 @@ export default function QuotationPage() {
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label="Kembali">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
-        <h1 className="text-[15px] font-bold text-white flex-1">Pending Quotation</h1>
+        <h1 className="text-[15px] font-bold text-white flex-1">{t("quick.pending_quo")}</h1>
       </header>
 
-      <div className="page-content flex flex-col items-center justify-center px-8 pb-24 pt-[148px] text-center">
-        <svg className="w-16 h-16 text-neutral-200 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm-1 1v5h5M8 13h8M8 17h5"/>
-        </svg>
-        <p className="text-sm font-semibold text-neutral-500">Anda tidak memiliki permintaan penawaran.</p>
+      <style>{`@keyframes pageItemIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <div className="flex min-h-[calc(100dvh-60px)] items-center justify-center px-8 text-center" style={{ animation: "pageItemIn 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <p className="text-sm text-neutral-400">{t("quotation.empty")}</p>
       </div>
     </main>
   );

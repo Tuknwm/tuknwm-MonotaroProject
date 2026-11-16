@@ -54,7 +54,7 @@ function PaymentIcon({ pm, size = "sm" }: { pm: typeof PAYMENTS[0]; size?: "sm" 
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { items: cartItems } = useCart();
+  const { items: cartItems, removeItems: ctxRemoveItems, clearCart: ctxClearCart } = useCart();
   const [userName, setUserName] = useState("Nama Penerima");
   const [alamat, setAlamat] = useState("");
   const [noPO, setNoPO] = useState("");
@@ -145,7 +145,21 @@ export default function CheckoutPage() {
         }
       }
       if (cartItems.length > 0) {
-        setItems(cartItems.map((item) => ({
+        let checkoutList = cartItems;
+        const rawSkus = sessionStorage.getItem("checkout_skus");
+        if (rawSkus) {
+          try {
+            const skus = JSON.parse(rawSkus) as string[];
+            if (Array.isArray(skus) && skus.length > 0) {
+              const skuSet = new Set(skus);
+              const filtered = cartItems.filter((item) => skuSet.has(item.sku));
+              if (filtered.length > 0) {
+                checkoutList = filtered;
+              }
+            }
+          } catch {}
+        }
+        setItems(checkoutList.map((item) => ({
           name: item.name,
           sku: item.sku,
           price: Number(item.price.replace(/[^0-9]/g, "")) || 0,
@@ -725,6 +739,26 @@ export default function CheckoutPage() {
           type="button"
           onClick={() => {
             localStorage.setItem("pending_confirmation_order", JSON.stringify({ id: `ORD-${Date.now()}`, createdAt: new Date().toISOString(), items, total }));
+            const rawSkus = sessionStorage.getItem("checkout_skus");
+            if (rawSkus) {
+              try {
+                const skus = JSON.parse(rawSkus) as string[];
+                if (Array.isArray(skus) && skus.length > 0) {
+                  ctxRemoveItems(skus);
+                } else {
+                  ctxClearCart();
+                }
+              } catch {
+                ctxClearCart();
+              }
+              sessionStorage.removeItem("checkout_skus");
+            } else if (!sessionStorage.getItem("selected_product")) {
+              const boughtSkus = items.map((i) => i.sku).filter(Boolean);
+              if (boughtSkus.length > 0) {
+                ctxRemoveItems(boughtSkus);
+              }
+            }
+            sessionStorage.removeItem("selected_product");
             router.push("/pembelian-berhasil");
           }}
           className="text-xs font-bold px-6 py-2.5 rounded-[8px] bg-brand text-white transition-colors"

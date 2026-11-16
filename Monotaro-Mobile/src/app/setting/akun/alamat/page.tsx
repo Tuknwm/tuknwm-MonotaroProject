@@ -16,15 +16,15 @@ export default function AlamatPage() {
 
   return (
     <main className="min-h-dvh">
-      <header className="relative flex items-center border-b border-neutral-200 bg-white px-4 py-3">
-        <button type="button" aria-label={t("common.back")} onClick={() => router.back()} className="text-neutral-500">
+      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
+        <button type="button" aria-label={t("common.back")} onClick={() => router.back()} className="text-white shrink-0 z-10">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         </button>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 top-1/2 h-7 w-auto -translate-x-1/2 -translate-y-1/2 object-contain" />
+        <img src="/Logo.png" alt="monotaro.id" className="absolute left-1/2 top-1/2 h-7 w-auto -translate-x-1/2 -translate-y-1/2 object-contain brightness-0 invert" />
       </header>
 
-      <form onSubmit={(e) => e.preventDefault()} className="page-content px-5 py-6 flex flex-col gap-6">
+      <form onSubmit={(e) => e.preventDefault()} className="page-content px-5 pt-[72px] pb-6 flex flex-col gap-6">
 
         <section className="flex flex-col gap-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">{t("checkout.shipping_address")}</p>

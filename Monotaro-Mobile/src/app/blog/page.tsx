@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -43,15 +44,54 @@ export default function BlogPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const en = language === "en";
+  const [catOpen, setCatOpen] = useState(false);
 
   return (
-    <main className="min-h-dvh bg-white pb-8">
-      <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
+    <div className="min-h-dvh bg-white pb-8">
+      {/* Header */}
+      <header className="fixed left-1/2 top-0 z-[70] flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-white">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 5l-7 7 7 7" />
+          </svg>
         </button>
-        <h1 className="text-sm font-bold">Blog monotaro.id</h1>
+        <h1 className="flex-1 text-sm font-bold">Blog monotaro.id</h1>
+
+        {/* Tombol kategori (hamburger) */}
+        <button
+          type="button"
+          aria-label="Kategori"
+          onClick={() => setCatOpen((v) => !v)}
+          className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white/15 text-white"
+        >
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </header>
+
+      {/* Dropdown kategori */}
+      {catOpen && (
+        <div className="fixed inset-0 z-[60]" onClick={() => setCatOpen(false)}>
+          <div
+            className="absolute right-5 top-[72px] w-[220px] overflow-hidden rounded-[12px] border border-neutral-200 bg-white shadow-[0_8px_28px_rgba(0,0,0,0.16)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="border-b border-neutral-100 px-4 py-2.5 text-[11px] font-bold text-neutral-500 uppercase tracking-wide">
+              {en ? "Categories" : "Kategori"}
+            </p>
+            {CATEGORIES.map(([labelId, labelEn, count]) => (
+              <div
+                key={labelId}
+                className="flex items-center justify-between border-b border-neutral-100 px-4 py-3 last:border-0"
+              >
+                <span className="text-xs font-medium text-neutral-700">{en ? labelEn : labelId}</span>
+                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-500">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="px-4 py-5 pt-[76px]">
         <h1 className="mb-6 text-3xl font-light">Blog monotaro.id</h1>
@@ -110,16 +150,7 @@ export default function BlogPage() {
             ))}
           </div>
         </div>
-
-        <div className="mt-8">
-          <Heading>{en ? "Categories" : "Categories"}</Heading>
-          <div className="grid grid-cols-1 gap-3 text-xs font-semibold text-neutral-700">
-            {CATEGORIES.map(([labelId, labelEn, count]) => (
-              <span key={labelId}>{en ? labelEn : labelId} ({count})</span>
-            ))}
-          </div>
-        </div>
       </div>
-    </main>
+    </div>
   );
 }
