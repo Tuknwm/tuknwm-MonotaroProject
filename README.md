@@ -1,6 +1,8 @@
 # Monotaro — Project Overview
 
-This repository contains two separate applications that together form the Monotaro Indonesia platform prototype: a customer facing mobile web app and an internal admin dashboard. note: this is not an official app for monotaro.id, just a homework project to make an mobile version and also the dashboard that how monotaro.id maintain the website
+This repository contains two separate applications that together form the Monotaro Indonesia platform prototype: a customer facing mobile web app and an internal admin dashboard. 
+
+Note: this is not an official app for monotaro.id, just a homework project to make an mobile version and also the dashboard that how monotaro.id maintain the website
                                                                     
 ---
 
