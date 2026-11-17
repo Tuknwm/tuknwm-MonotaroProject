@@ -3,11 +3,9 @@ import { AlertCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Dashboard from './Dashboard.jsx'
 import { seed } from './data.js'
 
-// bump the version when the seed shape changes, so old saved data is ignored
 const STORE = 'monotaro-demo-v4'
 const ADMIN_STORE = `${STORE}-admin`
 
-// storage can be blocked (private mode, cleared site data); the demo then just runs in memory
 const load = (key, fallback) => {
   try {
     const saved = localStorage.getItem(key)
@@ -20,7 +18,6 @@ const save = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch {
-    // ignore, see load()
   }
 }
 
@@ -36,10 +33,8 @@ export default function App() {
   const resetDemo = () => {
     setDb(seed)
   }
-  // look the admin up each render so edits in Admin Accounts show in the sidebar
   const admin = db.admins.find((a) => a.id === adminId)
 
-  // shortcut: demo login against in-memory admins, passwords are in the client bundle; use a real backend before going live
   const handleSubmit = (e) => {
     e.preventDefault()
     const { email, password } = Object.fromEntries(new FormData(e.currentTarget))
@@ -68,8 +63,7 @@ export default function App() {
         <label htmlFor="email">Email</label>
         <div className="login-field">
           <Mail size={18} strokeWidth={1.75} aria-hidden="true" />
-          {/* shortcut: pre-filled with the seeded demo admin for quick demos; remove the defaultValues before going live */}
-          <input id="email" name="email" type="email" autoComplete="email" placeholder="name@company.com" defaultValue="monotaro@admin.id" required />
+            <input id="email" name="email" type="email" autoComplete="email" placeholder="name@company.com" defaultValue="monotaro@admin.id" required />
         </div>
 
         <label htmlFor="password">Password</label>

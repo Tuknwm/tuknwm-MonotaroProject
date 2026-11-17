@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter, useParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
@@ -27,8 +27,8 @@ const PRODUCT = {
     { label: "Model Number", value: "LR6" },
     { label: "Unit", value: "1pack(4+2pcs)" },
     { label: "Size", value: "AA" },
-    { label: "Diameter", value: "13.7–14.5mm" },
-    { label: "Total Height", value: "49.5–50.5mm" },
+    { label: "Diameter", value: "13.7â€“14.5mm" },
+    { label: "Total Height", value: "49.5â€“50.5mm" },
     { label: "Voltage", value: "1.5V" },
     { label: "Blister Pack", value: "Shrink Pack 4+2 pcs" },
     { label: "Lisensi SNI", value: "Ada" },
@@ -51,7 +51,7 @@ const VARIANTS = [
 function Stars({ count = 5 }: { count?: number }) {
   return (
     <span className="text-orange-500 tracking-tight text-sm">
-      {"★".repeat(count)}{"☆".repeat(5 - count)}
+      {"â˜…".repeat(count)}{"â˜†".repeat(5 - count)}
     </span>
   );
 }
@@ -115,7 +115,6 @@ export default function ProdukDetailPage() {
     }
   }, []);
 
-  // varian bottom sheet
   const [showSheet, setShowSheet] = useState(false);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [sheetMode, setSheetMode] = useState<"keranjang" | "beli">("keranjang");
@@ -205,7 +204,6 @@ export default function ProdukDetailPage() {
 
   return (
     <div className="min-h-dvh pb-[80px]">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="shrink-0 text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -226,13 +224,11 @@ export default function ProdukDetailPage() {
       </header>
 
       <div className="page-content pt-[72px]">
-      {/* Gambar produk */}
       <div className="bg-white">
         <div className="relative aspect-square w-full bg-neutral-50 overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img ref={productImgRef} src={product.images[imgIdx]} alt={product.name} className="w-full h-full object-contain p-4" />
         </div>
-        {/* Thumbnail strip */}
         <div className="flex gap-2 px-4 py-3">
           {product.images.map((src, i) => (
             <button
@@ -248,22 +244,16 @@ export default function ProdukDetailPage() {
         </div>
       </div>
 
-      {/* Info utama */}
       <div className="bg-white mt-2 px-4 py-4 flex flex-col gap-2">
-        {/* Brand */}
         <span className="text-[11px] font-semibold text-brand uppercase tracking-wide">{product.brand}</span>
-        {/* Nama */}
         <h1 className="text-sm font-bold text-neutral-900 leading-snug">{product.name}</h1>
-        {/* SKU */}
         <p className="text-[11px] text-neutral-400">No. SKU: {product.sku}</p>
-        {/* Rating */}
         <div className="flex items-center gap-2 mt-1">
           <Stars />
           <span className="text-xs text-neutral-500">{product.reviews} {t("product.reviews_label")}</span>
           <span className="text-neutral-300">|</span>
           <span className="text-[11px] text-neutral-500">{product.sold}</span>
         </div>
-        {/* Harga */}
         <div className="mt-2 p-3 bg-neutral-50 rounded-[8px]">
           <p className="text-[11px] text-neutral-500 mb-0.5">{t("product.before_vat")}</p>
           <p className="text-xl font-extrabold text-brand">{product.priceStr}</p>
@@ -271,7 +261,6 @@ export default function ProdukDetailPage() {
         </div>
       </div>
 
-      {/* Spesifikasi */}
       <div className="bg-white mt-2">
         <button
           type="button"
@@ -295,7 +284,6 @@ export default function ProdukDetailPage() {
         )}
       </div>
 
-      {/* Informasi Produk */}
       <div className="bg-white mt-2">
         <button
           type="button"
@@ -319,7 +307,6 @@ export default function ProdukDetailPage() {
         )}
       </div>
 
-      {/* Dokumentasi Produk */}
       <div className="bg-white mt-2 px-4 py-4">
         <p className="text-sm font-bold text-neutral-900 mb-3">{t("product.docs_title")}</p>
         <a href="#" className="flex items-center gap-3 p-3 border border-neutral-200 rounded-[8px]">
@@ -334,7 +321,6 @@ export default function ProdukDetailPage() {
         </a>
       </div>
 
-      {/* Ketentuan */}
       <div className="bg-white mt-2 px-4 py-4 mb-2">
         <p className="text-sm font-bold text-neutral-900 mb-3">{t("product.terms_title")}</p>
         <div className="flex items-center gap-3 p-3 bg-brand/5 rounded-[8px] border border-brand/20">
@@ -348,7 +334,6 @@ export default function ProdukDetailPage() {
         </div>
       </div>
 
-      {/* Ulasan Produk */}
       <div className="bg-white mt-2 pt-4">
         <div className="flex items-center justify-between px-4 mb-2">
           <p className="text-sm font-bold text-neutral-900">{t("product.reviews")}</p>
@@ -380,7 +365,6 @@ export default function ProdukDetailPage() {
             { name: "Rina",    date: "22 Sep 2026", rating: 4, title: "Baik",                body: "produk bagus, sesuai ekspektasi, akan beli lagi",                    sku: "S028113195", skuLabel: "ABC (Battery) Alkaline Battery AA LR6 Carton (288 pcs)",                   isCurrent: false, img: "https://picsum.photos/seed/rev8/80/80" },
           ].slice(0, 4).map((r) => (
             <div key={r.name + r.date} className="py-4 flex flex-col gap-2">
-              {/* Header: avatar + nama + tanggal */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-neutral-200 flex items-center justify-center shrink-0">
@@ -390,14 +374,12 @@ export default function ProdukDetailPage() {
                 </div>
                 <span className="text-[10px] text-neutral-400">{r.date}</span>
               </div>
-              {/* Bintang + judul */}
               <div className="flex gap-0.5">
                 {Array.from({ length: r.rating }).map((_, i) => (
                   <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill="#f97316"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 ))}
               </div>
               <p className="text-xs font-bold text-neutral-900">{r.title}</p>
-              {/* Foto + deskripsi sejajar */}
               <div className="flex gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.img} alt="" className="w-16 h-16 rounded-[6px] object-cover border border-neutral-200 shrink-0" />
@@ -414,7 +396,6 @@ export default function ProdukDetailPage() {
         </div>
       </div>
 
-      {/* Rekomendasi produk */}
       {([
         "product.also_viewed",
         "product.also_bought_after_view",
@@ -443,7 +424,7 @@ export default function ProdukDetailPage() {
                     <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                   </div>
                   <div className="flex items-center gap-0.5 mt-0.5">
-                    <span className="text-[10px] text-orange-400">★★★★★</span>
+                    <span className="text-[10px] text-orange-400">â˜…â˜…â˜…â˜…â˜…</span>
                     <span className="text-[9px] text-neutral-400">({p.reviews})</span>
                   </div>
                 </div>
@@ -453,7 +434,6 @@ export default function ProdukDetailPage() {
         </div>
       ))}
 
-      {/* Produk Terpopuler */}
       <div className="bg-white mt-2 py-4">
         <p className="text-sm font-bold text-neutral-900 px-4 mb-3 border-b border-neutral-100 pb-3">{t("section.popular")}</p>
         <div className="flex gap-3 px-4 overflow-x-auto pb-1 no-scrollbar">
@@ -477,7 +457,7 @@ export default function ProdukDetailPage() {
                   <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                 </div>
                 <div className="flex items-center gap-0.5 mt-0.5">
-                  <span className="text-[10px] text-orange-400">★★★★★</span>
+                  <span className="text-[10px] text-orange-400">â˜…â˜…â˜…â˜…â˜…</span>
                   <span className="text-[9px] text-neutral-400">({p.reviews})</span>
                 </div>
               </div>
@@ -488,7 +468,6 @@ export default function ProdukDetailPage() {
 
       </div>{/* end page-content */}
 
-      {/* Fly-to-cart image */}
       {mounted && flyDot && createPortal(
         <img
           src={flyDot.img}
@@ -515,7 +494,6 @@ export default function ProdukDetailPage() {
         document.body
       )}
 
-      {/* Bottom buy bar */}
       {mounted && createPortal(
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] flex items-center gap-3 z-[90]">
           <button
@@ -545,7 +523,6 @@ export default function ProdukDetailPage() {
         document.body
       )}
 
-      {/* Varian bottom sheet */}
       {mounted && showSheet && createPortal(
         <>
           <div
@@ -563,21 +540,18 @@ export default function ProdukDetailPage() {
               overscrollBehavior: "none",
             }}
           >
-            {/* Handle — drag area untuk swipe down tutup sheet */}
             <div
               ref={handleRef}
               className="flex items-center justify-center px-4 pt-4 pb-3 shrink-0"
             >
               <div className="w-10 h-1 rounded-full bg-neutral-300" />
             </div>
-            {/* Close button row */}
             <div className="flex items-center justify-between px-4 pb-2 shrink-0">
               <button type="button" onClick={closeSheet} className="text-neutral-400 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
 
-            {/* Title */}
             <div className="px-4 pb-3 shrink-0">
               <p className="text-sm font-bold text-neutral-900">{t("product.select_variant_title")}</p>
               <p className="text-[11px] text-neutral-400 mt-0.5">{VARIANTS.length} {t("product.variants_available")}</p>
@@ -585,7 +559,6 @@ export default function ProdukDetailPage() {
 
             <div className="h-px bg-neutral-100 shrink-0" />
 
-            {/* List varian — scrollable */}
             <div ref={scrollRef} className="overflow-y-auto flex-1 px-4 py-3 flex flex-col gap-2.5" style={{ overscrollBehavior: "contain" }}>
               {VARIANTS.map((v) => {
                 const isCurrent = v.sku === product.sku;
@@ -616,7 +589,6 @@ export default function ProdukDetailPage() {
                         {v.days && <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">{t(v.days)}</span>}
                       </div>
                     </div>
-                    {/* Badge + Checkmark */}
                     <div className="shrink-0 flex flex-row items-center gap-1.5 self-start mt-0.5">
                       {isCurrent && <span className="text-[10px] font-bold text-neutral-900 leading-none">{language === "en" ? "Current SKU" : "SKU saat ini"}</span>}
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-brand bg-brand" : "border-neutral-300"}`}>
@@ -628,7 +600,6 @@ export default function ProdukDetailPage() {
               })}
             </div>
 
-            {/* Bottom: qty + action — muncul setelah pilih varian */}
             <div
               className="shrink-0 border-t border-neutral-100 overflow-hidden transition-all duration-300"
               style={{ maxHeight: selectedVariant ? "160px" : "0px", opacity: selectedVariant ? 1 : 0 }}

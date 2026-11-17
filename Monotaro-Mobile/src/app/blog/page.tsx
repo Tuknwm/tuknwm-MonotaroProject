@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -48,7 +48,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-dvh bg-white pb-8">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-[70] flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} aria-label={t("common.back")} className="text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -57,7 +56,6 @@ export default function BlogPage() {
         </button>
         <h1 className="flex-1 text-sm font-bold">Blog monotaro.id</h1>
 
-        {/* Tombol kategori (hamburger) */}
         <button
           type="button"
           aria-label="Kategori"
@@ -70,7 +68,6 @@ export default function BlogPage() {
         </button>
       </header>
 
-      {/* Dropdown kategori */}
       {catOpen && (
         <div className="fixed inset-0 z-[60]" onClick={() => setCatOpen(false)}>
           <div

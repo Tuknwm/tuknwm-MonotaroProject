@@ -3,8 +3,6 @@ import { Boxes, ChevronRight, ListChecks, Package, Tag, X } from 'lucide-react'
 import CrudPage from './CrudPage.jsx'
 import { AddPicker, useIsPhone } from './BottomSheet.jsx'
 
-// Products. A product's "Specs" or "SKUs" link opens its panel below the table:
-// its specification values (they belong to the product) and its SKUs.
 export default function ProductsPage({ db, setDb, admin }) {
   const [productId, setProductId] = useState(null)
   const isPhone = useIsPhone()
@@ -29,8 +27,7 @@ export default function ProductsPage({ db, setDb, admin }) {
   }
   const extraCell = { Specs: link('specificationValues', 'spec', 'specs'), SKUs: link('productSkus', 'SKU', 'SKUs') }
 
-  // a product only offers the specifications of its own category or that category's parent
-  const category = product && db.productCategories.find((c) => c.id === product.productCategoryId)
+  const category =product && db.productCategories.find((c) => c.id === product.productCategoryId)
   const fitsProduct = (spec) => spec.productCategoryId === category?.id || spec.productCategoryId === category?.parentId
   const skuIds = new Set(db.productSkus.filter((s) => s.productId === productId).map((s) => s.id))
 
@@ -51,7 +48,6 @@ export default function ProductsPage({ db, setDb, admin }) {
             </button>
           </div>
 
-          {/* keyed so search, sort and editing reset when another product is opened */}
           <div className="product-panels">
           <section className="product-panel spec-panel panel-spec" aria-labelledby="spec-title">
             <h3 id="spec-title" className="panel-title title-with-icon">
@@ -77,7 +73,6 @@ export default function ProductsPage({ db, setDb, admin }) {
               <Tag size={18} strokeWidth={1.75} aria-hidden="true" />
               SKU Attributes
             </h3>
-            {/* values hang off SKUs, so match through the SKU and only offer this product's SKUs */}
             <CrudPage key={`attr-${product.id}`} table="skuAttributeValues" db={db} setDb={setDb} admin={admin}
               where={(v) => skuIds.has(v.productSkuId)} refFilter={{ productSkuId: (s) => s.productId === product.id }}
               fab={false} addSignal={addSignal.skuAttributeValues} />

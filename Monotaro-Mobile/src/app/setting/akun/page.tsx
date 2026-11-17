@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,12 +35,10 @@ export default function AccountSettingsPage() {
 
       <div className="page-content px-5 pt-[72px] pb-6 flex flex-col gap-6">
 
-        {/* Informasi Akun */}
         <section>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{t("settings.account_info")}</p>
           <div className="rounded-xl bg-white divide-y divide-neutral-100 shadow-sm">
 
-            {/* Informasi Kontak */}
             <div className="px-4 py-4">
               <p className="text-sm font-bold text-neutral-900 mb-3">{t("settings.contact_info")}</p>
               <div className="flex flex-col gap-1.5 mb-3">
@@ -55,7 +53,6 @@ export default function AccountSettingsPage() {
               </div>
             </div>
 
-            {/* Newsletters */}
             <div className="px-4 py-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-neutral-900 mb-0.5">Newsletters</p>
@@ -74,7 +71,6 @@ export default function AccountSettingsPage() {
           </div>
         </section>
 
-        {/* Alamat */}
         <section>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-2">{t("settings.address")}</p>
           <div className="rounded-xl bg-white divide-y divide-neutral-100 shadow-sm">

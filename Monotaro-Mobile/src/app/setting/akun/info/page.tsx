@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -93,7 +93,6 @@ export default function AccountInfoPage() {
 
       <form onSubmit={(e) => e.preventDefault()} className="page-content px-5 pt-[72px] pb-6 flex flex-col gap-6">
 
-        {/* Login ID */}
         <section className="flex flex-col gap-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">{t("account.login_id")}</p>
           <hr className="border-neutral-200" />
@@ -115,7 +114,6 @@ export default function AccountInfoPage() {
           </>}
         </section>
 
-        {/* Informasi Saya */}
         <section className="flex flex-col gap-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">{t("account.my_info")}</p>
           <hr className="border-neutral-200" />
@@ -142,7 +140,6 @@ export default function AccountInfoPage() {
           </Row>
         </section>
 
-        {/* Informasi Perusahaan */}
         <section className="flex flex-col gap-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400">{t("account.my_company_info")}</p>
           <hr className="border-neutral-200" />
@@ -157,7 +154,6 @@ export default function AccountInfoPage() {
           </Row>
         </section>
 
-        {/* Footer */}
         <div className="flex items-center justify-between gap-3 pb-6">
           <p className="text-[11px] text-neutral-500 leading-relaxed flex-1">
             <span className="font-bold">{t("account.note")}</span> {t("account.note_npwp")}

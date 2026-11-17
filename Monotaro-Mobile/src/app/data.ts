@@ -1,4 +1,4 @@
-export type Product = {
+﻿export type Product = {
   name: string;
   price: string;
   oldPrice?: string;
@@ -364,7 +364,6 @@ export const CATEGORY_SECTIONS = [
   },
 ];
 
-// Fallback dummy agar setiap subkategori punya minimal satu produk.
 export const DUMMY_CATEGORY_PRODUCTS: Product[] = CATEGORY_SECTIONS.flatMap((section, sectionIndex) =>
   section.groups.flatMap((group, groupIndex) =>
     group.items.map((subCategory, itemIndex) => {

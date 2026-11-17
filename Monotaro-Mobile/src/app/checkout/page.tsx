@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -275,7 +275,6 @@ export default function CheckoutPage() {
 
   return (
     <main className="min-h-dvh pb-28">
-      {/* Header */}
       <header className="relative flex items-center bg-brand px-4 py-4 sticky top-0 z-40 shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
@@ -287,7 +286,6 @@ export default function CheckoutPage() {
       <div className="page-content px-5 py-6 flex flex-col gap-6">
 
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-4">
-        {/* Alamat Pengiriman */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
@@ -305,7 +303,6 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Nomor PO & Faktur Pajak */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <p className="text-xs font-bold text-neutral-900">{t("checkout.po_number")}</p>
@@ -328,7 +325,6 @@ export default function CheckoutPage() {
         </div>
         </div>
 
-        {/* Review Pesanan */}
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-neutral-900">Review Pesanan</p>
@@ -357,12 +353,10 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Kode Voucher & Pembayaran */}
         {(() => {
           const pm = PAYMENTS.find(p => p.id === selectedPayment);
           return (
             <div className="bg-white rounded-[8px] border border-neutral-200 flex flex-col divide-y divide-neutral-100">
-              {/* Voucher */}
               <div className="p-4 flex flex-col gap-2">
                 <p className="text-xs font-bold text-neutral-900">Punya Kode Voucher?</p>
                 <div className="flex gap-2">
@@ -404,7 +398,6 @@ export default function CheckoutPage() {
                 </div>
                 <button type="button" onClick={() => setShowPromo(true)} className="text-[11px] font-semibold text-brand text-left">Kupon promo yang tersedia &gt;</button>
               </div>
-              {/* Pembayaran */}
               <div className="p-4 flex flex-col gap-3">
                 <p className="text-xs font-bold text-neutral-900">Pembayaran</p>
                 {pm && (
@@ -424,7 +417,6 @@ export default function CheckoutPage() {
           );
         })()}
 
-        {/* Rangkuman Pesanan */}
         <div className="bg-brand/5 rounded-[8px] p-4 flex flex-col gap-2">
           <p className="text-xs font-bold text-neutral-900">Rangkuman Pesanan</p>
           <div className="flex flex-col gap-1.5 pt-1">
@@ -453,7 +445,6 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Promo ongkir */}
         <div className="bg-white rounded-[8px] border border-neutral-200 p-4 flex gap-3">
           <svg className="w-8 h-8 text-brand shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
@@ -477,7 +468,6 @@ export default function CheckoutPage() {
         </p>
       </div>
 
-      {/* Bottom sheet promo */}
       {showPromo && typeof document !== "undefined" && createPortal(
         <>
           <div
@@ -492,7 +482,6 @@ export default function CheckoutPage() {
               transition: promoDragging ? "none" : "transform 320ms cubic-bezier(0.32,0.72,0,1)",
             }}
           >
-            {/* Drag handle */}
             <div
               className="flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing"
               style={{ touchAction: "none" }}
@@ -536,7 +525,6 @@ export default function CheckoutPage() {
         document.body
       )}
 
-      {/* Bottom sheet alamat */}
       {showAlamat && typeof document !== "undefined" && createPortal(
         <>
           <div
@@ -551,7 +539,6 @@ export default function CheckoutPage() {
               transition: alamatDragging ? "none" : "transform 320ms cubic-bezier(0.32,0.72,0,1)",
             }}
           >
-            {/* Drag handle */}
             <div
               className="flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing shrink-0"
               style={{ touchAction: "none" }}
@@ -561,7 +548,6 @@ export default function CheckoutPage() {
             >
               <div className="w-10 h-1 rounded-full bg-neutral-300" />
             </div>
-            {/* Header */}
             <div className="flex items-center justify-between px-4 pt-2 pb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <p className="text-base font-bold text-neutral-900">{t("checkout.shipping_address")}</p>
@@ -573,9 +559,7 @@ export default function CheckoutPage() {
                 </button>
               </div>
             </div>
-            {/* Form */}
             <div className="overflow-y-auto px-4 pb-6 flex flex-col gap-4">
-              {/* Nama & HP */}
               <div className="flex gap-3">
                 <div className="flex-1 flex flex-col gap-1">
                   <p className="text-xs font-semibold text-neutral-700">Nama Penerima <span className="text-brand">*</span></p>
@@ -599,7 +583,6 @@ export default function CheckoutPage() {
                   {formSubmitted && !formHp && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
                 </div>
               </div>
-              {/* Provinsi */}
               <div className="flex flex-col gap-1">
                 <p className="text-xs font-semibold text-neutral-700">Provinsi/Kota/Kabupaten/Kecamatan/Kode Pos <span className="text-brand">*</span></p>
                 <input
@@ -611,7 +594,6 @@ export default function CheckoutPage() {
                 />
                 {formSubmitted && !formProvinsi && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
               </div>
-              {/* Detail Alamat */}
               <div className="flex flex-col gap-1">
                 <p className="text-xs font-semibold text-neutral-700">Detail Alamat (Gedung, Kawasan, Nama Jalan dan Blok) <span className="text-brand">*</span></p>
                 <textarea
@@ -623,7 +605,6 @@ export default function CheckoutPage() {
                 />
                 {formSubmitted && !formDetail && <p className="text-[10px] text-brand font-semibold">Harus diisi.</p>}
               </div>
-              {/* Badan Usaha & Perusahaan */}
               <div className="flex gap-3">
                 <div className="flex-1 flex flex-col gap-1">
                   <p className="text-xs font-semibold text-neutral-700">Badan Usaha <span className="text-amber-500 font-normal">(Opsional)</span></p>
@@ -650,7 +631,6 @@ export default function CheckoutPage() {
                   />
                 </div>
               </div>
-              {/* Submit */}
               {(() => {
                 const valid = !!(formNama && formHp && formProvinsi && formDetail);
                 return (
@@ -671,7 +651,6 @@ export default function CheckoutPage() {
         document.body
       )}
 
-      {/* Bottom sheet payment */}
       {showPayment && typeof document !== "undefined" && createPortal(
         <>
           <div
@@ -728,7 +707,6 @@ export default function CheckoutPage() {
         document.body
       )}
 
-      {/* Fixed bottom bar */}
       {mounted && createPortal(
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-neutral-200 px-4 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] flex items-center justify-between gap-3 z-[100] shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
         <div>

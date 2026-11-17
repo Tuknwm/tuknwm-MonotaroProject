@@ -1,6 +1,4 @@
-// Demo data and rules. Everything lives in memory, so a page refresh resets it.
-
-export const today = () => new Date().toISOString().slice(0, 10)
+export const today =() => new Date().toISOString().slice(0, 10)
 
 export const rupiah = (n) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0)
@@ -14,9 +12,7 @@ const unique = (key, message) => (row, db, table) =>
   db[table].some((r) => r.id !== row.id && String(r[key]).toLowerCase() === String(row[key]).toLowerCase()) && message
 const validPeriod = (row) => row.endDate && row.startDate > row.endDate && 'End date must be after start date.'
 
-// attribute values (ERD: SpecificationAttributeValue, ProductSkuAttributeValue): one value per owner + attribute,
-// typed by the attribute's jsonDataType
-const cleanValue = (row) => {
+const cleanValue =(row) => {
   const v = String(row.value ?? '').trim()
   return { ...row, value: /^(true|false)$/i.test(v) ? v.toLowerCase() : v }
 }
@@ -31,8 +27,7 @@ const valueProblem = ({ owner, ownerKey, attrTable, attrKey }) => (row, db, tabl
     return `This ${owner} already has a value for that attribute. Edit that one instead.`
   return typeProblem(db[attrTable].find((a) => a.id === row[attrKey])?.jsonDataType, row.value)
 }
-// a specification belongs to a category; it also applies to products in that category's subcategories
-const specFitsProduct = (row, db) => {
+const specFitsProduct =(row, db) => {
   const product = db.products.find((p) => p.id === row.productId)
   const spec = db.specificationAttributes.find((a) => a.id === row.specificationAttributeId)
   const category = db.productCategories.find((c) => c.id === product.productCategoryId)
@@ -40,9 +35,7 @@ const specFitsProduct = (row, db) => {
   return `${spec.name} only applies to ${labelOf(db.productCategories.find((c) => c.id === spec.productCategoryId))} products.`
 }
 
-// Field types: text (default), textarea, number, money, percent (stored 0–1), date, checkbox, password, email, stars.
-// `ref` points at another table; with type 'multi' it holds an array of ids.
-export const TABLES = {
+export const TABLES ={
   rfqs: {
     label: 'Quotation Requests', readOnly: true, noView: true,
     fields: [
@@ -205,7 +198,6 @@ export const TABLES = {
       { key: 'postedAt', label: 'Posted', type: 'date', auto: true },
       { key: 'updatedAt', label: 'Updated', type: 'date', auto: true, hideInList: true },
     ],
-    // the signed-in admin owns whatever they create
     defaults: (admin) => ({ adminAccountId: admin.id, postedAt: today() }),
     normalize: (row) => ({ ...row, updatedAt: today() }),
   },
@@ -236,7 +228,6 @@ export const TABLES = {
     hideDelete: (row) => row.email.toLowerCase() === 'monotaro@admin.id',
     canDelete: (row, admin) => row.id === admin.id && 'You cannot delete your own account.',
   },
-  // Orders has its own page; listed here so delete checks see its references.
   orders: {
     label: 'Orders',
     fields: [
@@ -259,7 +250,6 @@ export const DELIVERY_FIELDS = [
   { key: 'note', label: 'Note', type: 'textarea' },
 ]
 
-// Returns why a row can't be deleted, or false.
 export function inUse(db, table, id) {
   for (const [other, cfg] of Object.entries(TABLES)) {
     for (const f of cfg.fields) {
@@ -289,7 +279,6 @@ export const shippedCount = (order) => {
   return { ordered, shipped }
 }
 
-// shortcut: rules key off status names; statuses are fixed data (no admin menu), so keep these names in sync with the seed
 export function changeOrderStatus(db, orderId, statusId) {
   const order = db.orders.find((o) => o.id === orderId)
   const statusName = (id) => db.orderStatuses.find((s) => s.id === id)?.name
@@ -301,7 +290,6 @@ export function changeOrderStatus(db, orderId, statusId) {
   if (statusName(statusId) === 'Completed' && shipped < ordered)
     throw new Error(`Only ${shipped} of ${ordered} items have been shipped. Ship the rest before completing.`)
 
-  // cancelling puts the items back in stock; reopening takes them out again
   let skus = db.productSkus
   const wasCancelled = statusName(order.orderStatusId) === 'Cancelled'
   const nowCancelled = statusName(statusId) === 'Cancelled'

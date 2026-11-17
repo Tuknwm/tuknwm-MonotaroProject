@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import DeliveryNote from "@/components/DeliveryNote";
 
 const PAGE_ANIM = `
 @keyframes pageItemIn {
@@ -44,7 +45,10 @@ export default function OrderStatusPage({ title }: { title: string }) {
   function openInfo() { setInfoSheet(true); document.body.style.overflow = "hidden"; requestAnimationFrame(() => requestAnimationFrame(() => setInfoVisible(true))); }
   function closeInfo() { setInfoVisible(false); document.body.style.overflow = ""; setTimeout(() => setInfoSheet(false), 300); }
 
-  // review sheet state
+  const [noteIndex, setNoteIndex] = useState<number | null>(null);
+  function openNote(i: number) { setNoteIndex(i); document.body.style.overflow = "hidden"; }
+  function closeNote() { setNoteIndex(null); document.body.style.overflow = ""; }
+
   const [sheetProduct, setSheetProduct] = useState<[string, string, string] | null>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [stars, setStars] = useState(0);
@@ -120,7 +124,14 @@ export default function OrderStatusPage({ title }: { title: string }) {
                   <p className="text-[10px] text-neutral-500">10 November 2026</p>
                 </div>
               </div>
-              <button type="button" onClick={openInfo}><svg className="h-5 w-5 text-neutral-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Informasi"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg></button>
+              <div className="flex items-center gap-1">
+                {title === "Telah Dikirim" && (
+                  <button type="button" onClick={() => openNote(index)} aria-label="Delivery Note">
+                    <svg className="h-5 w-5 text-neutral-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><line x1="10" y1="9" x2="8" y2="9" /></svg>
+                  </button>
+                )}
+                <button type="button" onClick={openInfo}><svg className="h-5 w-5 text-neutral-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Informasi"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg></button>
+              </div>
             </div>
             <div className="mt-4 flex items-center gap-3 border-y border-neutral-100 py-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -163,7 +174,6 @@ export default function OrderStatusPage({ title }: { title: string }) {
         ))}
       </div>
 
-      {/* Info bottom sheet */}
       {infoSheet && createPortal(
         <div className={`fixed inset-0 z-[200] flex items-end bg-black/40 transition-opacity duration-300 ${infoVisible ? "opacity-100" : "opacity-0"}`} onClick={closeInfo}>
           <div className="w-full rounded-t-3xl bg-white p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.18)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ transform: infoVisible ? "translateY(0)" : "translateY(100%)" }} onClick={e => e.stopPropagation()}>
@@ -175,14 +185,12 @@ export default function OrderStatusPage({ title }: { title: string }) {
         document.body
       )}
 
-      {/* Review bottom sheet */}
       {sheetProduct && createPortal(
         <div className={`fixed inset-0 z-[200] flex items-end bg-black/40 transition-opacity duration-300 ${sheetVisible ? "opacity-100" : "opacity-0"}`} onClick={closeReview}>
           <div className="w-full rounded-t-3xl bg-white p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.18)]" style={{ transform: sheetVisible ? `translateY(${sheetY}px)` : "translateY(100%)", transition: isDragging ? "none" : "transform 300ms cubic-bezier(0.32,0.72,0,1)" }} onClick={e => e.stopPropagation()} onPointerDown={handleDragStart} onPointerMove={handleDragMove} onPointerUp={handleDragEnd}>
             <div className="mx-auto -mt-1 mb-3 flex cursor-grab touch-none items-center justify-center py-2" style={{ touchAction: "none" }}>
               <div className="h-1 w-10 rounded-full bg-neutral-300" />
             </div>
-            {/* Product info */}
             <div className="mb-4 flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={sheetProduct[2]} alt={sheetProduct[0]} className="h-14 w-14 rounded-[8px] bg-neutral-50 object-contain border border-neutral-100" />
@@ -191,7 +199,6 @@ export default function OrderStatusPage({ title }: { title: string }) {
                 <p className="mt-0.5 text-[11px] text-neutral-500">1 item · {sheetProduct[1]}</p>
               </div>
             </div>
-            {/* Stars */}
             <style>{TOAST_STYLE}</style>
             <div className="mb-3 flex justify-center gap-2">
               {[1,2,3,4,5].map(s => (
@@ -202,7 +209,6 @@ export default function OrderStatusPage({ title }: { title: string }) {
                 </button>
               ))}
             </div>
-            {/* Review text */}
             <div className="relative">
               <textarea
                 value={reviewText}
@@ -222,6 +228,7 @@ export default function OrderStatusPage({ title }: { title: string }) {
       )}
 
       {toast && createPortal(<><style>{TOAST_STYLE}</style><div className="toast-anim fixed bottom-24 left-1/2 z-[9999] rounded-[10px] bg-neutral-900/90 px-4 py-2.5 text-xs font-semibold text-white shadow-lg whitespace-nowrap" style={{ transform: "translateX(-50%)" }}>{t("order.added_to_cart")}</div></>, document.body)}
+      {noteIndex !== null && <DeliveryNote orderIndex={noteIndex} onClose={closeNote} />}
     </main>
   );
 }

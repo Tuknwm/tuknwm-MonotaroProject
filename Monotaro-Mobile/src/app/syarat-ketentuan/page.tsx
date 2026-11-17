@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -515,7 +515,6 @@ function EnContent() {
 
 function IdContent() {
   return <>
-    {/* BAB 1 */}
     <Bab title="BAB 1 - Ketentuan Umum" />
 
     <Pasal title="Pasal 1 - Lingkup Kebijakan">

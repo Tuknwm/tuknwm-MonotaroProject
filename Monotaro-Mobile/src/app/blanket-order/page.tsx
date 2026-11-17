@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -77,7 +77,6 @@ export default function BlanketOrderPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -86,7 +85,6 @@ export default function BlanketOrderPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-base font-bold text-neutral-900 mb-2">
             {language === "en"
@@ -100,7 +98,6 @@ export default function BlanketOrderPage() {
           </p>
         </div>
 
-        {/* Steps */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 mb-4">
             {language === "en" ? "Blanket Order Submission Steps" : "Langkah-langkah Pengajuan Blanket Order"}
@@ -118,7 +115,6 @@ export default function BlanketOrderPage() {
           </div>
         </div>
 
-        {/* Clause */}
         <div className="mx-4 my-4 rounded-[8px] border border-neutral-200 bg-neutral-50 p-4">
           <p className="text-[11px] font-bold text-neutral-900 mb-3">
             {language === "en"
@@ -132,7 +128,6 @@ export default function BlanketOrderPage() {
           </ul>
         </div>
 
-        {/* Form */}
         <div className="px-4 pb-6">
           <h3 className="text-base font-bold text-neutral-900 mb-4 pt-4 border-t border-neutral-200">
             {language === "en" ? "Blanket Order Submission Form" : "Formulir Pengajuan Blanket Order"}

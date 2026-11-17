@@ -4,8 +4,6 @@ import { Check, ChevronDown } from 'lucide-react'
 
 const MAX_HEIGHT = 280
 
-// Select-only combobox (WAI-ARIA pattern). The list renders in a portal so
-// scrolling tables and modals don't clip it. options: [{ value, label }]
 export default function Select({ value, options, onChange, required, label, className }) {
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
@@ -50,9 +48,8 @@ export default function Select({ value, options, onChange, required, label, clas
     if (!open) return
     const inside = (e) => listRef.current?.contains(e.target) || buttonRef.current?.contains(e.target)
     const onPointer = (e) => !inside(e) && close()
-    // the list is fixed-positioned, so close it rather than let it drift away from its button
-    const onScroll = (e) => !listRef.current?.contains(e.target) && setOpen(false)  // instant on scroll
-    const onResize = () => setOpen(false)  // instant on resize
+    const onScroll = (e) => !listRef.current?.contains(e.target) && setOpen(false)
+    const onResize = () => setOpen(false)
     document.addEventListener('pointerdown', onPointer)
     window.addEventListener('scroll', onScroll, true)
     window.addEventListener('resize', onResize)
@@ -84,7 +81,6 @@ export default function Select({ value, options, onChange, required, label, clas
       e.preventDefault()
       pick(active)
     } else if (e.key === 'Escape') {
-      // keep the surrounding modal or drawer open
       e.preventDefault()
       e.stopPropagation()
       close()
@@ -112,7 +108,6 @@ export default function Select({ value, options, onChange, required, label, clas
         <ChevronDown size={16} aria-hidden="true" />
       </button>
 
-      {/* lets the browser's required-field check cover this control too */}
       {required && (
         <input
           className="select-validate"

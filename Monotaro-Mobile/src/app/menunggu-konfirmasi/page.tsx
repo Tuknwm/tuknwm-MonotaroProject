@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -33,7 +33,6 @@ export default function MenungguKonfirmasiPage() {
   function pointerMove(event: React.PointerEvent<HTMLDivElement>) {
     if (!dragging.current) return;
     const delta = event.clientY - startY.current;
-    // swipe up: rubber-band resistance (dampened), swipe down: free
     currentY.current = delta > 0 ? delta : delta / 3;
     setSheetY(currentY.current);
   }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -49,7 +49,6 @@ export default function MultipleLoginPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-2xl font-extrabold text-neutral-900 mb-3">Multiple Login</h2>
           <p className="text-[11px] text-neutral-700 leading-relaxed mb-3 text-justify">
@@ -62,7 +61,6 @@ export default function MultipleLoginPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/MultipleLogin/MultipleLogin.avif" alt="Multiple Login" className="w-full object-contain rounded-[8px]" />
 
-          {/* Benefit chips */}
           <div className="flex flex-wrap gap-2 mt-3">
             {BENEFITS.map((b) => (
               <div key={b} className="relative bg-white rounded-[8px] px-3 py-2.5 shadow-sm border border-neutral-100 overflow-hidden">
@@ -73,7 +71,6 @@ export default function MultipleLoginPage() {
           </div>
         </div>
 
-        {/* Cara Mendapatkan */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-4">{language === "en" ? "How to Get the Multiple Login Feature" : "Cara Mendapatkan Fitur Multiple Login"}</h3>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -91,7 +88,6 @@ export default function MultipleLoginPage() {
           </button>
         </div>
 
-        {/* Cara Menggunakan */}
         <div className="px-4 py-4 pb-6">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-4">{language === "en" ? "How to Use the Multiple Login Feature" : "Cara Menggunakan Fitur Multiple Login"}</h3>
           <div className="flex flex-col gap-5">

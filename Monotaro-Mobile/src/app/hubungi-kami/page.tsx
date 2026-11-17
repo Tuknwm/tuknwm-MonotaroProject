@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -79,7 +79,6 @@ export default function HubungiKamiPage() {
       </header>
 
       <div className="mx-3 mt-3 space-y-3">
-        {/* Contact section */}
         <div className="rounded-[10px] bg-white shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-neutral-100">
             <h2 className="text-sm font-bold text-neutral-900">{t("account.contact_us")}</h2>
@@ -94,7 +93,6 @@ export default function HubungiKamiPage() {
           </div>
         </div>
 
-        {/* Company Information section */}
         <div className="rounded-[10px] bg-white shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-neutral-100">
             <h2 className="text-sm font-bold text-neutral-900">

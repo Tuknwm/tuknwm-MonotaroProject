@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useIsPhone } from './BottomSheet.jsx'
 import {
-  BadgeCheck, Boxes, Building2, ChevronDown, CircleDot, ClipboardList, FileText, FolderTree, LayoutDashboard, Library, Menu,
+  ArrowLeft, ArrowRight, BadgeCheck, Boxes, Building2, ChevronDown, CircleDot, ClipboardList, FileText, FolderTree, LayoutDashboard, Library, Menu,
   MessageSquareQuote, Network, Package, PanelLeftClose, PanelLeftOpen, Percent, Receipt, Settings2, ShieldCheck,
   ShoppingCart, SlidersHorizontal, Star, Tags, TicketPercent, TrendingUp, Users, UsersRound,
 } from 'lucide-react'
@@ -38,18 +38,16 @@ const title = (page) => page === 'overview' ? 'Overview' : page === 'config' ? '
 const groupOf = (page) => NAV.find(([, pages]) => pages.includes(page))[0]
 
 export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
-  const [page, setPage] = useState('overview')
-  // only used on phones, where the sidebar becomes a drawer
+  const [page, setPage] = useState(() => sessionStorage.getItem('dash-page') || 'overview')
   const [menuOpen, setMenuOpen] = useState(false)
   const isPhone = useIsPhone()
+  const [mobileBanner, setMobileBanner] = useState(() => isPhone && !localStorage.getItem('mobile-banner-dismissed'))
 
-  // phones: swipe right opens the menu drawer, swipe left closes it
   useEffect(() => {
     if (!isPhone) return
     let start = null
     const onStart = (e) => {
       const t = e.touches[0]
-      // leave swipes to a table that can still scroll back left, and to open sheets and dialogs
       const table = e.target.closest?.('.table-wrap')
       const busy = (table && table.scrollLeft > 0) || e.target.closest?.('.sheet-overlay, .overlay')
       start = busy ? null : { x: t.clientX, y: t.clientY }
@@ -67,6 +65,9 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
     return () => { window.removeEventListener('touchstart', onStart); window.removeEventListener('touchend', onEnd) }
   }, [isPhone])
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarRight, setSidebarRight] = useState(() => localStorage.getItem('sidebar-right') === '1')
+  const [sidebarAnim, setSidebarAnim] = useState(null)
+  const nextSidebarRight = useRef(null)
   const [confirming, setConfirming] = useState(null)
   const CONFIRMS = {
     reset: { title: 'Reset demo?', text: 'All demo data goes back to its original state. Your changes will be lost.', action: 'Reset', run: onReset },
@@ -84,13 +85,24 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
 
   const go = (p) => {
     setPage(p)
+    sessionStorage.setItem('dash-page', p)
     setMenuOpen(false)
-    // links from Overview can jump into a closed group; open it so the active item stays visible
     setOpenGroups((open) => new Set(open).add(groupOf(p)))
   }
 
+  const dismissMobileBanner = () => { localStorage.setItem('mobile-banner-dismissed', '1'); setMobileBanner(false) }
+
   return (
-    <div className="dashboard" onKeyDown={(e) => e.key === 'Escape' && setMenuOpen(false)}>
+    <div className="dashboard" data-sidebar-right={sidebarRight || undefined} data-sidebar-collapsed={!sidebarOpen || undefined} data-sidebar-anim={sidebarAnim || undefined} onKeyDown={(e) => e.key === 'Escape' && setMenuOpen(false)}>
+      {mobileBanner && (
+        <div className="mobile-banner-overlay" onClick={dismissMobileBanner}>
+          <div className="mobile-banner" onClick={(e) => e.stopPropagation()}>
+            <img src="/Ok.webp" alt="" className="mobile-banner-img" />
+            <p>This dashboard is designed for desktop. You can still browse on mobile, but some features work best on a larger screen.</p>
+            <button className="mobile-banner-btn" onClick={dismissMobileBanner}>Got it</button>
+          </div>
+        </div>
+      )}
       <header className="topbar">
         <img src="/Logo.png" alt="Monotaro.id" />
         <button className="btn btn-ghost" aria-expanded={menuOpen} aria-controls="sidebar" onClick={() => setMenuOpen(true)}>
@@ -99,7 +111,16 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
       </header>
       {menuOpen && <div className="backdrop" onClick={() => setMenuOpen(false)} />}
 
-      <aside id="sidebar" className={menuOpen ? 'sidebar open' : 'sidebar'} data-collapsed={!sidebarOpen || undefined}>
+      <aside id="sidebar" className={menuOpen ? 'sidebar open' : 'sidebar'} data-collapsed={!sidebarOpen || undefined} data-anim={sidebarAnim || undefined} onAnimationEnd={() => {
+          if (sidebarAnim === 'exit-left' || sidebarAnim === 'exit-right') {
+            const v = nextSidebarRight.current
+            setSidebarRight(v)
+            localStorage.setItem('sidebar-right', v ? '1' : '0')
+            setSidebarAnim(v ? 'enter-right' : 'enter-left')
+          } else {
+            setSidebarAnim(null)
+          }
+        }}>
         <img src="/Logo.png" alt="Monotaro.id" />
 
         <nav>
@@ -115,7 +136,6 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
                   <ChevronDown className="chevron" size={16} aria-hidden="true" />
                 </button>
               )}
-              {/* stays mounted so it can animate; inert keeps hidden items out of tab order */}
               <div className="nav-items" data-open={!group || openGroups.has(group)} inert={group && !openGroups.has(group)}>
                 <div>
                   {pages.map((p) => {
@@ -149,21 +169,30 @@ export default function Dashboard({ admin, db, setDb, onSignOut, onReset }) {
         </ConfirmDialog>
       )}
 
-      <button
-        className={sidebarOpen ? 'sidebar-collapse-btn' : 'sidebar-expand-btn'}
-        onClick={() => setSidebarOpen((v) => !v)}
-        aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-      >
-        {sidebarOpen
-          ? <PanelLeftClose size={18} strokeWidth={1.75} />
-          : <PanelLeftOpen size={18} strokeWidth={1.75} />}
-      </button>
+      <div className="sidebar-btns">
+        <button
+          className="sidebar-side-btn"
+          onClick={() => {
+            const v = !sidebarRight
+            nextSidebarRight.current = v
+            setSidebarAnim(v ? 'exit-left' : 'exit-right')
+          }}
+          aria-label={sidebarRight ? 'Move sidebar to left' : 'Move sidebar to right'}
+          title={sidebarRight ? 'Move sidebar to left' : 'Move sidebar to right'}
+        >
+          {sidebarRight ? <ArrowLeft size={18} strokeWidth={1.75} /> : <ArrowRight size={18} strokeWidth={1.75} />}
+        </button>
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen((v) => !v)}
+          aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        >
+          {sidebarOpen ? <PanelLeftClose size={18} strokeWidth={1.75} /> : <PanelLeftOpen size={18} strokeWidth={1.75} />}
+        </button>
+      </div>
 
       <main className="content">
-        {page !== 'vouchers' && (
-          <h1>{title(page)}</h1>
-        )}
-        {/* keyed so the enter animation replays on every page change */}
+        <h1>{title(page)}</h1>
         <div className={`page page-${page}`} key={page}>
           {page === 'overview' ? <Overview db={db} go={go} />
             : page === 'catalog' ? <CatalogPage db={db} setDb={setDb} admin={admin} />

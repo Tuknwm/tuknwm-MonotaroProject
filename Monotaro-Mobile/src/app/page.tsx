@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { createPortal } from "react-dom";
 import { AkunContent } from "@/components/AkunPage";
 import { KeranjangContent } from "@/components/KeranjangPage";
@@ -184,9 +184,7 @@ function KategoriSection({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="bg-white flex flex-col">
-      {/* Two-column layout */}
       <div className="flex flex-none h-[calc(100dvh-72px)] min-h-0 overflow-hidden">
-        {/* Sidebar */}
         <div className="w-[90px] shrink-0 h-full overflow-y-scroll overscroll-y-contain bg-neutral-50 border-r border-neutral-200 pb-32 no-scrollbar">
           {CATEGORY_SECTIONS.map((c, i) => (
             <button
@@ -204,9 +202,7 @@ function KategoriSection({ onBack }: { onBack: () => void }) {
           ))}
         </div>
 
-        {/* Content */}
         <div className="flex-1 h-full min-w-0 overflow-y-scroll overscroll-y-contain pb-32 no-scrollbar">
-          {/* Category header */}
           <div className="px-3 py-3 border-b border-neutral-100 flex items-center justify-between">
             <div>
               <p className="text-sm font-bold text-neutral-900">{cat.name}</p>
@@ -221,11 +217,9 @@ function KategoriSection({ onBack }: { onBack: () => void }) {
             </button>
           </div>
 
-          {/* Groups */}
           <div className="flex flex-col gap-0">
             {cat.groups.map((g) => (
               <div key={g.name} className="border-b border-neutral-100">
-                {/* Group header */}
                 <button
                   type="button"
                   onClick={() => router.push(`/kategori/${encodeURIComponent(g.name)}`)}
@@ -238,7 +232,6 @@ function KategoriSection({ onBack }: { onBack: () => void }) {
                   </div>
                   <svg className="w-4 h-4 text-neutral-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6"/></svg>
                 </button>
-                {/* Subcategory items */}
                 <div className="px-3 pb-2 grid grid-cols-2 gap-x-2 gap-y-0">
                   {g.items.slice(0, 6).map((it) => (
                     <button
@@ -281,7 +274,6 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
   useEffect(() => { setPortalEl(document.getElementById("modal-root")); }, []);
   useEffect(() => {
     if (!portalEl) return;
-    // two frames so the off-screen start position is painted before transitioning in
     let id = requestAnimationFrame(() => { id = requestAnimationFrame(() => setShown(true)); });
     return () => cancelAnimationFrame(id);
   }, [portalEl]);
@@ -331,16 +323,13 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
           onPointerUp={onDragEnd}
           onPointerCancel={onDragEnd}
         >
-          {/* Handle */}
           <div className="flex justify-center pt-2.5 pb-1">
             <div className="w-10 h-1 rounded-full bg-neutral-300" />
           </div>
-          {/* Header */}
           <div className="px-4 pb-2">
             <h2 className="text-[15px] font-bold text-neutral-900">{t("home.all_brands")}</h2>
           </div>
         </div>
-        {/* Search */}
         <div className="px-4 pb-3 shrink-0">
           <div className="flex items-center gap-2 bg-neutral-100 rounded-[8px] px-3">
             <svg className="w-4 h-4 shrink-0 text-neutral-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" d="m21 21-4.3-4.3M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" /></svg>
@@ -348,7 +337,6 @@ function BrandSheet({ onClose }: { onClose: () => void }) {
             {q && <button onClick={() => setQ("")} className="text-neutral-400 text-base leading-none">×</button>}
           </div>
         </div>
-        {/* Grid */}
         <div className="overflow-y-auto px-4 pb-8">
           <div className="grid grid-cols-4 gap-3">
             {filtered.map((b) => (
@@ -445,7 +433,6 @@ export default function Home() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  // scroll to top on mount (e.g. navigating back from product page)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
@@ -463,7 +450,6 @@ export default function Home() {
 
   return (
     <div className="min-h-dvh pb-24 relative">
-      {/* Header */}
       {section === "akun" && <div key="akun" className="section-transition"><AkunContent onBack={() => changeSection("home")} /></div>}
       {section === "keranjang" && <div key="keranjang"><KeranjangContent /></div>}
       {(section === "home" || section === "kategori") && <header className="bg-brand sticky top-0 z-40 px-4 pt-2.5 pb-3 shadow-md rounded-b-3xl">
@@ -496,7 +482,6 @@ export default function Home() {
       {section === "kategori" && <div key="kategori"><KategoriSection onBack={() => changeSection("home")} /></div>}
       {section === "home" && <div key="home" className="section-transition">
 
-      {/* Register promo popout — rendered via portal so it overlays correctly on mobile */}
       {showPromo && promoPortal && createPortal(
         <div className="absolute inset-0 z-50 flex items-center justify-center px-5">
           <div
@@ -526,7 +511,6 @@ export default function Home() {
         promoPortal
       )}
 
-      {/* Hero + quick links */}
       <div className="mt-3 grid grid-cols-[minmax(0,1fr)_88px] items-stretch gap-2 px-4">
         <div className="min-w-0">
           <HeroCarousel />
@@ -557,7 +541,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Services */}
       <div className="flex gap-2.5 px-4 mt-3 overflow-x-auto no-scrollbar">
         {SERVICES.map((s) => (
           <div key={s.title} className="shrink-0 rounded-[13px] overflow-hidden">
@@ -566,7 +549,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Product Highlight */}
       <section className="mt-3 py-4 bg-white">
         <SectionTitle title="PRODUCT HIGHLIGHT" action="" />
         <div className="overflow-x-auto no-scrollbar">
@@ -576,7 +558,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Value props */}
       <div className="flex gap-2 px-4 mt-3">
         {[
           { icon: <><path d="M7 7h10M7 11h6"/><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M16 15h2"/></>, text: t("val.exclusive_promo") },
@@ -591,7 +572,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Popular */}
       {recentlyViewed.length > 0 && <section className="mt-3 py-4 bg-white">
         <SectionTitle title={t("home.recently_viewed")} action="" />
         <div className="overflow-x-auto no-scrollbar"><div className="flex gap-2.5 px-4 w-max snap-x">
@@ -607,7 +587,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Top categories */}
       <section className="mt-3 py-4">
         <SectionTitle title={t("section.top_categories")} sub={t("section.top_categories_sub")} action="" />
         <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-4">
@@ -623,7 +602,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Brands */}
       <section className="mt-3 py-4">
         <SectionTitle title={t("section.brands")} onAction={() => setShowAllBrands(true)} />
         <div className="grid grid-cols-4 gap-2 px-4">
@@ -637,7 +615,6 @@ export default function Home() {
 
       <div className="mt-3"><CategoryExplorer /></div>
 
-      {/* Articles */}
       <section className="mt-3 py-4">
         <SectionTitle title={t("section.articles")} action={t("section.articles_action")} onAction={() => router.push("/blog")} />
         <div className="overflow-x-auto no-scrollbar">
@@ -654,7 +631,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Promos */}
       <section className="mt-3 py-4">
         <SectionTitle title={t("section.promos")} action={t("account.view_all")} onAction={() => router.push("/promo")} />
         <div className="overflow-x-auto no-scrollbar">
@@ -669,7 +645,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       {false && <footer className="mt-3">
         <div className="bg-neutral-200/70 flex gap-4 px-4 py-3 overflow-x-auto no-scrollbar">
           {FOOTER_TABS.map((t) => <span key={t} className="shrink-0 text-xs font-semibold text-neutral-700">{t}</span>)}
@@ -772,7 +747,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Bottom nav */}
       <BottomNav
         activeSection={section}
         onNavigate={(s) => {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -129,7 +129,6 @@ export default function OnlineApprovalPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -138,7 +137,6 @@ export default function OnlineApprovalPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-base font-bold text-neutral-900 mb-2">
             {language === "en" ? "Order Process with Online Approval System" : "Proses Pemesanan dengan Online Approval System"}
@@ -156,7 +154,6 @@ export default function OnlineApprovalPage() {
           </button>
         </div>
 
-        {/* Flow images */}
         <div className="px-4 py-4 border-b border-neutral-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/OnlineApproval/cara-pesan-online-approval3.avif" alt="Online Approval guide" className="w-full rounded-[8px] mb-3" />
@@ -164,7 +161,6 @@ export default function OnlineApprovalPage() {
           <img src="/OnlineApproval/flow-approval-b.avif" alt="Approval Flow" className="w-full rounded-[8px]" />
         </div>
 
-        {/* Step images 1-4 */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <p className="text-[10px] text-neutral-500 italic leading-relaxed mb-3">
             {language === "en"
@@ -194,7 +190,6 @@ export default function OnlineApprovalPage() {
           </div>
         </div>
 
-        {/* How to Get */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-1">
             {language === "en"
@@ -220,7 +215,6 @@ export default function OnlineApprovalPage() {
           </button>
         </div>
 
-        {/* Benefits */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-4">
             {language === "en" ? "Benefits of Online Order Approval" : "Benefit Approval Pesanan Secara Online"}
@@ -239,14 +233,12 @@ export default function OnlineApprovalPage() {
           </div>
         </div>
 
-        {/* Download button */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <button type="button" className="w-full bg-brand text-white text-xs font-bold py-3 rounded-[8px]">
             {language === "en" ? "Download Order Guide with Online Approval System" : "Download Panduan Proses Pemesanan dengan Online Approval System"}
           </button>
         </div>
 
-        {/* Banner opinion */}
         <div className="mx-4 my-4 rounded-[12px] overflow-hidden relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/OnlineApproval/bn-opinion.avif" alt={language === "en" ? "Share your opinion" : "Berikan pendapat Anda"} className="w-full" />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -42,7 +42,6 @@ export default function PickupFormPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Warehouse locations */}
         {WAREHOUSES.map((w) => (
           <div key={w.id} className="px-4 py-4 border-b border-neutral-200">
             <h2 className="text-base font-bold text-neutral-900 mb-1">{w.name}</h2>
@@ -69,13 +68,11 @@ export default function PickupFormPage() {
           </div>
         ))}
 
-        {/* Form */}
         <div className="px-4 py-5">
           <p className="text-[12px] font-bold text-neutral-700 text-center mb-4">Silahkan isi form berikut untuk mengajukan pick up barang pesanan Anda</p>
           <hr className="border-neutral-200 mb-5" />
 
           <div className="flex flex-col gap-4">
-            {/* Nomor Order */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-neutral-800">Nomor Order <span className="text-brand">*</span></label>
               <input
@@ -87,7 +84,6 @@ export default function PickupFormPage() {
               <p className="text-[10px] text-brand">Nomor pesanan dapat di cek pada email konfirmasi pesanan, contoh : 600000001</p>
             </div>
 
-            {/* Contact Person */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-neutral-800">Contact Person <span className="text-brand">*</span></label>
               <input
@@ -98,7 +94,6 @@ export default function PickupFormPage() {
               />
             </div>
 
-            {/* Pilih Lokasi Warehouse */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-neutral-800">Pilih Lokasi Warehouse <span className="text-brand">*</span></label>
               <CustomSelect
@@ -109,7 +104,6 @@ export default function PickupFormPage() {
               />
             </div>
 
-            {/* Email */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-neutral-800">Email <span className="text-brand">*</span></label>
               <input
@@ -120,7 +114,6 @@ export default function PickupFormPage() {
               />
             </div>
 
-            {/* Catatan */}
             <div className="bg-white rounded">
               <p className="text-[11px] font-semibold text-neutral-800 mb-1">Catatan:</p>
               <ul className="list-disc pl-4 flex flex-col gap-1">
@@ -129,7 +122,6 @@ export default function PickupFormPage() {
               </ul>
             </div>
 
-            {/* Captcha */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-neutral-800">Masukkan kode <span className="text-brand">*</span></label>
               <div className="flex items-center gap-2 mb-1">
@@ -146,7 +138,6 @@ export default function PickupFormPage() {
               />
             </div>
 
-            {/* Submit */}
             <button
               type="button"
               className="w-full bg-brand text-white text-sm font-bold py-3 rounded-[8px] mt-2"

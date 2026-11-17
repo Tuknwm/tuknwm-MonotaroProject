@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -42,11 +42,9 @@ export default function PickupServicePage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Banner */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/PickUpService/BannerAtas.avif" alt="Pick Up Service" className="w-full" />
 
-        {/* Description */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <p className="text-[11px] text-neutral-700 leading-relaxed text-justify">
             {language === "en"
@@ -56,7 +54,6 @@ export default function PickupServicePage() {
           </p>
         </div>
 
-        {/* How to Use */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 mb-4">
             {language === "en" ? "How to use Pick Up Service?" : "Bagaimana caranya menggunakan layanan Pick Up Service?"}
@@ -83,7 +80,6 @@ export default function PickupServicePage() {
           </div>
         </div>
 
-        {/* Info Links */}
         <div className="px-4 py-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-neutral-700">{language === "en" ? "Fill in the Pick Up Form" : "Isi Form Pick Up"}</p>

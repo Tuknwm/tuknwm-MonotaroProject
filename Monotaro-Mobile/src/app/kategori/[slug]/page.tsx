@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter, useParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
@@ -16,7 +16,7 @@ const ALL_PRODUCTS: Product[] = [
 ];
 
 function Stars() {
-  return <span className="text-[11px] tracking-[-1px] text-orange-500">★★★★★</span>;
+  return <span className="text-[11px] tracking-[-1px] text-orange-500">â˜…â˜…â˜…â˜…â˜…</span>;
 }
 
 function ProductCard({ p }: { p: Product }) {
@@ -158,7 +158,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
     }
   };
 
-  // always render so the close transition plays; sheet slides out when open=false
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col justify-end overflow-hidden"
@@ -176,7 +175,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           transition: dragY === 0 ? "transform 0.35s cubic-bezier(0.32,0.72,0,1)" : "none",
         }}
       >
-        {/* Drag handle — only this area handles swipe */}
         <div
           className="flex justify-center pt-3 pb-1 shrink-0 cursor-grab active:cursor-grabbing"
           style={{ touchAction: "none" }}
@@ -193,9 +191,7 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           </button>
         </div>
 
-        {/* Scrollable content — vertical only, no horizontal */}
         <div className="overflow-y-auto overflow-x-hidden overscroll-contain flex-1 px-4 pb-6 flex flex-col gap-5" style={{ touchAction: "pan-y" }}>
-          {/* Merek */}
           <div>
             <button
               type="button"
@@ -219,7 +215,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                 className={`fixed z-[70] bg-white border border-neutral-200 rounded-[8px] overflow-hidden shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-all duration-200 ease-out ${brandOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0 pointer-events-none"}`}
                 style={{ top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
               >
-                {/* Search */}
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-neutral-100">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-400 shrink-0">
                     <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
@@ -237,7 +232,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                     </button>
                   )}
                 </div>
-                {/* Selected chips */}
                 {selectedBrands.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 px-3 py-2 border-b border-neutral-100">
                     {selectedBrands.map((b) => (
@@ -248,7 +242,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                     ))}
                   </div>
                 )}
-                {/* List */}
                 <div className="max-h-48 overflow-y-auto" style={{ touchAction: "pan-y" }}>
                   {filteredBrands.length === 0 ? (
                     <p className="text-xs text-neutral-400 text-center py-4">{t("filter.brand_not_found")}</p>
@@ -273,7 +266,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
             )}
           </div>
 
-          {/* Area */}
           <div>
             <button
               type="button"
@@ -316,7 +308,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
             )}
           </div>
 
-          {/* Rentang Harga */}
           <div>
             <p className="text-xs font-bold text-neutral-700 mb-2">{t("filter.price_range")}</p>
             <div className="flex items-center gap-2">
@@ -327,7 +318,7 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                 onChange={(e) => setMinPrice(e.target.value)}
                 className="flex-1 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs outline-none focus:border-brand"
               />
-              <span className="text-neutral-400 text-xs">–</span>
+              <span className="text-neutral-400 text-xs">â€“</span>
               <input
                 type="number"
                 placeholder="Max"
@@ -338,7 +329,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
             </div>
           </div>
 
-          {/* Urutkan */}
           <div>
             <p className="text-xs font-bold text-neutral-700 mb-2">{t("filter.sort")}</p>
             <div className="flex flex-wrap gap-2">
@@ -355,7 +345,6 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           </div>
         </div>
 
-        {/* Apply */}
         <div className="px-4 py-3 border-t border-neutral-100 shrink-0 flex gap-2">
           <button
             onClick={() => { setSelectedBrands([]); setSelectedArea(""); setAreaOpen(false); setMinPrice(""); setMaxPrice(""); setSort(""); }}
@@ -382,15 +371,12 @@ export default function KategoriPage() {
 
   const name = decodeURIComponent(slug);
 
-  // mode 1: slug matches a main category
   const section = CATEGORY_SECTIONS.find((s) => s.name.toLowerCase() === name.toLowerCase());
 
-  // mode 2: slug matches a group inside any section
   const group = !section
     ? CATEGORY_SECTIONS.flatMap((s) => s.groups).find((g) => g.name.toLowerCase() === name.toLowerCase())
     : null;
 
-  // products: main category → filter by category, group → filter by subCategory
   const products = section
     ? ALL_PRODUCTS.filter((p) => p.category === section.name)
     : group
@@ -429,7 +415,6 @@ export default function KategoriPage() {
         </div>
       </header>
 
-      {/* Mode 1: main category — tampil daftar grup */}
       {section && (
         <div className="bg-white mt-3 mx-3 rounded-[8px] border border-neutral-100 overflow-hidden">
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide px-4 pt-3 pb-2">{t("category.sub")}</p>
@@ -458,7 +443,6 @@ export default function KategoriPage() {
         </div>
       )}
 
-      {/* Mode 2: group — tampil daftar item sub-kategori */}
       {group && group.items.length > 0 && (
         <div className="bg-white mt-3 mx-3 rounded-[8px] border border-neutral-100 overflow-hidden">
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide px-4 pt-3 pb-2">{t("category.sub")}</p>
@@ -477,7 +461,6 @@ export default function KategoriPage() {
 
       <FilterSheet open={filterOpen} onClose={() => setFilterOpen(false)} />
 
-      {/* Produk */}
       <div className="mt-3 px-3">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-bold text-neutral-700 self-center">{t("category.products_label")} ({products.length})</p>

@@ -1,11 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { ChevronDown, Eye, EyeOff, Pen, Search } from 'lucide-react'
+import { ChevronDown, Eye, EyeOff, Pen, Search, X } from 'lucide-react'
 import BottomSheet, { Fab, useIsPhone } from './BottomSheet.jsx'
 import ScrollTable from './ScrollTable.jsx'
 import ConfirmDialog from './ConfirmDialog.jsx'
 import { TABLES, inUse, labelOf, nextId, rupiah } from './data.js'
 import Select from './Select.jsx'
 import MultiSelect from './MultiSelect.jsx'
+import DatePicker from './DatePicker.jsx'
 
 export function display(db, f, value) {
   if (f.type === 'multi') return value?.length ? value.map((id) => labelOf(db[f.ref].find((r) => r.id === id))).join(', ') : '—'
@@ -63,20 +64,29 @@ export function Field({ f, db, value, onChange, selfId, allow }) {
   }
   if (f.type === 'checkbox') return <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} />
   if (f.type === 'textarea') return <textarea rows={3} value={value ?? ''} required={f.required} placeholder={placeholderFor(f)} onChange={(e) => onChange(e.target.value)} />
+  if (f.type === 'date') return <DatePicker value={value ?? ''} required={f.required} onChange={onChange} />
 
   const numeric = ['number', 'money', 'percent'].includes(f.type)
   if (f.type === 'password') return <PasswordField value={value ?? ''} required={f.required} onChange={onChange} />
+  const hasValue = value !== '' && value != null
   return (
-    <input
-      type={numeric ? 'number' : f.type || 'text'}
-      min={numeric ? 0 : undefined}
-      max={f.type === 'percent' ? 1 : undefined}
-      step={f.type === 'percent' ? 0.01 : 'any'}
-      value={value ?? ''}
-      required={f.required}
-      placeholder={placeholderFor(f)}
-      onChange={(e) => onChange(numeric ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value)}
-    />
+    <span className="input-clearable">
+      <input
+        type={numeric ? 'number' : f.type || 'text'}
+        min={numeric ? 0 : undefined}
+        max={f.type === 'percent' ? 1 : undefined}
+        step={f.type === 'percent' ? 0.01 : 'any'}
+        value={value ?? ''}
+        required={f.required}
+        placeholder={placeholderFor(f)}
+        onChange={(e) => onChange(numeric ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value)}
+      />
+      {hasValue && (
+        <button type="button" className="input-clear" aria-label="Clear" onClick={() => onChange(numeric ? null : '')}>
+          <X size={14} strokeWidth={2} />
+        </button>
+      )}
+    </span>
   )
 }
 
@@ -95,15 +105,7 @@ function PasswordField({ value, required, onChange }) {
 
 const NUMERIC = new Set(['number', 'money', 'percent', 'stars'])
 
-// fab: show this table's own + on phones (off when the page has one shared + for several tables)
-// addSignal: a counter the page bumps to open this table's add form from outside
-// scope: { field: value } shows only matching rows, hides those fields and pre-fills them on add
-// extraCell: { [extra column label]: (row) => content } replaces that extra column's cell
-// refFilter: { [ref field key]: (option row) => bool } limits that dropdown's choices
-// where: (row) => bool shows only matching rows, for conditions scope can't express
-// desktopSheet: desktop add/edit opens a sheet sliding from this edge ('top'); phones always use a bottom sheet
-// lucide's trash without its two inner lines, for a cleaner row action
-const TrashIcon = () => (
+const TrashIcon =() => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
   </svg>
@@ -145,11 +147,10 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
     setEditing(row ?? { ...cfg.defaults?.(admin), ...scope })
   }
   const cancel = () => { setEditing(null); setError('') }
-  // on phones a row is added or edited in a bottom sheet instead of inline cells you'd have to scroll across
   const inSheet = (isPhone || desktopSheet) && editing && !cfg.readOnly
 
-  useEffect(() => { if (addSignal) open() }, [addSignal]) // eslint-disable-line react-hooks/exhaustive-deps
-  const sheetClose = useRef(null) // the sheet's animated close, set while it's open
+  useEffect(() => { if (addSignal) open() }, [addSignal])
+  const sheetClose = useRef(null)
   const formId = useId()
 
   const save = (e) => {
@@ -167,8 +168,7 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
     else setEditing(null)
   }
 
-  // why a row can't be deleted (or false); its Delete button is shown greyed out with this as the tooltip
-  const deleteBlock = (row) =>
+  const deleteBlock =(row) =>
     (cfg.hideDelete?.(row) && 'The main admin account cannot be deleted.') || cfg.canDelete?.(row, admin) || inUse(db, table, row.id)
 
   const remove = (row) => {
@@ -203,7 +203,6 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
       </div>
       {!cfg.readOnly && isPhone && fab && <Fab label={`Add ${cfg.label}`} onClick={() => open()} />}
 
-      {/* the sheet and the dialog show their own error; inline editing needs it here */}
       {error && !inSheet && !(editing && !cfg.inlineEdit) && <div className="alert" role="alert">{error}</div>}
 
       <ScrollTable>
@@ -302,7 +301,6 @@ export default function CrudPage({ table, db, setDb, admin, fab = true, addSigna
               ))}
             </div>
             {error && <div className="alert" role="alert">{error}</div>}
-            {/* desktop: Save sits on the title row instead, and Esc / outside click / drag close it */}
             {isPhone && (
               <div className="sheet-actions">
                 <button type="button" className="btn btn-ghost" onClick={() => sheetClose.current()}>Cancel</button>

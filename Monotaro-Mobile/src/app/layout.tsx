@@ -13,7 +13,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
-  title: "Monotaro ID",
+  title: "Monotaro Mobile",
   description: "Ecommerce Perkakas Industri & ATK Perusahaan",
   icons: { icon: "/LogoTab.png" },
 };

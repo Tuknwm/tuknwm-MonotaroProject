@@ -2,7 +2,6 @@ import { shippedCount } from './data.js'
 
 const v = (x) => x || '—'
 
-// Paper version of an order's delivery data; only visible when printing.
 export default function DeliveryNote({ order, db }) {
   const c = db.customers.find((x) => x.id === order.customerAccountId)
   const a = db.deliveryAddresses.find((x) => x.id === order.deliveryAddressId)

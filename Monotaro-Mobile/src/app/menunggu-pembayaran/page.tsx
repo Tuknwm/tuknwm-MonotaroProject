@@ -1,9 +1,53 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ORDER_COUNT } from "@/components/OrderStatusPage";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const PRODUCTS = [["ABC Alkaline Battery AA", "Rp27.900", "https://picsum.photos/seed/order-battery/160/160"], ["Sinarline Copy Paper A4", "Rp36.900", "https://picsum.photos/seed/order-paper/160/160"], ["Tekiro Obeng Plus PH2", "Rp18.500", "https://picsum.photos/seed/order-screwdriver/160/160"], ["WD-40 Multi-Purpose 333ml", "Rp89.900", "https://picsum.photos/seed/order-wd40/160/160"], ["Sarung Tangan Safety", "Rp42.000", "https://picsum.photos/seed/order-gloves/160/160"]];
+const HOUR = 3600_000;
+
+function getDeadline(id: string, offsetMs: number): number {
+  const key = `pay_deadline_${id}`;
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) return Number(saved);
+    const deadline = Date.now() + 24 * HOUR - offsetMs;
+    localStorage.setItem(key, String(deadline));
+    return deadline;
+  } catch { return Date.now() + 24 * HOUR - offsetMs; }
+}
+
+function fmt(ms: number): string {
+  if (ms <= 0) return "00:00:00";
+  const h = Math.floor(ms / HOUR);
+  const m = Math.floor((ms % HOUR) / 60_000);
+  const s = Math.floor((ms % 60_000) / 1_000);
+  return [h, m, s].map(n => String(n).padStart(2, "0")).join(":");
+}
+
+function useCountdown(id: string, offsetMs: number) {
+  const [remaining, setRemaining] = useState<number | null>(null);
+  useEffect(() => {
+    const deadline = getDeadline(id, offsetMs);
+    const tick = () => setRemaining(Math.max(0, deadline - Date.now()));
+    tick();
+    const id_ = setInterval(tick, 1000);
+    return () => clearInterval(id_);
+  }, [id, offsetMs]);
+  return remaining;
+}
+
+function CountdownTimer({ orderId, offsetMs }: { orderId: string; offsetMs: number }) {
+  const remaining = useCountdown(orderId, offsetMs);
+  if (remaining === null) return null;
+  const urgent = remaining < 2 * HOUR;
+  return (
+    <div className="mt-2 flex items-center gap-1.5">
+      <svg className={`h-3.5 w-3.5 shrink-0 ${urgent ? "text-red-500" : "text-amber-500"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+      <span className={`font-mono text-xs font-bold tabular-nums ${urgent ? "text-red-500" : "text-amber-600"}`}>{fmt(remaining)}</span>
+    </div>
+  );
+}
 
 export default function MenungguPembayaranPage() {
   const router = useRouter();
@@ -37,12 +81,15 @@ export default function MenungguPembayaranPage() {
                 <p className="mt-1 text-[10px] text-neutral-500">1 item · {price}</p>
               </div>
             </div>
-            <div className="mt-3 flex items-end justify-between">
+            <div className="mt-3 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold text-neutral-900">{t("order.total_order")}</p>
                 <p className="text-sm font-bold text-brand">{price}</p>
               </div>
-              <button type="button" className="rounded-[8px] bg-brand px-4 py-2 text-xs font-bold text-white">{t("order.pay_now")}</button>
+              <div className="flex items-center gap-2">
+                <CountdownTimer orderId={`ORD-DEMO-${String(index + 1).padStart(3, "0")}`} offsetMs={index * 2 * HOUR} />
+                <button type="button" className="rounded-[8px] bg-brand px-4 py-2 text-xs font-bold text-white">{t("order.pay_now")}</button>
+              </div>
             </div>
           </article>
         ))}

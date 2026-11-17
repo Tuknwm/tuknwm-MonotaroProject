@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,6 @@ export default function UlasanPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-      {/* Filter */}
       <div className="flex gap-1.5 px-4 pt-3 pb-3 overflow-x-auto no-scrollbar border-b border-neutral-100">
         {FILTERS.map((f) => (
           <button
@@ -48,7 +47,6 @@ export default function UlasanPage() {
         ))}
       </div>
 
-      {/* Daftar ulasan */}
       <div className="flex flex-col divide-y divide-neutral-100 px-4">
         {REVIEWS
           .filter((r) => activeFilter === "product.filter_photo" ? !!r.img : true)

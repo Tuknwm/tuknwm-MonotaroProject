@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
@@ -78,7 +78,6 @@ export default function TempoTerminPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -89,7 +88,6 @@ export default function TempoTerminPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-xl font-extrabold text-neutral-900 mb-3">
             {language === "en" ? "Term of Payment" : "Pembayaran Tempo/Termin"}
@@ -101,7 +99,6 @@ export default function TempoTerminPage() {
           </p>
         </div>
 
-        {/* Benefits */}
         <div className="mx-4 mb-4 rounded-[12px] border border-neutral-200 bg-neutral-50 p-4">
           <h3 className="text-sm font-bold text-neutral-900 mb-5">
             {language === "en" ? "Benefits of Using Term of Payment" : "Keuntungan Menggunakan Pembayaran Tempo/Termin"}
@@ -116,7 +113,6 @@ export default function TempoTerminPage() {
           </div>
         </div>
 
-        {/* Requirements */}
         <div className="px-4 mb-4">
           <h3 className="text-sm font-bold text-neutral-900 mb-3">
             {language === "en" ? "Term of Payment Application Requirements" : "Syarat Pengajuan Pembayaran Tempo/Termin"}
@@ -141,7 +137,6 @@ export default function TempoTerminPage() {
           </ol>
         </div>
 
-        {/* How to Apply */}
         <div className="mx-4 mb-4 rounded-[12px] border border-neutral-200 bg-neutral-50 p-4">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-3">
             {language === "en" ? "How to Apply for Term of Payment" : "Cara Menggunakan/Mengajukan Pembayaran Tempo/Termin"}
@@ -210,7 +205,6 @@ export default function TempoTerminPage() {
           </div>
         </div>
 
-        {/* Form */}
         <div className="px-4 pb-4">
           <h3 className="text-base font-bold text-neutral-900 mb-4 pt-4 border-t border-neutral-200">
             {language === "en" ? "Term of Payment Application Form" : "Formulir Pengajuan Pembayaran Tempo/Termin"}
@@ -231,7 +225,6 @@ export default function TempoTerminPage() {
             ))}
           </div>
 
-          {/* Attachments */}
           <div className="mt-6 pt-4 border-t border-neutral-200">
             <h4 className="text-base font-bold text-neutral-900 mb-1">
               {language === "en" ? "Document Attachments" : "Lampiran Berkas"}
@@ -260,7 +253,6 @@ export default function TempoTerminPage() {
                 </div>
               ))}
 
-              {/* Captcha */}
               <div className="flex items-start gap-3">
                 <label className="w-28 shrink-0 text-xs text-neutral-700 pt-2.5">
                   {language === "en" ? "Captcha Code" : "Kode Captcha"} <span className="text-brand">*</span>

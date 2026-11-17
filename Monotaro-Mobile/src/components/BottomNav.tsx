@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
@@ -47,9 +47,7 @@ const NAV = [
 type Section = "home" | "akun" | "keranjang" | "kategori";
 
 interface BottomNavProps {
-  /** Section aktif saat ini. Jika tidak diberikan, tidak ada item yang disorot. */
   activeSection?: Section;
-  /** Dipanggil saat item nav diklik. Jika tidak diberikan, navigasi default ke "/" dengan sessionStorage. */
   onNavigate?: (section: Section) => void;
 }
 
@@ -64,7 +62,6 @@ export default function BottomNav({ activeSection, onNavigate }: BottomNavProps)
     if (onNavigate) {
       onNavigate(section);
     } else {
-      // Digunakan dari halaman selain home — arahkan ke home dengan section yang sesuai
       if (section === "kategori") sessionStorage.setItem("home_section", "kategori");
       if (section === "keranjang") sessionStorage.setItem("open_keranjang", "1");
       if (section === "akun") sessionStorage.setItem("open_account", "1");

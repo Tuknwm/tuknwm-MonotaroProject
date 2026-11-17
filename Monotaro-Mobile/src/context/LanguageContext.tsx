@@ -1,11 +1,10 @@
-"use client";
+﻿"use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type Language = "id" | "en";
 
 export const DICTIONARY = {
-  // Navigation
   "nav.home": { id: "Home", en: "Home" },
   "nav.category": { id: "Kategori", en: "Category" },
   "nav.quotation": { id: "Quotation", en: "Quotation" },
@@ -13,13 +12,11 @@ export const DICTIONARY = {
   "nav.account": { id: "Akun", en: "Account" },
   "nav.beranda": { id: "Beranda", en: "Home" },
 
-  // Header / Search
   "search.placeholder": { id: "Cari dari 7 Juta+ Produk", en: "Search across 7 Million+ Products" },
   "search.popular": { id: "Pencarian Populer", en: "Popular Searches" },
   "search.view_all": { id: "Lihat semua", en: "View all" },
   "header.help": { id: "Bantuan", en: "Help" },
 
-  // Sections
   "section.services": { id: "Layanan Bisnis", en: "Business Services" },
   "section.services_sub": { id: "Solusi pengadaan industri terpercaya", en: "Trusted industrial procurement solutions" },
   "section.highlight": { id: "PRODUCT HIGHLIGHT", en: "PRODUCT HIGHLIGHT" },
@@ -32,7 +29,6 @@ export const DICTIONARY = {
   "section.promos": { id: "Promo Menarik monotaro.id", en: "Exciting Promos at monotaro.id" },
   "section.why_us": { id: "Kenapa memilih monotaro.id?", en: "Why Choose monotaro.id?" },
 
-  // Quick Links
   "quick.tempo": { id: "Tempo/Termin", en: "Term of Payment" },
   "quick.online_quo": { id: "Online Quotation", en: "Online Quotation" },
   "quick.tax_invoice": { id: "Faktur Pajak", en: "Tax Invoice" },
@@ -43,13 +39,11 @@ export const DICTIONARY = {
   "quick.multiple_login": { id: "Multiple Login", en: "Multiple Login" },
   "quick.pickup_service": { id: "Pickup Service", en: "Pickup Service" },
 
-  // Value props
   "val.exclusive_promo": { id: "Promo Belanja Exclusive", en: "Exclusive Shopping Promos" },
   "val.advisor": { id: "Layanan Produk Advisor", en: "Product Advisor Service" },
   "val.tax_invoice": { id: "Penerbitan Faktur Pajak", en: "Tax Invoice Issuance" },
   "val.voucher_review": { id: "Ulas & Dapat Voucher", en: "Review & Get Vouchers" },
 
-  // Advantages
   "adv.komprehensif.title": { id: "Lengkap & Komprehensif", en: "Complete & Comprehensive" },
   "adv.komprehensif.desc": { id: "3.000.000+ produk industri dari brand terpercaya", en: "3,000,000+ industrial products from trusted brands" },
   "adv.delivery.title": { id: "Pengiriman Cepat", en: "Fast Delivery" },
@@ -59,13 +53,11 @@ export const DICTIONARY = {
   "adv.procurement.title": { id: "Pengadaan Mudah", en: "Easy Procurement" },
   "adv.procurement.desc": { id: "Online Approval System & Multiple Login", en: "Online Approval System & Multiple Login" },
 
-  // Popups & Promos
   "promo.special": { id: "Penawaran Khusus", en: "Special Offer" },
   "promo.popup_title": { id: "Daftar Akun & Nikmati Diskon 10% Belanja Pertama", en: "Register Account & Enjoy 10% Off First Purchase" },
   "promo.popup_sub": { id: "Tempo/Termin · Online Quotation · Faktur Pajak · Product Advisor", en: "Terms of Payment · Online Quotation · Tax Invoice · Product Advisor" },
   "promo.register_btn": { id: "Daftar Akun", en: "Register Account" },
 
-  // Account / Auth
   "account.login": { id: "Masuk", en: "Login" },
   "account.register": { id: "Daftar", en: "Register" },
   "account.register_now": { id: "Daftar Sekarang", en: "Register Now" },
@@ -143,7 +135,6 @@ export const DICTIONARY = {
   "account.feedback": { id: "Saran & Kritik", en: "Suggestions & Feedback" },
   "account.popular_products": { id: "Produk Terpopuler", en: "Popular Products" },
 
-  // Settings
   "settings.title": { id: "Pengaturan", en: "Settings" },
   "settings.account": { id: "Akun", en: "Account" },
   "settings.account_sub": { id: "Kelola informasi kontak, password, dan preferensi akun", en: "Manage contact information, password, and account preferences" },
@@ -160,7 +151,6 @@ export const DICTIONARY = {
   "settings.quotation": { id: "Quotation", en: "Quotation" },
   "settings.quotation_sub": { id: "Lihat dan kelola penawaran harga", en: "View and manage price quotations" },
 
-  // FAQ Page
   "faq.title": { id: "FAQ / Tentang Kami", en: "FAQ / About Us" },
   "faq.subtitle": { id: "Kenali monotaro.id dan temukan jawaban untuk kebutuhan belanja bisnis Anda.", en: "Learn about monotaro.id and find answers for your business procurement needs." },
   "faq.faq_section": { id: "Pertanyaan umum", en: "Frequently Asked Questions" },
@@ -169,7 +159,6 @@ export const DICTIONARY = {
   "faq.newsletter_label": { id: "Dapatkan info produk & promo terkini:", en: "Get the latest product updates & promotions:" },
   "faq.subscribe": { id: "Langganan", en: "Subscribe" },
 
-  // Cart page
   "cart.title": { id: "Keranjang Belanja Anda", en: "Your Shopping Cart" },
   "cart.empty": { id: "Keranjang kamu kosong", en: "Your cart is empty" },
   "cart.empty_sub": { id: "Tambahkan produk untuk mulai belanja", en: "Add products to start shopping" },
@@ -182,13 +171,11 @@ export const DICTIONARY = {
   "cart.wishlist_swipe": { id: "Wishlist", en: "Wishlist" },
   "cart.add_to_cart": { id: "+ Keranjang", en: "+ Cart" },
 
-  // Wishlist page
   "wishlist.empty": { id: "Wishlist kosong", en: "Wishlist is empty" },
   "wishlist.empty_sub": { id: "Simpan produk favorit kamu di sini", en: "Save your favorite products here" },
   "wishlist.start_shopping": { id: "Mulai Belanja", en: "Start Shopping" },
   "wishlist.remove": { id: "Hapus", en: "Remove" },
 
-  // Product detail page
   "product.filter_latest": { id: "Terbaru", en: "Latest" },
   "product.filter_photo": { id: "Dengan Foto", en: "With Photos" },
   "product.filter_top_rating": { id: "Rating tertinggi", en: "Highest Rating" },
@@ -198,7 +185,6 @@ export const DICTIONARY = {
   "product.cart_btn": { id: "Keranjang", en: "Cart" },
   "product.buy_now": { id: "Beli Sekarang", en: "Buy Now" },
 
-  // Checkout page
   "checkout.change_payment": { id: "Ubah Metode Pembayaran", en: "Change Payment Method" },
   "checkout.select_payment_btn": { id: "Pilih Metode Pembayaran", en: "Select Payment Method" },
   "checkout.use_address": { id: "Gunakan Alamat", en: "Use Address" },
@@ -217,13 +203,11 @@ export const DICTIONARY = {
   "checkout.shipping_cost": { id: "Biaya Pengiriman", en: "Shipping Cost" },
   "checkout.select_payment_title": { id: "Pilih Metode Pembayaran", en: "Select Payment Method" },
 
-  // Home page
   "home.all_brands": { id: "Semua Brand", en: "All Brands" },
   "home.search_brand": { id: "Cari brand...", en: "Search brand..." },
   "home.brand_not_found": { id: "Brand tidak ditemukan", en: "Brand not found" },
   "home.recently_viewed": { id: "Terakhir Dilihat", en: "Recently Viewed" },
 
-  // More menu items
   "menu.new_products": { id: "Produk Baru", en: "New Products" },
   "menu.brand_monotaro": { id: "Brand Monotaro", en: "Monotaro Brand" },
   "menu.promo": { id: "Promo", en: "Promotions" },
@@ -231,7 +215,6 @@ export const DICTIONARY = {
   "menu.blog": { id: "Blog", en: "Blog" },
   "menu.request_quotation": { id: "Request Quotation", en: "Request Quotation" },
 
-  // Product page
   "product.before_vat": { id: "Sebelum PPN", en: "Before VAT" },
   "product.specs_title": { id: "Spesifikasi Produk", en: "Product Specifications" },
   "product.info_title": { id: "Informasi Produk", en: "Product Information" },
@@ -246,16 +229,13 @@ export const DICTIONARY = {
   "product.docs_title": { id: "Dokumentasi Produk", en: "Product Documentation" },
   "product.terms_title": { id: "Ketentuan dan Kondisi Barang", en: "Terms & Product Condition" },
 
-  // Search page
   "search.not_found": { id: "Produk tidak ditemukan", en: "Product not found" },
   "search.try_different": { id: "Coba kata kunci yang berbeda", en: "Try a different keyword" },
 
-  // Orders / pesanan
   "order.all_orders": { id: "Semua Pesanan", en: "All Orders" },
   "order.no_orders": { id: "Belum ada pesanan", en: "No orders yet" },
   "order.filter_all": { id: "Semua", en: "All" },
 
-  // Saran & Kritik page
   "feedback.title": { id: "Saran & Kritik", en: "Suggestions & Feedback" },
   "feedback.heading": { id: "Saran & Kritik Anda Membuat Kami Bahagia :)", en: "Your Feedback Makes Us Happy :)" },
   "feedback.subtitle": { id: "Kami siap mendengarkan", en: "We're ready to listen" },
@@ -271,24 +251,19 @@ export const DICTIONARY = {
   "feedback.captcha_error": { id: "Kode captcha belum sesuai", en: "Captcha code is incorrect" },
   "feedback.submit_btn": { id: "Kirim saran & kritik", en: "Submit feedback" },
 
-  // Bantuan page
   "help.title": { id: "Pusat Bantuan", en: "Help Center" },
   "help.welcome": { id: "Selamat Datang di Pusat Bantuan monotaro.id!", en: "Welcome to monotaro.id Help Center!" },
   "help.search_placeholder": { id: "Ketik pertanyaan Anda disini dan kami akan membantu menjawab", en: "Type your question here and we'll help answer it" },
   "help.pick_topic": { id: "Pilih Topik Sesuai Kebutuhan Anda", en: "Select a Topic for Your Needs" },
   "help.frequently_asked": { id: "Topik Yang Sering Ditanyakan", en: "Frequently Asked Topics" },
 
-  // Promo page
   "promo.check_now": { id: "Cek Sekarang", en: "Check Now" },
 
-  // Testimonial page
   "testimonial.customers_say": { id: "Apa Kata Pelanggan Kami", en: "What Our Customers Say" },
   "testimonial.show_more": { id: "Tampilkan lagi", en: "Show more" },
 
-  // Settings
   "settings.account_dashboard": { id: "Dashboard Akun", en: "Account Dashboard" },
 
-  // Common buttons & labels
   "common.back": { id: "Kembali", en: "Back" },
   "common.close": { id: "Tutup", en: "Close" },
   "common.search": { id: "Cari", en: "Search" },
@@ -302,7 +277,6 @@ export const DICTIONARY = {
   "common.other_menu": { id: "Menu lainnya", en: "More" },
   "common.more_items": { id: "lainnya", en: "more" },
 
-  // Address form
   "addr.recipient": { id: "Nama Penerima", en: "Recipient Name" },
   "addr.city_field": { id: "Kota/Kabupaten/Kecamatan/Kode Pos", en: "City/Regency/District/Postal Code" },
   "addr.city_placeholder": { id: "Masukkan 3 atau lebih karakter", en: "Enter 3 or more characters" },
@@ -310,7 +284,6 @@ export const DICTIONARY = {
   "addr.save": { id: "Simpan Alamat", en: "Save Address" },
   "addr.company_placeholder": { id: "Masukkan nama perusahaan", en: "Enter company name" },
 
-  // Settings – account
   "settings.contact_info": { id: "Informasi Kontak", en: "Contact Information" },
   "settings.billing_primary": { id: "Penagihan Utama", en: "Primary Billing" },
   "settings.no_billing_address": { id: "Anda belum memiliki alamat tagihan utama", en: "No primary billing address yet" },
@@ -319,11 +292,9 @@ export const DICTIONARY = {
   "settings.no_shipping_address": { id: "Anda belum memiliki alamat pengiriman utama", en: "No primary shipping address yet" },
   "settings.edit_address": { id: "Ubah Alamat", en: "Edit Address" },
 
-  // Product badges
   "product.new_badge": { id: "Baru", en: "New" },
   "product.delivery_days": { id: "3 - 7 hari kerja", en: "3 - 7 business days" },
 
-  // Filter / sort
   "filter.title": { id: "Filter & Urutkan", en: "Filter & Sort" },
   "filter.brand": { id: "Merek / Brand", en: "Brand" },
   "filter.search_brand": { id: "Cari merek...", en: "Search brand..." },
@@ -339,7 +310,6 @@ export const DICTIONARY = {
   "sort.new_products": { id: "Produk Baru", en: "New Products" },
   "sort.best_seller": { id: "Terlaris", en: "Best Seller" },
 
-  // Category / subcategory page
   "category.sub": { id: "Sub Kategori", en: "Sub Category" },
   "category.products_available": { id: "produk tersedia", en: "products available" },
   "category.no_products": { id: "Belum ada produk", en: "No products yet" },
@@ -348,14 +318,11 @@ export const DICTIONARY = {
   "category.explore": { id: "Jelajahi Kategori", en: "Explore Categories" },
   "category.products_label": { id: "Produk", en: "Products" },
 
-  // Help center
   "help.other_topics": { id: "Kategori Topik Lainnya", en: "Other Topic Categories" },
 
-  // Search results
   "search.result_count": { id: "hasil untuk", en: "results for" },
   "search.no_result": { id: "Tidak ada hasil untuk", en: "No results for" },
 
-  // Order status pages
   "order.buy_again": { id: "Beli Lagi", en: "Buy Again" },
   "order.review": { id: "Ulas", en: "Review" },
   "order.view_review": { id: "Lihat Ulasan", en: "View Review" },
@@ -382,16 +349,41 @@ export const DICTIONARY = {
   "order.total_order": { id: "Total Pesanan", en: "Order Total" },
   "order.awaiting_payment_status": { id: "Menunggu pembayaran", en: "Awaiting payment" },
   "order.no_orders_yet": { id: "Belum ada pesanan.", en: "No orders yet." },
-  // Payment / purchase success
   "payment.page_title": { id: "Pembayaran", en: "Payment" },
   "payment.success_title": { id: "Pembelian Berhasil", en: "Purchase Successful" },
   "payment.success_desc": { id: "Pesanan kamu berhasil dibuat dan sedang menunggu dikonfirmasi.", en: "Your order has been placed and is awaiting confirmation." },
   "payment.view_status": { id: "Lihat Status", en: "View Status" },
-  // Ulasan page
   "ulasan.my_reviews": { id: "Ulasan Saya", en: "My Reviews" },
   "ulasan.oldest": { id: "Terlama", en: "Oldest" },
-  // Quotation
   "quotation.empty": { id: "Anda tidak memiliki permintaan penawaran.", en: "You have no pending quotation requests." },
+
+  "dn.title": { id: "Surat Jalan", en: "Delivery Note" },
+  "dn.ship_to": { id: "Dikirim ke", en: "Ship to" },
+  "dn.pic": { id: "PIC", en: "PIC" },
+  "dn.phone": { id: "Telepon", en: "Phone" },
+  "dn.order_date": { id: "Tgl. Order", en: "Order date" },
+  "dn.so_no": { id: "No. SO", en: "SO No" },
+  "dn.do_no": { id: "No. DO", en: "DO No" },
+  "dn.po_no": { id: "No. PO", en: "PO No" },
+  "dn.address": { id: "Alamat", en: "Address" },
+  "dn.awb": { id: "No. Resi", en: "AWB" },
+  "dn.transport": { id: "Kurir", en: "Transport" },
+  "dn.payment": { id: "Pembayaran", en: "Payment" },
+  "dn.delivery_date": { id: "Tgl. Kirim", en: "Delivery date" },
+  "dn.printed": { id: "Dicetak", en: "Printed" },
+  "dn.col_no": { id: "No", en: "No" },
+  "dn.col_product": { id: "Produk", en: "Product" },
+  "dn.col_ordered": { id: "Order", en: "Ordered" },
+  "dn.col_shipped": { id: "Dikirim", en: "Shipped" },
+  "dn.col_remaining": { id: "Sisa", en: "Remaining" },
+  "dn.total": { id: "Total", en: "Total" },
+  "dn.note": { id: "Catatan", en: "Note" },
+  "dn.sign_warehouse": { id: "Disiapkan oleh", en: "Warehouse by" },
+  "dn.sign_delivered": { id: "Dikirim oleh", en: "Delivered by" },
+  "dn.sign_received": { id: "Diterima oleh", en: "Received by" },
+  "dn.sign_date": { id: "Tanggal:", en: "Date:" },
+  "dn.foot1": { id: "Periksa kesesuaian barang dan kuantitas saat menerima.", en: "Please check that the goods and quantities match this note when you receive them." },
+  "dn.foot2": { id: "Barang yang belum dikirim akan menyusul. Laporkan kerusakan dalam 14 hari.", en: "Items not shipped yet will follow in a later delivery. Report missing or damaged goods within 14 days." },
 } as const;
 
 export type TranslationKey = keyof typeof DICTIONARY;

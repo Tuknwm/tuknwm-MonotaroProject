@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -60,7 +60,6 @@ export default function FakturPajakPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -71,7 +70,6 @@ export default function FakturPajakPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-xl font-extrabold text-neutral-900 mb-3">
             {language === "en" ? "Invoice & Tax Invoice Feature" : "Fitur Invoice & Faktur Pajak"}
@@ -94,7 +92,6 @@ export default function FakturPajakPage() {
           </button>
         </div>
 
-        {/* Requirements */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-brand mb-4">
             {language === "en" ? "Requirements for Tax Invoice" : "Syarat Mendapatkan Faktur Pajak"}
@@ -114,13 +111,11 @@ export default function FakturPajakPage() {
           </div>
         </div>
 
-        {/* Document Delivery */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-brand mb-4">
             {language === "en" ? "Document Delivery" : "Pengiriman Dokumen"}
           </h3>
           <div className="border border-neutral-200 rounded-[10px] p-4 flex flex-col gap-5">
-            {/* Softcopy */}
             <div className="flex flex-col items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/FakturPajak/faktur-pajak-softcopy.avif" alt="Softcopy" className="w-12 h-12 object-contain" />
@@ -144,7 +139,6 @@ export default function FakturPajakPage() {
               </ul>
             </div>
             <hr className="border-neutral-200" />
-            {/* Hardcopy */}
             <div className="flex flex-col items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/FakturPajak/faktur-pajak-hardcopy.avif" alt="Hardcopy" className="w-12 h-12 object-contain" />
@@ -170,7 +164,6 @@ export default function FakturPajakPage() {
           </div>
         </div>
 
-        {/* Changes & Revisions */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-brand mb-3">
             {language === "en" ? "Changes & Data Revisions" : "Perubahan & Revisi Data"}
@@ -192,7 +185,6 @@ export default function FakturPajakPage() {
           </ul>
         </div>
 
-        {/* FAQ */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 mb-3">
             {language === "en" ? "Quick FAQ" : "FAQ Singkat"}
@@ -218,7 +210,6 @@ export default function FakturPajakPage() {
           </div>
         </div>
 
-        {/* Need Help */}
         <div className="mx-4 my-4 rounded-[12px] bg-neutral-200 p-5 text-center">
           <p className="text-sm font-bold text-neutral-900 mb-1">
             {language === "en" ? "Need Further Assistance?" : "Butuh Bantuan Lebih Lanjut?"}

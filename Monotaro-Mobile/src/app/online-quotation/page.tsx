@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +27,6 @@ export default function OnlineQuotationPage() {
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center gap-3 bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <button type="button" onClick={() => router.back()} className="text-white shrink-0" aria-label={t("common.back")}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -36,7 +35,6 @@ export default function OnlineQuotationPage() {
       </header>
 
       <div className="page-content pt-[56px]">
-        {/* Hero */}
         <div className="px-4 pt-3 pb-4 border-b border-neutral-100">
           <h2 className="text-xl font-extrabold text-neutral-900 mb-3">{language === "en" ? "Online Quotation (Price Offer)" : "Online Quotation (Surat Penawaran)"}</h2>
           <p className="text-xs text-neutral-600 leading-relaxed text-justify">
@@ -44,7 +42,6 @@ export default function OnlineQuotationPage() {
           </p>
         </div>
 
-        {/* 3 Keuntungan */}
         <div className="mx-4 my-4 rounded-[12px] border border-neutral-200 bg-neutral-50 p-4">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-5">{language === "en" ? "3 Benefits of Using Online Quotation" : "3 Keuntungan Menggunakan Online Quotation"}</h3>
           <div className="flex flex-col gap-4">
@@ -70,11 +67,9 @@ export default function OnlineQuotationPage() {
           </div>
         </div>
 
-        {/* 5 Langkah */}
         <div className="mx-4 mb-4 rounded-[12px] border border-neutral-200 bg-neutral-50 p-4">
           <h3 className="text-sm font-bold text-neutral-900 mb-4">{language === "en" ? "5 Easy Steps to Get Online Quotation" : "5 Langkah Mudah Mendapatkan Online Quotation"}</h3>
 
-          {/* Step image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`/OnlineQuotation/5 Langkah Mudah-${activeStep + 1}.avif`}
@@ -83,7 +78,6 @@ export default function OnlineQuotationPage() {
           />
           <p className="text-[10px] text-brand mb-4">{language === "en" ? "Click a number to see the step guide image" : "Klik pada nomor untuk melihat panduan gambar"}</p>
 
-          {/* Steps list */}
           <div className="flex flex-col gap-3">
             {STEPS.map((s, i) => (
               <button key={i} type="button" onClick={() => setActiveStep(i)} className="flex items-start gap-3 text-left">
@@ -97,7 +91,6 @@ export default function OnlineQuotationPage() {
           </div>
         </div>
 
-        {/* Contoh Online Quotation */}
         <div className="mx-4 mb-4">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-3">{language === "en" ? "Online Quotation Example" : "Contoh Online Quotation"}</h3>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -109,7 +102,6 @@ export default function OnlineQuotationPage() {
           </button>
         </div>
 
-        {/* Catatan */}
         <div className="mx-4 mb-6 rounded-[8px] bg-yellow-50 border border-yellow-200 p-4">
           <h4 className="text-sm font-bold text-neutral-900 mb-2">{language === "en" ? "Note" : "Catatan"}</h4>
           <p className="text-[11px] text-neutral-700 leading-relaxed text-justify">

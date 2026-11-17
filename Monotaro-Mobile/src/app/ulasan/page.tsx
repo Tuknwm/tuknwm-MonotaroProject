@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -56,7 +56,6 @@ export default function UlasanPage() {
       <section className="flex flex-col gap-3 px-4 pb-5 pt-3">
         {sorted.map(({ name, image, rating, comment, id, qty, date }, i) => (
           <article key={id} style={{ animation: `ulasanIn 0.4s cubic-bezier(0.22,1,0.36,1) ${i * 0.07}s both` }} className="rounded-[8px] border border-neutral-200 bg-white p-4">
-            {/* order meta */}
             <div className="mb-3 flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
                 <p className="text-[11px] font-bold text-neutral-800">{id}</p>
@@ -70,7 +69,6 @@ export default function UlasanPage() {
                 ))}
               </div>
             </div>
-            {/* product */}
             <div className="flex gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={image} alt={name} className="h-14 w-14 rounded-[6px] bg-neutral-50 object-contain border border-neutral-100" />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -48,7 +48,6 @@ export function KeranjangContent() {
     if (hasBack) { sessionStorage.removeItem("keranjang_has_back"); setCanGoBack(true); }
   }, []);
 
-  // sync checked when items length changes (item removed)
   const prevLen = useRef(items.length);
   if (items.length !== prevLen.current) {
     prevLen.current = items.length;
@@ -86,7 +85,6 @@ export function KeranjangContent() {
 
   return (
     <div className="min-h-dvh pb-[260px]">
-      {/* Header */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 items-center bg-brand px-4 py-4 text-white shadow-md rounded-b-3xl">
         <div className="flex w-full items-center gap-2">
         {canGoBack && <button type="button" onClick={() => router.back()} className="text-white shrink-0 mr-1" aria-label="Kembali">
@@ -120,13 +118,11 @@ export function KeranjangContent() {
         </div>
       ) : (
         <div className="px-4 pt-4 flex flex-col gap-3">
-          {/* Select all */}
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={allChecked} onChange={toggleAll} className="accent-brand w-4 h-4" />
             <span className="text-xs font-semibold text-neutral-700">{t("cart.select_all")} ({items.length})</span>
           </label>
 
-          {/* Cart items */}
           {items.map((item, i) => (
             <div key={item.name} className="flex items-center gap-2">
               <input type="checkbox" checked={checked.includes(i)} onChange={() => toggleItem(i)} className="accent-brand w-4 h-4 shrink-0" />
@@ -168,7 +164,6 @@ export function KeranjangContent() {
         </div>
       )}
 
-      {/* Produk Terpopuler */}
       <section className="mt-5 py-4 border-t border-neutral-200">
         <div className="flex items-end justify-between px-4 mb-3">
           <h2 className="text-[15px] font-bold text-neutral-900">{t("section.popular")}</h2>
@@ -178,7 +173,6 @@ export function KeranjangContent() {
         </div>
       </section>
 
-      {/* Checkout bar — portal ke body supaya fixed tidak terpengaruh transform container */}
       {items.length > 0 && typeof document !== "undefined" && createPortal(
         <div className="fixed bottom-[calc(92px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 w-[calc(100%-40px)] max-w-[390px] bg-white rounded-[8px] shadow-[0_0_8px_2px_rgba(0,0,0,0.10)] px-4 py-4 flex flex-col gap-3 z-[90]">
           <div className="flex flex-col gap-1.5">
@@ -244,7 +238,6 @@ function SwipeReveal({ children, wishlisted, onWishlist, onDelete }: { children:
     if (!dragging.current || leavingRef.current) return;
     const dx = startX.current - e.clientX;
     const dy = Math.abs(e.clientY - startY.current);
-    // kalau gerakan vertikal lebih dominan, anggap scroll — batalkan gesture
     if (!isScrollGesture.current && dy > Math.abs(dx) && dy > 6) {
       isScrollGesture.current = true;
       if (!lockedRef.current) { setOffset(0); return; }

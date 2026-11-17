@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -585,7 +585,6 @@ function RegisterTab({ onSwitch, onRegister }: { onSwitch: () => void; onRegiste
         <Field label={t("account.fullname")} name="nama" placeholder={t("account.fullname")} defaultValue="User Monotaro" required />
         <Field label={t("account.phone")} name="telepon" type="tel" placeholder="08000000000 / 021556789" defaultValue="081234567890" required />
 
-        {/* Tipe Akun */}
         <div className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold text-neutral-700">{t("account.account_type")}<span className="text-brand ml-0.5">*</span></span>
           <div className="flex gap-4">
@@ -644,7 +643,6 @@ function RegisterTab({ onSwitch, onRegister }: { onSwitch: () => void; onRegiste
         </button>
       </div>
 
-      {/* Voucher info */}
       <div className="flex items-center justify-between gap-3 bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2.5">
         <p className="text-[11px] text-neutral-600 leading-relaxed flex-1">
           {language === "en"
@@ -692,7 +690,6 @@ function InviteScreen({ onMasuk, onDaftar }: { onMasuk: () => void; onDaftar: ()
   const { t } = useLanguage();
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-6 text-center">
-      {/* Promo banner */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/Ok.webp" alt="Penawaran khusus Monotaro" className="w-[120px] h-[120px] rounded-[12px] object-contain" />
 
@@ -700,7 +697,6 @@ function InviteScreen({ onMasuk, onDaftar }: { onMasuk: () => void; onDaftar: ()
         {t("account.invite_text")}
       </p>
 
-      {/* CTA row */}
       <div className="w-full flex flex-col items-center gap-2">
         <button onClick={onDaftar} className="w-full max-w-[280px] bg-brand text-white font-bold text-sm py-3 rounded-[8px]">
           {t("account.register_now")}
@@ -791,7 +787,6 @@ export function AkunContent({ onBack }: { onBack?: () => void }) {
 
   return (
     <>
-      {/* Tab switcher — only when in form view */}
       {(view === "masuk" || view === "daftar") && (
         <div className="bg-white border-b border-neutral-200 px-4">
           <div className="flex">
@@ -810,7 +805,6 @@ export function AkunContent({ onBack }: { onBack?: () => void }) {
         </div>
       )}
 
-      {/* Content */}
       <div className="flex-1 min-h-[calc(100dvh-88px)] overflow-y-auto flex flex-col">
         {view === "idle" && <div className="flex-1" />}
         {view === "invite" && <InviteScreen onMasuk={goMasuk} onDaftar={goDaftar} />}

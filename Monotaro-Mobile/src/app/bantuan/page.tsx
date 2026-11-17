@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import React from "react";
@@ -159,7 +159,6 @@ export default function BantuanPage() {
       </header>
 
       <div className="page-content pt-[38px]">
-        {/* Hero search */}
         <div className="bg-brand px-4 py-6">
           <h2 className="text-base font-bold text-white text-center mb-3">{t("help.welcome")}</h2>
           <div className="flex items-center bg-white rounded-[6px] overflow-hidden shadow">
@@ -176,7 +175,6 @@ export default function BantuanPage() {
           </div>
         </div>
 
-        {/* Topic buttons */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-3">{t("help.pick_topic")}</h3>
           <div className="grid grid-cols-2 gap-2">
@@ -197,7 +195,6 @@ export default function BantuanPage() {
           </div>
         </div>
 
-        {/* FAQ section */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-4">{t("help.frequently_asked")}</h3>
           <div className="flex flex-col gap-3">
@@ -224,7 +221,6 @@ export default function BantuanPage() {
           </div>
         </div>
 
-        {/* Categories */}
         <div className="px-4 py-4 pb-8">
           <h3 className="text-sm font-bold text-neutral-900 text-center mb-4">{t("help.other_topics")}</h3>
           <div className="grid grid-cols-2 gap-3">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -81,7 +81,6 @@ function SearchPageInner() {
     } catch {}
   }, []);
 
-  // keep input in sync when URL changes (e.g. browser back/forward)
   useEffect(() => {
     const val = searchParams.get("q") ?? "";
     setInputVal(val);
@@ -90,7 +89,6 @@ function SearchPageInner() {
     }
   }, [searchParams]);
 
-  // autofocus when arriving with empty query
   useEffect(() => {
     if (!initialQ) inputRef.current?.focus();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -133,7 +131,6 @@ function SearchPageInner() {
 
   return (
     <div className="min-h-dvh pb-6">
-      {/* Header with search bar */}
       <header className="fixed left-1/2 top-0 z-50 flex w-full max-w-[430px] -translate-x-1/2 flex-col bg-brand px-4 pt-4 pb-2 shadow-md rounded-b-3xl">
         <div className="flex items-center gap-3 mb-2.5">
           <button
@@ -198,7 +195,6 @@ function SearchPageInner() {
       </header>
 
       <div className="page-content pt-[66px]">
-        {/* No query yet — show history + popular searches */}
         {!q && (
           <div className="px-4 pt-5">
             {history.length > 0 && (
@@ -258,7 +254,6 @@ function SearchPageInner() {
           </div>
         )}
 
-        {/* Results */}
         {q && (
           <div className="px-4 pt-4">
             <p className="text-xs text-neutral-500 mb-3">

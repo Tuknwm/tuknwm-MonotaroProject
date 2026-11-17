@@ -3,22 +3,16 @@ import { createPortal } from 'react-dom'
 import { Plus } from 'lucide-react'
 
 const phone = window.matchMedia('(max-width: 768px)')
-// resize too: some environments (device emulation) change the width without firing the query's change event
-const subscribe = (cb) => {
+const subscribe =(cb) => {
   phone.addEventListener('change', cb)
   window.addEventListener('resize', cb)
   return () => { phone.removeEventListener('change', cb); window.removeEventListener('resize', cb) }
 }
 export const useIsPhone = () => useSyncExternalStore(subscribe, () => phone.matches)
 
-// rendered into <body>: the page wrapper animates with a transform, which would drag fixed elements along
 const SWIPE_CLOSE = 100
-
-// from: 'bottom' (default) slides up from the bottom edge; 'top' slides down from the top edge.
-// closeRef: gets the animated close function, so buttons inside (Cancel, Save) can close it with the same animation.
 const CLOSE_MS = 220
 
-// action: optional button shown on the title row (desktop Save)
 export default function BottomSheet({ title, onClose, children, from = 'bottom', closeRef, action }) {
   const dir = from === 'top' ? -1 : 1
   const ref = useRef(null)
@@ -30,7 +24,6 @@ export default function BottomSheet({ title, onClose, children, from = 'bottom',
   const [closing, setClosing] = useState(false)
   useEffect(() => { ref.current?.focus() }, [])
 
-  // slide out the way it came, then let the parent unmount it
   const close = () => {
     if (closingRef.current) return
     closingRef.current = true
@@ -53,10 +46,8 @@ export default function BottomSheet({ title, onClose, children, from = 'bottom',
     setTimeout(() => { dragged.current = false })
   }
 
-  // swipe it back toward its edge to close: only from the top of the sheet's scroll, so scrolling a long form still works
   const onTouchStart = (e) => { startY.current = ref.current.scrollTop > 0 ? null : e.touches[0].clientY }
   const onTouchMove = (e) => { if (startY.current != null) moveTo(e.touches[0].clientY) }
-  // the mouse drags from anywhere that isn't a control, so fields and buttons still click normally
   const onMouseDown = (e) => {
     if (e.button !== 0 || e.target.closest('input, textarea, button, a, label, .select-trigger')) return
     startY.current = e.clientY
@@ -92,7 +83,6 @@ export function Fab({ label, onClick }) {
   )
 }
 
-// one + for a page with several tables: pick the table first, then its add sheet opens
 export function AddPicker({ sections, onPick, open, setOpen }) {
   return (
     <>

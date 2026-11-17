@@ -20,7 +20,7 @@ export default function OrdersPage({ db, setDb }) {
   const [openId, setOpenId] = useState(null)
   const [error, setError] = useState('')
   const [sortCol, setSortCol] = useState('date')
-  const [sortDir, setSortDir] = useState(-1) // -1 desc, 1 asc
+  const [sortDir, setSortDir] = useState(-1)
 
   const toggleSort = (col) => {
     if (sortCol === col) setSortDir((d) => -d)
@@ -60,7 +60,6 @@ export default function OrdersPage({ db, setDb }) {
 
       {error && <div className="alert" role="alert">{error}</div>}
 
-      {/* on phones each row is laid out as a card, see table.orders in index.css */}
       <ScrollTable className="table-wrap orders-wrap">
         <table className="stack orders">
           <thead>
@@ -124,8 +123,7 @@ function OrderDetail({ order, db, setDb, onClose }) {
   const address = db.deliveryAddresses.find((a) => a.id === order.deliveryAddressId)
   const sku = (id) => db.productSkus.find((s) => s.id === id)
 
-  // printCount isn't in the form, so it always comes from the stored order, never the draft
-  const persist = (printed = 0) =>
+  const persist =(printed = 0) =>
     setDb((db) => ({
       ...db,
       orders: db.orders.map((o) => (o.id !== order.id ? o : {
@@ -147,7 +145,6 @@ function OrderDetail({ order, db, setDb, onClose }) {
     window.setTimeout(onClose, 180)
   }
 
-  // printing also saves, so the paper always matches what is stored
   const print = () => {
     persist(1)
     setPrinting(true)
@@ -177,43 +174,45 @@ function OrderDetail({ order, db, setDb, onClose }) {
       >
         <h2>Order #{order.id} · {labelOf(db.orderStatuses.find((s) => s.id === order.orderStatusId))}</h2>
 
-        <div className="detail-grid">
-          <div>
-            <h3>Customer</h3>
-            <p>{c.fullname}{c.companyName && ` · ${c.companyName}`}</p>
-            <p className="muted">{c.email} · {c.phoneNumber}</p>
+        <div className="order-summary">
+          <div className="detail-grid">
+            <div>
+              <h3>Customer</h3>
+              <p>{c.fullname}{c.companyName && ` · ${c.companyName}`}</p>
+              <p className="muted">{c.email} · {c.phoneNumber}</p>
+            </div>
+            <div>
+              <h3>Ship to</h3>
+              <p>{address.receiverName} · {address.receiverPhoneNumber}</p>
+              <p className="muted">{address.detailedAddress}, {address.regionAddress}</p>
+            </div>
           </div>
-          <div>
-            <h3>Ship to</h3>
-            <p>{address.receiverName} · {address.receiverPhoneNumber}</p>
-            <p className="muted">{address.detailedAddress}, {address.regionAddress}</p>
+
+          <div className="table-wrap">
+            <table className="stack">
+              <thead><tr><th>SKU</th><th>Qty</th><th>Price</th><th>Line total</th></tr></thead>
+              <tbody>
+                {order.items.map((i) => (
+                  <tr key={i.productSkuId}>
+                    <td data-label="SKU"><span>{sku(i.productSkuId)?.name}<div className="muted">{sku(i.productSkuId)?.skuNumber}</div></span></td>
+                    <td data-label="Qty">{i.quantity}</td>
+                    <td data-label="Price">{rupiah(i.price)}</td>
+                    <td data-label="Line total">{rupiah(i.quantity * i.price)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <div className="table-wrap">
-          <table className="stack">
-            <thead><tr><th>SKU</th><th>Qty</th><th>Price</th><th>Line total</th></tr></thead>
-            <tbody>
-              {order.items.map((i) => (
-                <tr key={i.productSkuId}>
-                  <td data-label="SKU"><span>{sku(i.productSkuId)?.name}<div className="muted">{sku(i.productSkuId)?.skuNumber}</div></span></td>
-                  <td data-label="Qty">{i.quantity}</td>
-                  <td data-label="Price">{rupiah(i.price)}</td>
-                  <td data-label="Line total">{rupiah(i.quantity * i.price)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <dl className="totals">
+            <dt>Subtotal</dt><dd>{rupiah(t.subtotal)}</dd>
+            {t.discount > 0 && <><dt>Discount ({order.discountDecimal * 100}%)</dt><dd>− {rupiah(t.discount)}</dd></>}
+            <dt>Delivery fee ({t.totalWeightKg.toFixed(2)} kg)</dt><dd>{rupiah(order.deliveryFee)}</dd>
+            <dt>VAT ({Math.round(t.rate * 100)}%)</dt><dd>{rupiah(t.vat)}</dd>
+            <dt className="total">Total</dt><dd className="total">{rupiah(t.total)}</dd>
+          </dl>
+          {order.remarks && <p className="muted">Remarks: {order.remarks}</p>}
         </div>
-
-        <dl className="totals">
-          <dt>Subtotal</dt><dd>{rupiah(t.subtotal)}</dd>
-          {t.discount > 0 && <><dt>Discount ({order.discountDecimal * 100}%)</dt><dd>− {rupiah(t.discount)}</dd></>}
-          <dt>Delivery fee ({t.totalWeightKg.toFixed(2)} kg)</dt><dd>{rupiah(order.deliveryFee)}</dd>
-          <dt>VAT ({Math.round(t.rate * 100)}%)</dt><dd>{rupiah(t.vat)}</dd>
-          <dt className="total">Total</dt><dd className="total">{rupiah(t.total)}</dd>
-        </dl>
-        {order.remarks && <p className="muted">Remarks: {order.remarks}</p>}
 
         <h3>Delivery</h3>
         <div className="fields">
@@ -226,7 +225,7 @@ function OrderDetail({ order, db, setDb, onClose }) {
         </div>
 
         <h3>Shipped items</h3>
-        <div className="table-wrap">
+        <div className="table-wrap shipped-wrap">
           <table className="stack">
             <thead><tr><th>SKU</th><th>Ordered</th><th>Shipped</th><th>Remaining</th></tr></thead>
             <tbody>
