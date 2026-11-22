@@ -15,6 +15,50 @@ header[class*="max-w-\[430px\]"] {
   z-index: 50 !important;
 }
 
+/* Desktop notice — hidden on mobile/tablet, shown on wide screens */
+.desktop-notice {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #fff;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 32px;
+  font-family: var(--font-plus-jakarta-sans), sans-serif;
+}
+.desktop-notice img { width: 200px; height: auto; }
+.desktop-notice h2 { font-size: 1.1rem; font-weight: 600; color: #111; margin: 0; }
+.desktop-notice p  { font-size: 0.875rem; color: #555; margin: 0; line-height: 1.6; }
+.desktop-notice-langs {
+  display: flex;
+  gap: 40px;
+  margin-top: 4px;
+}
+.desktop-notice-lang { max-width: 260px; }
+.desktop-notice-langs > .desktop-notice-lang:first-child { text-align: left; }
+.desktop-notice-langs > .desktop-notice-lang:last-child  { text-align: right; }
+.desktop-notice-divider {
+  width: 1px;
+  background: #e5e5e5;
+  align-self: stretch;
+}
+.desktop-notice kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+@media (min-width: 640px) {
+  .desktop-notice { display: flex; }
+}
+
 /* Hide scrollbar but keep scroll */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
