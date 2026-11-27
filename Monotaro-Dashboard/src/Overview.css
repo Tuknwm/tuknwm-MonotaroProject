@@ -32,7 +32,7 @@
 
 .ov-card {
   min-width: 0; padding: 20px;
-  background: transparent; border: 1px solid var(--hairline); border-radius: 8px;
+  background: transparent; border: 1px solid #eeeeee; border-radius: 8px;
 }
 .ov-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; margin-bottom: 16px; }
 .ov-flow .ov-card-head { flex-direction: column; align-items: flex-start; gap: 8px; }

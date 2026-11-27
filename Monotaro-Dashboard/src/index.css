@@ -170,11 +170,10 @@ body:has(.login)::before { display: none; }
 .login .login-submit {
   margin-top: 0.4rem; align-self: flex-end;
   height: 44px; padding: 0 1.25rem; border-radius: 8px; font-weight: 400;
-  background: #fff; color: var(--text);
-  box-shadow: 0 1px 2px rgb(15 23 42/.04), 0 4px 16px rgb(15 23 42/.07);
-  transition: box-shadow 0.15s;
+  background: transparent; color: var(--text); border: 1px solid #d1d5db;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
-.login .login-submit:hover { box-shadow: 0 1px 2px rgb(15 23 42/.06), 0 6px 22px rgb(15 23 42/.12); }
+.login .login-submit:hover { background: #f1f5f9; border-color: #94a3b8; }
 
 .login .error {
   display: flex;
@@ -215,9 +214,9 @@ body:has(.login)::before { display: none; }
   flex-direction: column;
   padding: 1.5rem 1rem;
   background: transparent;
-  border: 1px solid #d1d5db;
+  border: 0;
   border-radius: 8px;
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgb(15 23 42/.06), 0 8px 24px rgb(15 23 42/.10);
 }
 
 .sidebar img {
@@ -1663,7 +1662,7 @@ td.actions .action-buttons .btn-icon:not([aria-disabled='true']):hover { backgro
   .page-admins .table-wrap :is(th, td):last-child { width: 16%; }
 }
 .toolbar .toolbar-add { width: auto; padding: 0 1.25rem; border-radius: 8px; }
-.sidebar { border-radius: 8px; box-shadow: none; }
+.sidebar { border-radius: 8px; }
 @media (min-width: 769px) {
   .toolbar:has(.toolbar-add) { flex-wrap: nowrap; }
   .toolbar:has(.toolbar-add) .search-field { flex: 0 1 auto; min-width: 0; }

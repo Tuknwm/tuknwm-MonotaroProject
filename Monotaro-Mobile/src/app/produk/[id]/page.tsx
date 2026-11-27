@@ -27,8 +27,8 @@ const PRODUCT = {
     { label: "Model Number", value: "LR6" },
     { label: "Unit", value: "1pack(4+2pcs)" },
     { label: "Size", value: "AA" },
-    { label: "Diameter", value: "13.7â€“14.5mm" },
-    { label: "Total Height", value: "49.5â€“50.5mm" },
+    { label: "Diameter", value: "13.7–14.5mm" },
+    { label: "Total Height", value: "49.5–50.5mm" },
     { label: "Voltage", value: "1.5V" },
     { label: "Blister Pack", value: "Shrink Pack 4+2 pcs" },
     { label: "Lisensi SNI", value: "Ada" },
@@ -51,7 +51,7 @@ const VARIANTS = [
 function Stars({ count = 5 }: { count?: number }) {
   return (
     <span className="text-orange-500 tracking-tight text-sm">
-      {"â˜…".repeat(count)}{"â˜†".repeat(5 - count)}
+      {"★".repeat(count)}{"☆".repeat(5 - count)}
     </span>
   );
 }
@@ -424,7 +424,7 @@ export default function ProdukDetailPage() {
                     <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                   </div>
                   <div className="flex items-center gap-0.5 mt-0.5">
-                    <span className="text-[10px] text-orange-400">â˜…â˜…â˜…â˜…â˜…</span>
+                    <span className="text-[10px] text-orange-400">★★★★★</span>
                     <span className="text-[9px] text-neutral-400">({p.reviews})</span>
                   </div>
                 </div>
@@ -457,7 +457,7 @@ export default function ProdukDetailPage() {
                   <span className="text-[9px] font-semibold text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded-[3px]">{t("product.sold_prefix")} &gt; 5</span>
                 </div>
                 <div className="flex items-center gap-0.5 mt-0.5">
-                  <span className="text-[10px] text-orange-400">â˜…â˜…â˜…â˜…â˜…</span>
+                  <span className="text-[10px] text-orange-400">★★★★★</span>
                   <span className="text-[9px] text-neutral-400">({p.reviews})</span>
                 </div>
               </div>

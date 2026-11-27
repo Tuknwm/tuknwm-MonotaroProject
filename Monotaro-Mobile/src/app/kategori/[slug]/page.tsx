@@ -16,7 +16,7 @@ const ALL_PRODUCTS: Product[] = [
 ];
 
 function Stars() {
-  return <span className="text-[11px] tracking-[-1px] text-orange-500">â˜…â˜…â˜…â˜…â˜…</span>;
+  return <span className="text-[11px] tracking-[-1px] text-orange-500">★★★★★</span>;
 }
 
 function ProductCard({ p }: { p: Product }) {
@@ -318,7 +318,7 @@ function FilterSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                 onChange={(e) => setMinPrice(e.target.value)}
                 className="flex-1 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs outline-none focus:border-brand"
               />
-              <span className="text-neutral-400 text-xs">â€“</span>
+              <span className="text-neutral-400 text-xs">–</span>
               <input
                 type="number"
                 placeholder="Max"
